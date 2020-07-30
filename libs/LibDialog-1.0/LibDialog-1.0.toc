@@ -1,0 +1,12 @@
+## Interface: 80000
+## Title: Lib: Dialog-1.0
+## Notes: Replacement for the default UI's StaticPopup dialogs.
+## Author: Torhal
+## Version: v0.2.0
+## LoadOnDemand: 1
+## X-Date: 2019-11-16T15:56:11Z
+## X-Category: Libraries
+## X-License: All Rights Reserved
+
+LibStub\LibStub.lua
+lib.xml

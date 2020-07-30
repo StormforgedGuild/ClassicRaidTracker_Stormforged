@@ -1,0 +1,32 @@
+﻿## Interface: 11302
+## Title: ClassicRaidTracker
+## Version: v0.2.0
+## Notes: Tracks raid, loot and attendance
+## Author: Wenlock@EU-Firemaw
+## LoadOnDemand: 0
+## DefaultState: enabled
+## SavedVariables: MRT_Options, MRT_RaidLog, MRT_PlayerDB, MRT_NumOfCurrentRaid, MRT_NumOfLastBoss
+## X-Max-Interface: 11302
+## X-Min-Interface: 11302
+## X-Curse-Project-ID: 344365
+
+embeds.xml
+localization.lua
+localization_deDE.lua
+localization_enUS.lua
+localization_esES.lua
+localization_esMX.lua
+localization_frFR.lua
+localization_itIT.lua
+localization_koKR.lua
+localization_ptBR.lua
+localization_ruRU.lua
+localization_zhCN.lua
+localization_zhTW.lua
+ClassicRaidTracker_UIDropDownMenuTemplates.xml
+ClassicRaidTracker_UIDropDownMenu.lua
+ClassicRaidTracker_Constants.lua
+ClassicRaidTracker.xml
+ClassicRaidTracker_Options.xml
+ClassicRaidTracker_GUI.xml
+ClassicRaidTracker_API.lua
