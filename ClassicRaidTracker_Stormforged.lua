@@ -1280,7 +1280,8 @@ function MRT_AutoAddLoot(chatmsg)
         -- MRT_Debug("No valid loot event received.");
         return;
     end
-	-- if code reaches this point, we should have a valid looter and a valid itemLink
+    -- if code reaches this point, we should have a valid looter and a valid itemLink
+    playerName = "disenchanted";
     MRT_Debug("Item looted - Looter is "..playerName.." and loot is "..itemLink);
 	MRT_AutoAddLootItem(playerName, itemLink, itemCount);
 end
