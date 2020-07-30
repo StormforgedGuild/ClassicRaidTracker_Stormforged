@@ -1,5 +1,5 @@
 ﻿## Interface: 11302
-## Title: ClassicRaidTracker
+## Title: ClassicRaidTracker_Stormforged
 ## Version: v0.2.0
 ## Notes: Tracks raid, loot and attendance
 ## Author: Wenlock@EU-Firemaw
@@ -26,7 +26,8 @@ localization_zhTW.lua
 ClassicRaidTracker_UIDropDownMenuTemplates.xml
 ClassicRaidTracker_UIDropDownMenu.lua
 ClassicRaidTracker_Constants.lua
-ClassicRaidTracker.xml
+ClassicRaidTracker_Stormforged.xml
+ClassicRaidTracker_Stormforged.lua
 ClassicRaidTracker_Options.xml
 ClassicRaidTracker_GUI.xml
 ClassicRaidTracker_API.lua

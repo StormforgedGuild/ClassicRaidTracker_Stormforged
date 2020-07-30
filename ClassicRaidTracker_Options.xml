@@ -1087,7 +1087,7 @@
       </ScrollFrame>
     </Frames>
     <Scripts>
-      <OnLoad>MRT_Options_AttendancePanel_OnLoad(self);</OnLoad>
+      <OnLoad>_AttendancePanel_OnLoad(self);</OnLoad>
     </Scripts>
   </Frame>
   <Frame name="MRT_Options_ExportPanel_ScrollFrame_Parent">
