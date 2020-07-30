@@ -35,8 +35,8 @@ local _L = ClassicRaidTracker._L
 -------------------------------
 --  Globals/Default Options  --
 -------------------------------
-MRT_ADDON_TITLE = GetAddOnMetadata("ClassicRaidTracker", "Title");
-MRT_ADDON_VERSION = GetAddOnMetadata("ClassicRaidTracker", "Version");
+MRT_ADDON_TITLE = GetAddOnMetadata("ClassicRaidTracker_Stormforged", "Title");
+MRT_ADDON_VERSION = GetAddOnMetadata("ClassicRaidTracker_Stormforged", "Version");
 MRT_NumOfCurrentRaid = nil;
 MRT_NumOfLastBoss = nil;
 MRT_Options = {};
@@ -187,7 +187,7 @@ end
 function MRT_OnEvent(frame, event, ...)
     if (event == "ADDON_LOADED") then
         local addonName = ...;
-        if (addonName == "ClassicRaidTracker") then
+        if (addonName == "ClassicRaidTracker_Stormforged") then
             MRT_Debug("Initializing MRT...");
             frame:UnregisterEvent("ADDON_LOADED");
             MRT_Initialize(frame);
@@ -370,7 +370,7 @@ end
 function MRT_SlashCmdHandler(msg)
     local msg_lower = string.lower(msg);
     if (msg_lower == 'options' or msg_lower == 'o') then
-        InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker");
+        InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker_Stormforged");
         return;
     elseif (msg_lower == 'dkpcheck') then
         MRT_AddBosskill(MRT_L.Core["GuildAttendanceBossEntry"]);
@@ -461,8 +461,8 @@ function MRT_Initialize(frame)
         SlashCmdList["MIZUSRAIDTRACKER"] = function(msg) MRT_SlashCmdHandler(msg); end
     end
     -- set up LDB data source
-    MRT_LDB_DS = LDB:NewDataObject("Classic RaidTracker", {
-        icon = "Interface\\AddOns\\ClassicRaidTracker\\icons\\icon_disabled",
+    MRT_LDB_DS = LDB:NewDataObject("Classic RaidTracker_Stormforged", {
+        icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_disabled",
         label = MRT_ADDON_TITLE,
         text = "MRT",
         type = "data source",
@@ -470,19 +470,19 @@ function MRT_Initialize(frame)
             if (button == "LeftButton") then
                 MRT_GUI_Toggle();
             elseif (button == "RightButton") then
-                InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker");
-                InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker");
+                InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker_Stormforged");
+                InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker_Stormforged");
             end
         end,
         OnTooltipShow = function(tooltip)
-            tooltip:AddLine(MRT_ADDON_TITLE);
+            tooltip:AddLine(_TITLE);
             tooltip:AddLine(" ");
             tooltip:AddLine(MRT_L.Core["LDB Left-click to toggle the raidlog browser"]);
             tooltip:AddLine(MRT_L.Core["LDB Right-click to open the options menu"]);
         end,
     });
     -- set up minimap icon
-    LDBIcon:Register("Classic RaidTracker", MRT_LDB_DS, MRT_Options["MiniMap_SV"]);
+    LDBIcon:Register("Classic RaidTracker_Stormforged", MRT_LDB_DS, MRT_Options["MiniMap_SV"]);
     -- set up drop down menu for the DKPFrame
     MRT_DKPFrame_DropDownTable = ScrollingTable:CreateST(MRT_DKPFrame_DropDownTableColDef, 9, nil, nil, MRT_GetDKPValueFrame);
     MRT_DKPFrame_DropDownTable.head:SetHeight(1);
@@ -850,7 +850,7 @@ end
 function MRT_CheckRaidStatusAfterLogin()
     if (not MRT_IsInRaid()) then
         MRT_EndActiveRaid();
-        MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker\\icons\\icon_disabled";
+        MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_disabled";
         return;
     end
     if (MRT_NumOfCurrentRaid) then
@@ -863,7 +863,7 @@ function MRT_CheckRaidStatusAfterLogin()
             end
         end);
         -- update LDB text and icon
-        MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker\\icons\\icon_enabled";
+        MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_enabled";
     end
 end
 
@@ -999,7 +999,7 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
         end
     end);
     -- update LDB text and icon
-    MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker\\icons\\icon_enabled";
+    MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_enabled";
 end
 
 function MRT_ResumeLastRaid()
@@ -1076,7 +1076,7 @@ function MRT_ResumeLastRaid()
         end
     end);
     -- update LDB text and icon
-    MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker\\icons\\icon_enabled";
+    MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_enabled";
     -- update status variables
     MRT_NumOfCurrentRaid = numOfLastRaid;
     if (#MRT_RaidLog[MRT_NumOfCurrentRaid]["Bosskills"] > 0) then
@@ -1232,7 +1232,7 @@ function MRT_EndActiveRaid()
     MRT_NumOfCurrentRaid = nil;
     MRT_NumOfLastBoss = nil;
     -- update LDB text and icon
-    MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker\\icons\\icon_disabled";
+    MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_disabled";
 end
 
 function MRT_TakeSnapshot()
