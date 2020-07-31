@@ -513,6 +513,13 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
+      <Button name="$parent_BossLoot_RaidAnnounce_Button" inherits="MRT_GUI_Button_Template">
+        <Scripts>
+          <OnClick>MRT_GUI_LootRaidAnnounce();</OnClick>
+          <OnEnter>MRT_GUI_SetTT(self, "Loot_RaidAnnounce");</OnEnter>
+          <OnLeave>MRT_GUI_HideTT();</OnLeave>
+        </Scripts>
+      </Button>
       <Button name="$parent_BossAttendees_Add_Button" inherits="MRT_GUI_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_BossAttendeeAdd();</OnClick>

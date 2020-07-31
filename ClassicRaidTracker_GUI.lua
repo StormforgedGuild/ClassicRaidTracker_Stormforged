@@ -225,6 +225,8 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLoot_Modify_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Add_Button, "RIGHT", 10, 0);
     MRT_GUIFrame_BossLoot_Delete_Button:SetText(MRT_L.GUI["Button_Delete"]);
     MRT_GUIFrame_BossLoot_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Modify_Button, "RIGHT", 10, 0);
+    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetText("Announce");
+    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Delete_Button, "RIGHT", 10, 0);
     MRT_GUIFrame_BossAttendees_Add_Button:SetText(MRT_L.GUI["Button_Add"]);
     MRT_GUIFrame_BossAttendees_Add_Button:SetPoint("TOPLEFT", MRT_GUI_BossAttendeesTable.frame, "BOTTOMLEFT", 0, -5);
     MRT_GUIFrame_BossAttendees_Delete_Button:SetText(MRT_L.GUI["Button_Delete"]);
@@ -836,6 +838,7 @@ function MRT_GUI_LootModify()
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
     local lootnote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"];
+
     -- Force item into cache:
     GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     -- gather playerdata and fill drop down menu
@@ -993,6 +996,30 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
         MRT_GUI_BossLootTableUpdate(bossnum);
     end
 end
+
+function MRT_GUI_LootRaidAnnounce()
+    MRT_GUI_HideDialogs();
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    if (raid_select == nil) then
+        MRT_Print(MRT_L.GUI["No raid selected"]);
+        return;
+    end
+    local loot_select = MRT_GUI_BossLootTable:GetSelection();
+    if (loot_select == nil) then
+        MRT_Print(MRT_L.GUI["No loot selected"]);
+        return;
+    end
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
+    local lootName = MRT_GUI_BossLootTable:GetCell(loot_select, 3);
+
+    local rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    SendChatMessage(rwMessage, "RAID_WARNING");
+
+
+end
+
 
 function MRT_GUI_LootDelete()
     MRT_GUI_HideDialogs();
