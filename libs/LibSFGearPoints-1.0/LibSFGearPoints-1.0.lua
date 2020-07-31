@@ -397,8 +397,8 @@ local SF_ITEM_DATA = {
   ["Scarab Brooch"] = 1875,
   ["Sharpened Silithid Femur"] = 6250,
   ["Slime-coated Leggings"] = 391,
-  ["Qiraji Bindings of Command "] = 2500,
-  ["Qiraji Bindings of Dominance "] = 2500,
+  ["Qiraji Bindings of Command"] = 2500,
+  ["Qiraji Bindings of Dominance"] = 2500,
   ["Vek'lor's Diadem"] = 3125,
   ["Vek'nilash's Circlet"] = 3125,
   ["Ouro's Intact Hide"] = 4688,
@@ -408,7 +408,7 @@ local SF_ITEM_DATA = {
   ["Imperial Qiraji Armaments"] = 8750,
   ["Imperial Qiraji Regalia"] = 8750,
   ["Husk of the Old God"] = 3125,
-  ["Carapace of the Old God "] = 3125,
+  ["Carapace of the Old God"] = 3125,
 }
 
 
