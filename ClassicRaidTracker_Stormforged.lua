@@ -1308,7 +1308,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     local lootAction = nil;
     local itemNote = nil;
     local supressCostDialog = nil;
-    local gp1, gp2 = nil, nil;
+    local gp1 = nil;
     -- if EPGP GP system is enabled, get GP values
     -- SF: Old Code here.
     --if (MRT_Options["ItemTracking_UseEPGPValues"]) then
@@ -1327,14 +1327,16 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     -- SF: ep/gp code here.
 
     if (MRT_Options["ItemTracking_UseEPGPValues"]) then
-        gp1, gp2 = LibGP:GetValue(itemLink);
+        MRT_Debug("MRT_AutoAddLootItem called - pregetvalue");
+        gp1 = LibSFGP:GetValue(itemLink);
+        MRT_Debug("MRT_AutoAddLootItem called - postgetvalue");
         if (not gp1) then
+            MRT_Debug("MRT_AutoAddLootItem called - gp1 =nil");
             dkpValue = 0
-        elseif (not gp2) then
-            dkpValue = gp1
         else
+            MRT_Debug("MRT_AutoAddLootItem called - gp1 !=nil = "..gp1);
             dkpValue = gp1
-            itemNote = string.format("%d or %d", gp1, gp2)
+            --itemNote = string.format("%d", gp1);
         end
     end
 
