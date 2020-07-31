@@ -10,4 +10,5 @@
   <Include file="libs\LibBabble-Zone-3.0\lib.xml"/>
   <Include file="libs\LibDialog-1.0\lib.xml"/>
   <Script file="libs\LibGearPoints-1.2\LibGearPoints-1.2.lua"/>
+  <Script file="libs\LibSFGearPoints-1.0\LibSFGearPoints-1.0.lua"/>
 </Ui>

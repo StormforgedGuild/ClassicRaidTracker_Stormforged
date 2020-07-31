@@ -17,8 +17,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 -- History
 -- 7/31/2020 Created
 
-local MAJOR_VERSION = "LibSFGearPoints-1.0-MRT"
-local MINOR_VERSION = 10000
+local MAJOR_VERSION = "LibSFGearPoints-1.0"
+local MINOR_VERSION = 10200
 
 local lib, oldMinor = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if not lib then return end
@@ -28,43 +28,21 @@ if not lib then return end
 -- **Warning, this area will be generated.  Modifications will be lost!!!
 local SF_ITEM_DATA = {
 -- Need to figure out the format  
+  ["foo"] = {123},
 }
 
-local CUSTOM_ITEM_DATA = {
+--local CUSTOM_ITEM_DATA = {
   -- Tier 4
-  [29753] = { 4, 120, "INVTYPE_CHEST" },
-  [29754] = { 4, 120, "INVTYPE_CHEST" },
-  [29755] = { 4, 120, "INVTYPE_CHEST" },
-  [29756] = { 4, 120, "INVTYPE_HAND" },
-  [29757] = { 4, 120, "INVTYPE_HAND" },
-  [29758] = { 4, 120, "INVTYPE_HAND" },
-  [29759] = { 4, 120, "INVTYPE_HEAD" },
-  [29760] = { 4, 120, "INVTYPE_HEAD" },
-  [29761] = { 4, 120, "INVTYPE_HEAD" },
-  [29762] = { 4, 120, "INVTYPE_SHOULDER" },
-  [29763] = { 4, 120, "INVTYPE_SHOULDER" },
-  [29764] = { 4, 120, "INVTYPE_SHOULDER" },
-  [29765] = { 4, 120, "INVTYPE_LEGS" },
-  [29766] = { 4, 120, "INVTYPE_LEGS" },
-  [29767] = { 4, 120, "INVTYPE_LEGS" },
-
-  
-}
+--  [29753] = { 4, 120, "INVTYPE_CHEST" },
+--  [29754] = { 4, 120, "INVTYPE_CHEST" },
+--}
 
 -- Used to add extra GP if the item contains bonus stats
 -- generally considered chargeable.
-local ITEM_BONUS_GP = {
-  [40]  = 0,  -- avoidance, no material value
-  [41]  = 0,  -- leech, no material value
-  [42]  = 25,  -- speed, arguably useful, so 25 gp
-  [43]  = 0,  -- indestructible, no material value
-  [523] = 200, -- extra socket
-  [563] = 200, -- extra socket
-  [564] = 200, -- extra socket
-  [565] = 200, -- extra socket
-  [572] = 200, -- extra socket
-  [1808] = 200, -- extra socket
-}
+--local ITEM_BONUS_GP = {
+--  [40]  = 0,  -- avoidance, no material value
+--  [41]  = 0,  -- leech, no material value
+--}
 
 -- The default quality threshold:
 -- 0 - Poor
