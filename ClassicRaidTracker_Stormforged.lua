@@ -117,6 +117,7 @@ local LDialog = LibStub("LibDialog-1.0");
 local LBB = LibStub("LibBabble-Boss-3.0");
 local LBBL = LBB:GetUnstrictLookupTable();
 local LibGP = LibStub("LibGearPoints-1.2-MRT");
+--local LibSFGP = LibStub("LibSFGearPoints-1.0-MRT");
 local ScrollingTable = LibStub("ScrollingTable");
 local tinsert = tinsert;
 local pairs = pairs;
@@ -1309,6 +1310,22 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     local supressCostDialog = nil;
     local gp1, gp2 = nil, nil;
     -- if EPGP GP system is enabled, get GP values
+    -- SF: Old Code here.
+    --if (MRT_Options["ItemTracking_UseEPGPValues"]) then
+    --    gp1, gp2 = LibGP:GetValue(itemLink);
+    --   if (not gp1) then
+    --        dkpValue = 0
+    --    elseif (not gp2) then
+    --        dkpValue = gp1
+    --    else
+    --        dkpValue = gp1
+    --        itemNote = string.format("%d or %d", gp1, gp2)
+    --    end
+    --end
+    
+    -- SF: use this setting to get Stormforged GP values
+    -- SF: ep/gp code here.
+
     if (MRT_Options["ItemTracking_UseEPGPValues"]) then
         gp1, gp2 = LibGP:GetValue(itemLink);
         if (not gp1) then
@@ -1320,6 +1337,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
             itemNote = string.format("%d or %d", gp1, gp2)
         end
     end
+
     -- if an external function handles item data, notify it
     if (MRT_ExternalItemCostHandler.func) then
         local notifierInfo = {
