@@ -27,7 +27,7 @@ if not lib then return end
 -- **@Item Cost section
 -- **Warning, this area will be generated.  Modifications will be lost!!!
 local SF_ITEM_DATA = {
--- Need to figure out the format  
+-- SF: Need to figure out the format  
   ["Forest Spider Webbing"] = 3000,
   ["Malachite"] = 200,
   ["Tigerseye"] = 400,
@@ -478,19 +478,21 @@ function lib:GetValue(item)
   
   -- Is the item above our minimum threshold?
   if not rarity or rarity < quality_threshold then
-      --low = SF_ITEM_DATA["raritytoolow"];
-      --this is mostly for testing purposes
+      
+      --SF this is mostly for testing purposes
       MRT_Debug("GetValue: rarity too low"); 
       low = SF_ITEM_DATA[itemName];
       return low, level, rarity, equipLoc
   end
-
+-- SF: not sure what this does.. keeping it for now.
   UpdateRecentLoot(itemLink)
+
+  -- SF: Not really sure why this is needed.  keeping in just in case.
   if level < 463 then
     MRT_Debug("GetValue: level < 463, is this needed?");   
     return nil, level, rarity, equipLoc
   end
-  --Get the GP For the item
+  --SF: Get the GP For the item
   MRT_Debug("GetValue: Getting GP"); 
   low = SF_ITEM_DATA[itemName];
   return low, level, rarity, equipLoc
