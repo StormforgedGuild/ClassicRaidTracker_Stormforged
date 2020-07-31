@@ -461,6 +461,7 @@ function lib:SetQualityThreshold(itemQuality)
   quality_threshold = itemQuality
 end
 
+-- Main Function to get GP
 function lib:GetValue(item)
   if not item then return end
 
@@ -474,15 +475,7 @@ function lib:GetValue(item)
   if not itemID then return end
   itemID = tonumber(itemID)
   local low = nil;
-  -- For now, just use the actual ilvl, not the upgraded cost
-  -- level = ItemUtils:GetItemIlevel(item, level)
-
-  -- Check if item is relevant.  Item is automatically relevant if it
-  -- is in CUSTOM_ITEM_DATA (as of 6.0, can no longer rely on ilvl alone
-  -- for these).
   
-  -- Check to see if there is custom data for this item ID
-
   -- Is the item above our minimum threshold?
   if not rarity or rarity < quality_threshold then
       --low = SF_ITEM_DATA["raritytoolow"];
@@ -497,6 +490,7 @@ function lib:GetValue(item)
     MRT_Debug("GetValue: level < 463, is this needed?");   
     return nil, level, rarity, equipLoc
   end
+  --Get the GP For the item
   MRT_Debug("GetValue: Getting GP"); 
   low = SF_ITEM_DATA[itemName];
   return low, level, rarity, equipLoc
