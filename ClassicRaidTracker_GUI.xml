@@ -370,7 +370,7 @@
     </Scripts>
   </Frame>
   <Frame name="MRT_GUIFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
-    <Size x="800" y="606"/>
+    <Size x="655" y="515"/>
     <Anchors>
       <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent"/>
     </Anchors>
@@ -401,28 +401,28 @@
         <FontString name="$parent_RaidLogTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
-              <Offset x="30" y="-30"/>
+              <Offset x="30" y="-50"/>
             </Anchor>
           </Anchors>
         </FontString>
         <FontString name="$parent_RaidBosskillsTitle" inherits="GameFontNormal">
           <Anchors>
-            <Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent_RaidLogTitle">
-              <Offset x="275" y="0"/>
+            <Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_RaidLogTitle">
+              <Offset x="0" y="-140"/>
             </Anchor>
           </Anchors>
         </FontString>
         <FontString name="$parent_RaidAttendeesTitle" inherits="GameFontNormal">
           <Anchors>
-            <Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent_RaidBosskillsTitle">
-              <Offset x="265" y="0"/>
+            <Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_RaidBosskillsTitle">
+              <Offset x="0" y="-160"/>
             </Anchor>
           </Anchors>
         </FontString>
         <FontString name="$parent_BossLootTitle" inherits="GameFontNormal">
           <Anchors>
-            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_RaidBosskillsTitle">
-              <Offset x="-60" y="-175"/>
+            <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_RaidLogTitle">
+              <Offset x="155" y="-50"/>
             </Anchor>
           </Anchors>
         </FontString>
@@ -548,7 +548,7 @@
         </Scripts>
       </Button> -->
       <Button name="$parent_StartNewRaid_Button" inherits="MRT_GUI_Button_Template" text="(L) StartRaid">
-        <Size x="180" y="22"/>
+        <Size x="85" y="22"/>
         <!-- <Anchors>
           <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_TakeSnapshot_Button" x="0" y="-15"/>
         </Anchors> -->
@@ -570,9 +570,9 @@
         </Scripts>
       </Button> -->
       <Button name="$parent_EndCurrentRaid_Button" inherits="MRT_GUI_Button_Template" text="FIXME: EndRaid">
-        <Size x="180" y="22"/>
+        <Size x="85" y="22"/>
         <Anchors>
-          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_StartNewRaid_Button" x="0" y="-5"/>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_StartNewRaid_Button" x="10" y="0"/>
         </Anchors>
         <Scripts>
           <OnClick>MRT_GUI_EndCurrentRaid();</OnClick>
@@ -580,28 +580,28 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
-      <Button name="$parent_ResumeLastRaid_Button" inherits="MRT_GUI_Button_Template" text="Resume last raid (L)">
-        <Size x="180" y="22"/>
+<!--     <Button name="$parent_ResumeLastRaid_Button" inherits="MRT_GUI_Button_Template" text="Resume last raid (L)">
+        <Size x="85" y="22"/>
         <Anchors>
-          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_EndCurrentRaid_Button" x="0" y="-15"/>
+          <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent_EndCurrentRaid_Button" x="95" y="0"/>
         </Anchors>
         <Scripts>
           <OnClick>MRT_GUI_ResumeLastRaid();</OnClick>
           <OnEnter></OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
-        </Scripts>
-      </Button>
-       <Button name="$parent_TakeSnapshot_Button" inherits="MRT_GUI_Button_Template">
-        <Size x="180" y="22"/>
+        </Scripts> 
+      </Button> -->
+  <!--       <Button name="$parent_TakeSnapshot_Button" inherits="MRT_GUI_Button_Template">
+        <Size x="85" y="22"/>
         <Anchors>
-          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_ResumeLastRaid_Button" x="0" y="-15"/>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_ResumeLastRaid_Button" x="10" y="0"/>
         </Anchors>
         <Scripts>
           <OnClick>MRT_GUI_TakeSnapshot();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "TakeSnapshot");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
-      </Button>
+      </Button> -->
       <Button name="$parent_CloseButton" inherits="UIPanelCloseButton">
         <Anchors>
           <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent"></Anchor>
