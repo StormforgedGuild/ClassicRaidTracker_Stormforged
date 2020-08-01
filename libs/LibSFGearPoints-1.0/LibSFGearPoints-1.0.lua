@@ -489,8 +489,9 @@ function lib:GetValue(item)
 
   -- SF: Not really sure why this is needed.  keeping in just in case.
   if level < 463 then
-    MRT_Debug("GetValue: level < 463, is this needed?");   
-    return nil, level, rarity, equipLoc
+    MRT_Debug("GetValue: level < 463, is this needed?");
+    low = SF_ITEM_DATA[itemName];     
+    return low, level, rarity, equipLoc
   end
   --SF: Get the GP For the item
   MRT_Debug("GetValue: Getting GP"); 
