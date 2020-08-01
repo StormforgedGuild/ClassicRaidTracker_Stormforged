@@ -2,7 +2,7 @@
  http://wowprogramming.com/FrameXML/UI.xsd">
   <Script file="ClassicRaidTracker_GUI.lua"/>
   <EditBox name="MRT_GUI_Editbox_Template" inherits="InputBoxTemplate" virtual="true" historyLines="0" enableKeyboard="true" enableMouse="true" letters="400">
-    <Size x="250" y="32"/>
+    <Size x="150" y="25"/>
     <Layers>
       <Layer level="OVERLAY">
         <FontString name="$parent_Text" inherits="ChatFontNormal" text="FIXME!">
@@ -265,7 +265,7 @@
     </Frames>
   </Frame>
   <Frame name="MRT_GUI_FourRowDialog" toplevel="true" hidden="true" enableMouse="true" movable="true" enableKeyboard="true" parent="UIParent">
-    <Size x="366" y="346"/>
+    <Size x="215" y="283"/>
     <Anchors>
       <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent"/>
     </Anchors>
@@ -299,14 +299,14 @@
       <Button name="$parent_OKButton" inherits="MRT_GUI_Button_Template">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent">
-            <Offset x="66" y="32"/>
+            <Offset x="20" y="20"/>
           </Anchor>
         </Anchors>
       </Button>
       <Button name="$parent_CancelButton" inherits="MRT_GUI_Button_Template">
         <Anchors>
           <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent">
-            <Offset x="-66" y="32"/>
+            <Offset x="-20" y="20"/>
           </Anchor>
         </Anchors>
         <Scripts>
@@ -325,9 +325,9 @@
         </Scripts>
       </EditBox>
       <EditBox name="$parent_EB2" inherits="MRT_GUI_Editbox_Template">
-        <Size x="226" y="32"/>
+        <Size x="125" y="32"/>
         <Anchors>
-          <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent_EB1" x="0" y="-64"/>
+          <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent_EB1" x="0" y="-50"/>
         </Anchors>
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
@@ -336,7 +336,7 @@
       </EditBox>
       <EditBox name="$parent_EB3" inherits="MRT_GUI_Editbox_Template">
         <Anchors>
-          <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent_EB2" x="0" y="-64"/>
+          <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent_EB2" x="0" y="-50"/>
         </Anchors>
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
@@ -346,7 +346,7 @@
       <EditBox name="$parent_EB4" inherits="MRT_GUI_Editbox_Template">
         <Anchors>
           <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent_EB3">
-            <Offset x="0" y="-64"/>
+            <Offset x="0" y="-50"/>
           </Anchor>
         </Anchors>
         <Scripts>
@@ -363,6 +363,11 @@
         </Scripts>
       </Button>
     </Frames>
+    <Scripts>
+      <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
+      <OnDragStart>self:StartMoving();</OnDragStart>
+      <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
+    </Scripts>
   </Frame>
   <Frame name="MRT_GUIFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
     <Size x="800" y="606"/>

@@ -293,9 +293,9 @@ MRT_L.GUI["Entered time is not between start and end of raid"] =
     "Error: Entered time is not between start and end of raid."
 MRT_L.GUI["Header_Title"] = " Raidlog"
 MRT_L.GUI["Item cost invalid"] = "Error: Item cost is not a number."
-MRT_L.GUI["Itemlink"] = "Itemlink or ItemID or Itemname"
+MRT_L.GUI["Itemlink"] = "Item Name"
 MRT_L.GUI["Looter"] = "Looter"
-MRT_L.GUI["Modify loot data"] = "Modify loot data"
+MRT_L.GUI["Modify loot data"] = "Modify loot"
 MRT_L.GUI["No active raid in progress. Please enter time."] =
     "Error: No active raid in progress. Please enter time."
 MRT_L.GUI["No active raid."] = "Error: No active raid."
