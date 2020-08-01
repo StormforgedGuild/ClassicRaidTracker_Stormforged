@@ -1282,10 +1282,28 @@ function MRT_AutoAddLoot(chatmsg)
         return;
     end
     -- if code reaches this point, we should have a valid looter and a valid itemLink
-    playerName = "disenchanted";
+    -- playerName = "disenchanted";
     MRT_Debug("Item looted - Looter is "..playerName.." and loot is "..itemLink);
 	MRT_AutoAddLootItem(playerName, itemLink, itemCount);
 end
+
+function autoAssign (itemName)
+    local SF_AUTOASSIGN_ITEM_LIST = {
+        ["Elementium Ore"] = "bank";
+        ["Sulfuron Ingot"] = "bank";
+        ["Felheart Bracers"] = "bank";
+        ["Belt of Might"] = "bank";
+        ["Giantstalker's Bracers"] = "bank";
+        ["Giantstalker's Belt"] = "bank";
+        ["Bracers of Might"] = "bank";
+        ["Felheart Belt"] = "bank";
+        ["Nightslayer Belt"] = "bank";
+        ["Stringy Wolf Meat"] = "bank";
+    }
+    local retval = SF_AUTOASSIGN_ITEM_LIST[itemName];
+    return retval;
+end
+
 
 -- track loot for a given player and item
 function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
@@ -1373,6 +1391,19 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     if (MRT_NumOfLastBoss == nil) then
         MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
     end
+    -- SF: set default values.
+    local dLooter = nil;
+    dLooter = autoAssign(itemName);
+    if not dLooter then
+        dLooter = "disenchanted";
+    end
+    -- SF: add a note to who it was looted to.
+    local dNote;
+    if not itemNote then
+        dNote = "looted to: "..playerName;
+    else
+        dNote = itemNote.."looted to: "..playerName;
+    end
     -- if code reach this point, we should have valid item information, an active raid and at least one boss kill entry - make a table!
     local MRT_LootInfo = {
         ["ItemLink"] = itemLink,
@@ -1381,11 +1412,11 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         ["ItemName"] = itemName,
         ["ItemColor"] = itemColor,
         ["ItemCount"] = itemCount,
-        ["Looter"] = playerName,
+        ["Looter"] = dLooter, -- playerName
         ["DKPValue"] = dkpValue,
         ["BossNumber"] = MRT_NumOfLastBoss,
         ["Time"] = MRT_GetCurrentTime(),
-        ["Note"] = itemNote,
+        ["Note"] = dNote, -- itemNote
     };
     tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"], MRT_LootInfo);
     -- get current loot mode
