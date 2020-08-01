@@ -49,7 +49,7 @@ local MRT_RaidLogTableColDef = {
     {["name"] = MRT_L.GUI["Col_Num"], ["width"] = 25, ["defaultsort"] = "dsc"},
     {["name"] = MRT_L.GUI["Col_Date"], ["width"] = 75},
     {["name"] = MRT_L.GUI["Col_Zone"], ["width"] = 100},
-    {["name"] = MRT_L.GUI["Col_Size"], ["width"] = 25},
+    --{["name"] = MRT_L.GUI["Col_Size"], ["width"] = 25},
 };
 local MRT_RaidAttendeesTableColDef = {
     {["name"] = "", ["width"] = 1},                            -- invisible column for storing the player number index from the raidlog-table
@@ -106,7 +106,7 @@ local MRT_BossLootTableColDef = {
     },
     {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 179},
     {["name"] = MRT_L.GUI["Col_Looter"], ["width"] = 85},
-    {["name"] = MRT_L.GUI["Col_Cost"], ["width"] = 30},
+    {["name"] = MRT_L.GUI["Col_Cost"], ["width"] = 45},
     {["name"] = "", ["width"] = 1},                            -- invisible column for itemString (needed for tooltip)
     {
         ["name"] = MRT_L.GUI["Note"],
@@ -190,16 +190,16 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
     --MRT_GUIFrame_BossAttendeesTitle:SetText(MRT_L.GUI["Tables_BossAttendeesTitle"]);
     -- Create and anchor tables
-    MRT_GUI_RaidLogTable = ScrollingTable:CreateST(MRT_RaidLogTableColDef, 12, nil, nil, MRT_GUIFrame);
+    MRT_GUI_RaidLogTable = ScrollingTable:CreateST(MRT_RaidLogTableColDef, 6, nil, nil, MRT_GUIFrame);
     MRT_GUI_RaidLogTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 0, -15);
     MRT_GUI_RaidLogTable:EnableSelection(true);
-    MRT_GUI_RaidAttendeesTable = ScrollingTable:CreateST(MRT_RaidAttendeesTableColDef, 12, nil, nil, MRT_GUIFrame);
+    MRT_GUI_RaidAttendeesTable = ScrollingTable:CreateST(MRT_RaidAttendeesTableColDef, 6, nil, nil, MRT_GUIFrame);
     MRT_GUI_RaidAttendeesTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidAttendeesTitle, "BOTTOMLEFT", 0, -15);
     MRT_GUI_RaidAttendeesTable:EnableSelection(true);
-    MRT_GUI_RaidBosskillsTable = ScrollingTable:CreateST(MRT_RaidBosskillsTableColDef, 12, nil, nil, MRT_GUIFrame);
+    MRT_GUI_RaidBosskillsTable = ScrollingTable:CreateST(MRT_RaidBosskillsTableColDef, 6, nil, nil, MRT_GUIFrame);
     MRT_GUI_RaidBosskillsTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidBosskillsTitle, "BOTTOMLEFT", 0, -15);
     MRT_GUI_RaidBosskillsTable:EnableSelection(true);
-    MRT_GUI_BossLootTable = ScrollingTable:CreateST(MRT_BossLootTableColDef, 6, 30, nil, MRT_GUIFrame);           -- ItemId should be squared - so use 30x30 -> 30 pixels high
+    MRT_GUI_BossLootTable = ScrollingTable:CreateST(MRT_BossLootTableColDef, 9, 32, nil, MRT_GUIFrame);           -- ItemId should be squared - so use 30x30 -> 30 pixels high
     MRT_GUI_BossLootTable.head:SetHeight(15);                                                                     -- Manually correct the height of the header (standard is rowHight - 30 pix would be different from others tables around and looks ugly)
     MRT_GUI_BossLootTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_BossLootTitle, "BOTTOMLEFT", 0, -15);
     MRT_GUI_BossLootTable:EnableSelection(true);
@@ -1346,7 +1346,8 @@ function MRT_GUI_RaidLogTableUpdate()
     local MRT_GUI_RaidLogTableData = {};
     -- insert reverse order
     for i, v in ipairs(MRT_RaidLog) do
-        MRT_GUI_RaidLogTableData[i] = {i, date("%m/%d %H:%M", v["StartTime"]), v["RaidZone"], v["RaidSize"]};
+        --MRT_GUI_RaidLogTableData[i] = {i, date("%m/%d %H:%M", v["StartTime"]), v["RaidZone"], v["RaidSize"]};
+        MRT_GUI_RaidLogTableData[i] = {i, date("%m/%d %H:%M", v["StartTime"]), v["RaidZone"]};
     end
     table.sort(MRT_GUI_RaidLogTableData, function(a, b) return (a[1] > b[1]); end);
     MRT_GUI_RaidLogTable:ClearSelection();

@@ -422,7 +422,7 @@
         <FontString name="$parent_BossLootTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_RaidBosskillsTitle">
-              <Offset x="-60" y="-275"/>
+              <Offset x="-60" y="-175"/>
             </Anchor>
           </Anchors>
         </FontString>
