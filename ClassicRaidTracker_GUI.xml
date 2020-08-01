@@ -421,13 +421,13 @@
             </Anchor>
           </Anchors>
         </FontString>
-        <FontString name="$parent_BossAttendeesTitle" inherits="GameFontNormal">
+        <!-- <FontString name="$parent_BossAttendeesTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent_BossLootTitle">
               <Offset x="405" y="0"/>
             </Anchor>
           </Anchors>
-        </FontString>
+        </FontString> -->
       </Layer>
     </Layers>
     <Frames>
@@ -520,7 +520,7 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
-      <Button name="$parent_BossAttendees_Add_Button" inherits="MRT_GUI_Button_Template">
+      <!-- <Button name="$parent_BossAttendees_Add_Button" inherits="MRT_GUI_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_BossAttendeeAdd();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "BA_Add");</OnEnter>
@@ -533,27 +533,27 @@
           <OnEnter>MRT_GUI_SetTT(self, "BA_Delete");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
-      </Button>
-      <Button name="$parent_TakeSnapshot_Button" inherits="MRT_GUI_Button_Template">
+      </Button> -->
+     <!--  <Button name="$parent_TakeSnapshot_Button" inherits="MRT_GUI_Button_Template">
         <Size x="180" y="22"/>
         <Scripts>
           <OnClick>MRT_GUI_TakeSnapshot();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "TakeSnapshot");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
-      </Button>
+      </Button> -->
       <Button name="$parent_StartNewRaid_Button" inherits="MRT_GUI_Button_Template" text="(L) StartRaid">
         <Size x="180" y="22"/>
-        <Anchors>
+        <!-- <Anchors>
           <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_TakeSnapshot_Button" x="0" y="-15"/>
-        </Anchors>
+        </Anchors> -->
         <Scripts>
           <OnClick>MRT_GUI_StartNewRaid();</OnClick>
           <OnEnter></OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
-      <Button name="$parent_MakeAttendanceCheck_Button" inherits="MRT_GUI_Button_Template" text="(L) Make guild attendance check">
+      <!-- <Button name="$parent_MakeAttendanceCheck_Button" inherits="MRT_GUI_Button_Template" text="(L) Make guild attendance check">
         <Size x="180" y="22"/>
         <Anchors>
           <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_StartNewRaid_Button" x="0" y="-5"/>
@@ -563,11 +563,11 @@
           <OnEnter></OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
-      </Button>
+      </Button> -->
       <Button name="$parent_EndCurrentRaid_Button" inherits="MRT_GUI_Button_Template" text="FIXME: EndRaid">
         <Size x="180" y="22"/>
         <Anchors>
-          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_MakeAttendanceCheck_Button" x="0" y="-5"/>
+          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_StartNewRaid_Button" x="0" y="-5"/>
         </Anchors>
         <Scripts>
           <OnClick>MRT_GUI_EndCurrentRaid();</OnClick>
@@ -586,6 +586,17 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
+       <Button name="$parent_TakeSnapshot_Button" inherits="MRT_GUI_Button_Template">
+        <Size x="180" y="22"/>
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_ResumeLastRaid_Button" x="0" y="-15"/>
+        </Anchors>
+        <Scripts>
+          <OnClick>MRT_GUI_TakeSnapshot();</OnClick>
+          <OnEnter>MRT_GUI_SetTT(self, "TakeSnapshot");</OnEnter>
+          <OnLeave>MRT_GUI_HideTT();</OnLeave>
+        </Scripts>
+      </Button>
       <Button name="$parent_CloseButton" inherits="UIPanelCloseButton">
         <Anchors>
           <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent"></Anchor>
@@ -593,9 +604,9 @@
       </Button>
     </Frames>
     <Scripts>
-      <!--<OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>-->
-      <!--<OnDragStart>self:StartMoving();</OnDragStart>-->
-      <!--<OnDragStop>self:StopMovingOrSizing();</OnDragStop>-->
+      <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
+      <OnDragStart>self:StartMoving();</OnDragStart>
+      <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
     </Scripts>
   </Frame>
   <GameTooltip name="MRT_GUI_ItemTT" inherits="GameTooltipTemplate" parent="UIParent" hidden="false"/>
