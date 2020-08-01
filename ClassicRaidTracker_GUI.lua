@@ -57,11 +57,17 @@ local MRT_RaidAttendeesTableColDef = {
     {["name"] = MRT_L.GUI["Col_Join"], ["width"] = 45},
     {["name"] = MRT_L.GUI["Col_Leave"], ["width"] = 45},
 };
-local MRT_RaidBosskillsTableColDef = {
+--SF: Old RaidBosskillstable
+--[[ local MRT_RaidBosskillsTableColDef = {
     {["name"] = MRT_L.GUI["Col_Num"], ["width"] = 25, ["defaultsort"] = "dsc"},
     {["name"] = MRT_L.GUI["Col_Time"], ["width"] = 40},
     {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 105},
     {["name"] = MRT_L.GUI["Col_Difficulty"], ["width"] = 45},
+}; ]]
+--SF: new RaidBossKillsTable
+local MRT_RaidBosskillsTableColDef = {
+    {["name"] = MRT_L.GUI["Col_Num"], ["width"] = 25, ["defaultsort"] = "dsc"},
+    {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 145},
 };
 local MRT_BossLootTableColDef = {
     {["name"] = "", ["width"] = 1},                            -- invisible column for storing the loot number index from the raidlog-table
@@ -1373,7 +1379,7 @@ function MRT_GUI_RaidBosskillsTableUpdate(raidnum)
     local MRT_BosskillsCount = nil;
     if (raidnum) then MRT_BosskillsCount = #MRT_RaidLog[raidnum]["Bosskills"]; end;
     if (raidnum and MRT_BosskillsCount) then
-        for i, v in ipairs(MRT_RaidLog[raidnum]["Bosskills"]) do
+       --[[  for i, v in ipairs(MRT_RaidLog[raidnum]["Bosskills"]) do
             if (not v["Difficulty"]) then
                 MRT_GUI_RaidBosskillsTableData[i] = {i, date("%H:%M", v["Date"]), v["Name"], "-"};
             elseif (tContains(mrt.diffIDsNormal, v["Difficulty"])) then
@@ -1387,6 +1393,9 @@ function MRT_GUI_RaidBosskillsTableUpdate(raidnum)
             elseif (tContains(mrt.diffIDsLFR, v["Difficulty"])) then
                 MRT_GUI_RaidBosskillsTableData[i] = {i, date("%H:%M", v["Date"]), v["Name"], MRT_L.GUI.Cell_LFR};
             end
+        end ]]
+        for i, v in ipairs(MRT_RaidLog[raidnum]["Bosskills"]) do 
+            MRT_GUI_RaidBosskillsTableData[i] = {i, v["Name"]};
         end
     end
     table.sort(MRT_GUI_RaidBosskillsTableData, function(a, b) return (a[1] > b[1]); end);
