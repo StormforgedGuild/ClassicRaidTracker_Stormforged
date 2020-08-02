@@ -19,6 +19,9 @@
   <Button name="MRT_GUI_Button_Template" inherits="GameMenuButtonTemplate" virtual="true" hidden="false" text="FIXME!">
     <Size x="85" y="22"/>
   </Button>
+  <Button name="MRT_GUI_BIG_Button_Template" inherits="GameMenuButtonTemplate" virtual="true" hidden="false" text="FIXME!">
+    <Size x="85" y="38"/>
+  </Button>
   <Button name="MRT_GUI_DropDownButtonTemplate" virtual="true" hidden="false">
     <Size x="24" y="24"/>
     <NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up">
@@ -181,7 +184,7 @@
     </Frames>
   </Frame>
   <Frame name="MRT_GUI_ThreeRowDialog" toplevel="true" hidden="true" enableMouse="true" movable="true" enableKeyboard="true" parent="UIParent">
-    <Size x="366" y="282"/>
+    <Size x="215" y="283"/>
     <Anchors>
       <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent"/>
     </Anchors>
@@ -215,14 +218,14 @@
       <Button name="$parent_OKButton" inherits="MRT_GUI_Button_Template">
         <Anchors>
           <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent">
-            <Offset x="66" y="32"/>
+            <Offset x="20" y="32"/>
           </Anchor>
         </Anchors>
       </Button>
       <Button name="$parent_CancelButton" inherits="MRT_GUI_Button_Template">
         <Anchors>
           <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent">
-            <Offset x="-66" y="32"/>
+            <Offset x="-20" y="32"/>
           </Anchor>
         </Anchors>
         <Scripts>
@@ -263,6 +266,11 @@
         </Scripts>
       </EditBox>
     </Frames>
+    <Scripts>
+      <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
+      <OnDragStart>self:StartMoving();</OnDragStart>
+      <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
+    </Scripts>
   </Frame>
   <Frame name="MRT_GUI_FourRowDialog" toplevel="true" hidden="true" enableMouse="true" movable="true" enableKeyboard="true" parent="UIParent">
     <Size x="215" y="283"/>
@@ -370,7 +378,7 @@
     </Scripts>
   </Frame>
   <Frame name="MRT_GUIFrame" toplevel="true" enableMouse="true" movable="true" parent="UIParent" hidden="true">
-    <Size x="655" y="515"/>
+    <Size x="635" y="495"/>
     <Anchors>
       <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent"/>
     </Anchors>
@@ -408,21 +416,21 @@
         <FontString name="$parent_RaidBosskillsTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_RaidLogTitle">
-              <Offset x="0" y="-140"/>
+              <Offset x="0" y="-128"/>
             </Anchor>
           </Anchors>
         </FontString>
         <FontString name="$parent_RaidAttendeesTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="LEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_RaidBosskillsTitle">
-              <Offset x="0" y="-160"/>
+              <Offset x="0" y="-157"/>
             </Anchor>
           </Anchors>
         </FontString>
         <FontString name="$parent_BossLootTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_RaidLogTitle">
-              <Offset x="155" y="-50"/>
+              <Offset x="155" y="-67"/>
             </Anchor>
           </Anchors>
         </FontString>
@@ -436,28 +444,28 @@
       </Layer>
     </Layers>
     <Frames>
-      <Button name="$parent_RaidLog_Export_Button" inherits="MRT_GUI_Button_Template">
+      <Button name="$parent_RaidLog_Export_Button" inherits="MRT_GUI_BIG_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_RaidExportComplete();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Raid_Export");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
-      <Button name="$parent_RaidLog_Delete_Button" inherits="MRT_GUI_Button_Template">
+      <Button name="$parent_RaidLog_Delete_Button" inherits="MRT_GUI_BIG_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_RaidDelete();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Raid_Delete");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
-      <Button name="$parent_RaidLog_ExportNormal_Button" inherits="MRT_GUI_Button_Template">
+      <Button name="$parent_RaidLog_ExportNormal_Button" inherits="MRT_GUI_BIG_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_RaidExportNormal();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Raid_ExportN");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
-      <Button name="$parent_RaidLog_ExportHeroic_Button" inherits="MRT_GUI_Button_Template">
+      <Button name="$parent_RaidLog_ExportHeroic_Button" inherits="MRT_GUI_BIG_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_RaidExportHard();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Raid_ExportH");</OnEnter>
@@ -547,8 +555,7 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button> -->
-      <Button name="$parent_StartNewRaid_Button" inherits="MRT_GUI_Button_Template" text="(L) StartRaid">
-        <Size x="85" y="22"/>
+      <Button name="$parent_StartNewRaid_Button" inherits="MRT_GUI_BIG_Button_Template" text="(L) StartRaid">
         <!-- <Anchors>
           <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_TakeSnapshot_Button" x="0" y="-15"/>
         </Anchors> -->
@@ -569,8 +576,7 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button> -->
-      <Button name="$parent_EndCurrentRaid_Button" inherits="MRT_GUI_Button_Template" text="FIXME: EndRaid">
-        <Size x="85" y="22"/>
+      <Button name="$parent_EndCurrentRaid_Button" inherits="MRT_GUI_BIG_Button_Template" text="FIXME: EndRaid">
         <Anchors>
           <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_StartNewRaid_Button" x="10" y="0"/>
         </Anchors>
