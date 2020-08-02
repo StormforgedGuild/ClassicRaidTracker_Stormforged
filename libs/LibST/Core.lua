@@ -597,8 +597,9 @@ do
 		return (realrow > self.offset and realrow <= (self.displayRows + self.offset))
 	end
 
-	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)
+	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, st, ...)
 		MRT_Debug("ST_doOnclick fired!");
+		local st = table;
 		if button == "LeftButton" then	-- LS: only handle on LeftButton click (right passes thru)
 			if not (row or realrow) then
 				for i, col in ipairs(st.cols) do
@@ -755,7 +756,7 @@ do
 		scrolltroughborder.background = scrolltrough:CreateTexture(nil, "BACKGROUND");
 		scrolltroughborder.background:SetAllPoints(scrolltroughborder);
 		scrolltroughborder.background:SetColorTexture(0.5, 0.5, 0.5, 1.0);
-
+		
 		st.Refresh = function(self)
 			FauxScrollFrame_Update(scrollframe, #st.filtered, st.displayRows, st.rowHeight);
 			local o = FauxScrollFrame_GetOffset(scrollframe);
