@@ -1046,7 +1046,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
 end
 
 function MRT_GUI_LootRaidAnnounce()
-    MRT_GUI_HideDialogs();
+    --MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
         MRT_Print(MRT_L.GUI["No raid selected"]);
