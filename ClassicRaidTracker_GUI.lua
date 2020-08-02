@@ -43,6 +43,9 @@ local lastShownNumOfRaids = nil;
 local lastSelectedRaidNum = nil;
 local lastShownNumOfBosses = nil;
 local lastSelectedBossNum = nil;
+local lastLootNum = nil;
+local lastBossNum = nil;
+local lastRaidNum = nil;
 
 -- table definitions
 local MRT_RaidLogTableColDef = {
@@ -205,6 +208,25 @@ function MRT_GUI_ParseValues()
     MRT_GUI_BossLootTable.head:SetHeight(15);                                                                     -- Manually correct the height of the header (standard is rowHight - 30 pix would be different from others tables around and looks ugly)
     MRT_GUI_BossLootTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_BossLootTitle, "BOTTOMLEFT", 0, -15);
     MRT_GUI_BossLootTable:EnableSelection(true);
+    MRT_GUI_BossLootTable:RegisterEvents({
+        ["OnDoubleClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
+            MRT_Debug("Doubleclick pre condition hit");
+            if MRT_GUI_FourRowDialog:IsVisible() then
+                MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                MRT_GUI_LootModify();
+            else
+                MRT_Debug("in false condition");
+                MRT_GUI_LootModify();
+            end;
+        end,
+        ["OnClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
+            if MRT_GUI_FourRowDialog:IsVisible() then
+                MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                MRT_GUI_LootModify();
+            end;
+        end,
+    });
+    
     --MRT_GUI_BossAttendeesTable = ScrollingTable:CreateST(MRT_BossAttendeesTableColDef, 12, nil, nil, MRT_GUIFrame);
     --MRT_GUI_BossAttendeesTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_BossAttendeesTitle, "BOTTOMLEFT", 0, -15);
     --MRT_GUI_BossAttendeesTable:EnableSelection(true);
@@ -221,7 +243,7 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_RaidBosskills_Add_Button:SetPoint("TOPLEFT", MRT_GUI_RaidBosskillsTable.frame, "BOTTOMLEFT", 0, -5);
     MRT_GUIFrame_RaidBosskills_Delete_Button:SetText(MRT_L.GUI["Button_Delete"]);
     MRT_GUIFrame_RaidBosskills_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_RaidBosskills_Add_Button, "RIGHT", 10, 0);
-    --MRT_GUIFrame_RaidBosskills_Export_Button:SetText(MRT_L.GUI["Button_Export"]);
+    --MRT_GUIFrame_RaidBosskills_Export_Button:SetText(MRT_L.GUI["Button_Export"]);0
     --MRT_GUIFrame_RaidBosskills_Export_Button:SetPoint("TOP", MRT_GUIFrame_RaidBosskills_Add_Button, "BOTTOM", 0, -5);
     MRT_GUIFrame_RaidAttendees_Add_Button:SetText(MRT_L.GUI["Button_Add"]);
     MRT_GUIFrame_RaidAttendees_Add_Button:SetPoint("TOPLEFT", MRT_GUI_RaidAttendeesTable.frame, "BOTTOMLEFT", 0, -5);
@@ -844,9 +866,13 @@ function MRT_GUI_LootModify()
         return;
     end
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    lastRaidNum = raidnum;
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    lastLootNum = lootnum;
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
+    lastBossNum = bossnum;
     local lootnote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"];
+
 
     -- Force item into cache:
     GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
@@ -883,6 +909,7 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum); end);
     MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
     MRT_GUI_FourRowDialog:Show();
+    MRT_GUI_FourRowDialog_EB1:SetEnabled(false);
 end
 
 function MRT_GUI_PlayerDropDownList_Toggle()
