@@ -211,6 +211,7 @@ function MRT_GUI_ParseValues()
     MRT_GUI_BossLootTable:RegisterEvents({
         ["OnDoubleClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             MRT_Debug("Doubleclick pre condition hit");
+ --           MRT_GUI_BossLootTable:SetSelection(realrow)
             if MRT_GUI_FourRowDialog:IsVisible() then
                 MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                 MRT_GUI_LootModify();
@@ -222,6 +223,9 @@ function MRT_GUI_ParseValues()
         ["OnClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             if MRT_GUI_FourRowDialog:IsVisible() then
                 MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+
+                MRT_GUI_BossLootTable:SetSelection(realrow)
+                MRT_GUI_LootModify();
             end;
         end,
     });
@@ -382,7 +386,7 @@ end
 
 --[[ function MRT_GUI_RaidExportNormal()
     MRT_GUI_HideDialogs();
-    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raid_select = 8;
     if (raid_select == nil) then
         MRT_Print(MRT_L.GUI["No raid selected"]);
         return;
