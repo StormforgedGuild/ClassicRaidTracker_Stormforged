@@ -210,7 +210,7 @@ function MRT_GUI_ParseValues()
     MRT_GUI_BossLootTable:EnableSelection(true);
     MRT_GUI_BossLootTable:RegisterEvents({
         ["OnDoubleClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
-            MRT_Debug("Doubleclick pre condition hit");
+            MRT_Debug("Doubleclick fired!");
             if MRT_GUI_FourRowDialog:IsVisible() then
                 MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                 MRT_GUI_LootModify();
@@ -220,9 +220,13 @@ function MRT_GUI_ParseValues()
             end;
         end,
         ["OnClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
+            MRT_Debug("MRT_Onclick fired!");
+            doOnclick(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             if MRT_GUI_FourRowDialog:IsVisible() then
                 MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                MRT_GUI_LootModify();
             end;
+            return true;
         end,
     });
     
@@ -1024,6 +1028,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
         end
     end
     -- do table update, if selected loot table was modified
+    local item_select = MRT_GUI_BossLootTable:GetSelection();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then return; end
     local raidnum_selected = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
@@ -1473,7 +1478,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum)
         MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
     end
     table.sort(MRT_GUI_BossLootTableData, function(a, b) return (a[3] < b[3]); end);
-    MRT_GUI_BossLootTable:ClearSelection();
+    --MRT_GUI_BossLootTable:ClearSelection();
     MRT_GUI_BossLootTable:SetData(MRT_GUI_BossLootTableData, true);
     lastSelectedBossNum = bossnum;
 end
