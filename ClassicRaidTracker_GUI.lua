@@ -222,7 +222,6 @@ function MRT_GUI_ParseValues()
         ["OnClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             if MRT_GUI_FourRowDialog:IsVisible() then
                 MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
-                MRT_GUI_LootModify();
             end;
         end,
     });
