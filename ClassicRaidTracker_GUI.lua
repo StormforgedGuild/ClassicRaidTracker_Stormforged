@@ -255,11 +255,13 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLoot_Add_Button:SetText(MRT_L.GUI["Button_Add"]);
     MRT_GUIFrame_BossLoot_Add_Button:SetPoint("TOPLEFT", MRT_GUI_BossLootTable.frame, "BOTTOMLEFT", 0, -5);
     MRT_GUIFrame_BossLoot_Modify_Button:SetText(MRT_L.GUI["Button_Modify"]);
-    MRT_GUIFrame_BossLoot_Modify_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Add_Button, "RIGHT", 10, 0);
+    MRT_GUIFrame_BossLoot_Modify_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Add_Button, "RIGHT", 8, 0);
     MRT_GUIFrame_BossLoot_Delete_Button:SetText(MRT_L.GUI["Button_Delete"]);
-    MRT_GUIFrame_BossLoot_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Modify_Button, "RIGHT", 10, 0);
-    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetText("Announce");
-    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Delete_Button, "RIGHT", 10, 0);
+    MRT_GUIFrame_BossLoot_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Modify_Button, "RIGHT", 8, 0);
+    MRT_GUIFrame_BossLoot_RaidLink_Button:SetText("Link");
+    MRT_GUIFrame_BossLoot_RaidLink_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Delete_Button, "RIGHT", 8, 0);
+    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetText("Bid");
+    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidLink_Button, "RIGHT", 8, 0);
     --MRT_GUIFrame_BossAttendees_Add_Button:SetText(MRT_L.GUI["Button_Add"]);
     --MRT_GUIFrame_BossAttendees_Add_Button:SetPoint("TOPLEFT", MRT_GUI_BossAttendeesTable.frame, "BOTTOMLEFT", 0, -5);
     --MRT_GUIFrame_BossAttendees_Delete_Button:SetText(MRT_L.GUI["Button_Delete"]);
@@ -1043,6 +1045,29 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     if (raidnum_selected == raidnum and bossnum_selected == bossnum) then
         MRT_GUI_BossLootTableUpdate(bossnum);
     end
+end
+
+function MRT_GUI_LootRaidLink()
+    --MRT_GUI_HideDialogs();
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    if (raid_select == nil) then
+        MRT_Print(MRT_L.GUI["No raid selected"]);
+        return;
+    end
+    local loot_select = MRT_GUI_BossLootTable:GetSelection();
+    if (loot_select == nil) then
+        MRT_Print(MRT_L.GUI["No loot selected"]);
+        return;
+    end
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
+    local lootName = MRT_GUI_BossLootTable:GetCell(loot_select, 3);
+
+    local rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    SendChatMessage(rwMessage, "Raid");
+
+
 end
 
 function MRT_GUI_LootRaidAnnounce()
