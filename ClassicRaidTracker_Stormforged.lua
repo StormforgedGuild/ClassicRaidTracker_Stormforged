@@ -1282,7 +1282,7 @@ function MRT_AutoAddLoot(chatmsg)
         return;
     end
     -- if code reaches this point, we should have a valid looter and a valid itemLink
-    -- playerName = "disenchanted";
+    -- SF: hack to assign to disenchanted playerName = "disenchanted";
     MRT_Debug("Item looted - Looter is "..playerName.." and loot is "..itemLink);
 	MRT_AutoAddLootItem(playerName, itemLink, itemCount);
 end
@@ -1391,11 +1391,11 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     if (MRT_NumOfLastBoss == nil) then
         MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
     end
-    -- SF: set default values.
+    -- SF: set default values for looter.
     local dLooter = nil;
     dLooter = autoAssign(itemName);
     if not dLooter then
-        dLooter = "disenchanted";
+        dLooter = "unassigned";
     end
     -- SF: add a note to who it was looted to.
     local dNote;
