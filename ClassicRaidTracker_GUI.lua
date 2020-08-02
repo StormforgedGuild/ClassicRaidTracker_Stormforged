@@ -210,7 +210,17 @@ function MRT_GUI_ParseValues()
     MRT_GUI_BossLootTable:EnableSelection(true);
     MRT_GUI_BossLootTable:RegisterEvents({
         ["OnDoubleClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
+<<<<<<< HEAD
             MRT_Debug("Doubleclick fired!");
+<<<<<<< Updated upstream
+=======
+            MRT_Debug("Doubleclick pre condition hit");
+ --           MRT_GUI_BossLootTable:SetSelection(realrow)
+>>>>>>> 2dbd77b1b45b2dde369ef45e9d81ac34f8a956a3
+=======
+            --MRT_Debug("Doubleclick pre condition hit");
+ --           MRT_GUI_BossLootTable:SetSelection(realrow)
+>>>>>>> Stashed changes
             if MRT_GUI_FourRowDialog:IsVisible() then
                 MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                 MRT_GUI_LootModify();
@@ -221,9 +231,19 @@ function MRT_GUI_ParseValues()
         end,
         ["OnClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             MRT_Debug("MRT_Onclick fired!");
-            doOnclick(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
+            doOnClick(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             if MRT_GUI_FourRowDialog:IsVisible() then
                 MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+<<<<<<< Updated upstream
+<<<<<<< HEAD
+=======
+
+                MRT_GUI_BossLootTable:SetSelection(realrow)
+>>>>>>> 2dbd77b1b45b2dde369ef45e9d81ac34f8a956a3
+=======
+
+                --MRT_GUI_BossLootTable:SetSelection(realrow)
+>>>>>>> Stashed changes
                 MRT_GUI_LootModify();
             end;
             return true;
@@ -386,7 +406,7 @@ end
 
 --[[ function MRT_GUI_RaidExportNormal()
     MRT_GUI_HideDialogs();
-    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raid_select = 8;
     if (raid_select == nil) then
         MRT_Print(MRT_L.GUI["No raid selected"]);
         return;
