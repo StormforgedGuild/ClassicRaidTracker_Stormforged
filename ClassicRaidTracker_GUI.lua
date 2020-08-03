@@ -46,6 +46,10 @@ local lastSelectedBossNum = nil;
 local lastLootNum = nil;
 local lastBossNum = nil;
 local lastRaidNum = nil;
+--state of dialog
+local lastLooter = nil;
+local lastValue = nil;
+local lastNote = nil;
 
 -- table definitions
 local MRT_RaidLogTableColDef = {
@@ -179,7 +183,17 @@ function MRT_UnregisterLootNotifyGUI(functionCalled)
         return false;
     end
 end
+---------------------------------------------------------------
+--  Helper Function to detect dirty dialog                   --
+---------------------------------------------------------------
 
+function isDirty (strLooter, strValue, strNote)
+    if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) then
+        return false;
+    else
+        return true;
+    end
+end
 
 ---------------------------------------------------------------
 --  parse localization and set up tables after ADDON_LOADED  --
@@ -212,7 +226,10 @@ function MRT_GUI_ParseValues()
         ["OnDoubleClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             MRT_Debug("Doubleclick fired!");
             if MRT_GUI_FourRowDialog:IsVisible() then
-                MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText()) then
+                    MRT_Debug("STOnDoubleClick: isDirty == True");
+                    MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                end
                 MRT_GUI_LootModify();
             else
                 MRT_Debug("in false condition");
@@ -223,7 +240,10 @@ function MRT_GUI_ParseValues()
             MRT_Debug("MRT_Onclick fired!");
             doOnClick(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             if MRT_GUI_FourRowDialog:IsVisible() then
-                MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText()) then
+                    MRT_Debug("STOnClick: isDirty == True");
+                    MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                end
                 MRT_GUI_LootModify();
             end;
             return true;
@@ -912,13 +932,19 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
     MRT_GUI_FourRowDialog_EB2:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 4));
+    lastLooter = MRT_GUI_FourRowDialog_EB2:GetText();
+    MRT_Debug("MRT_GUI_LootModify: lastLooter: "..lastLooter);
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
     MRT_GUI_FourRowDialog_EB3:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    lastValue = MRT_GUI_FourRowDialog_EB3:GetText();
+    MRT_Debug("MRT_GUI_LootModify: lastValue: "..lastValue);
     MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
     if (lootnote == nil or lootnote == "" or lootnote == " ") then
         MRT_GUI_FourRowDialog_EB4:SetText("");
+        lastNote = "";
     else
         MRT_GUI_FourRowDialog_EB4:SetText(lootnote);
+        lastNote = lootnote;
     end
     MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Modify"]);
     MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum); end);

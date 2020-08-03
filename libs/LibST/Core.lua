@@ -602,6 +602,7 @@ do
 		local st = table;
 		if button == "LeftButton" then	-- LS: only handle on LeftButton click (right passes thru)
 			if not (row or realrow) then
+				MRT_Debug("ST_doOnclick sorting!");
 				for i, col in ipairs(st.cols) do
 					if i ~= column then -- clear out all other sort marks
 						cols[i].sort = nil;
