@@ -1,14 +1,14 @@
 ﻿## Interface: 11305
 ## Title: ClassicRaidTracker_Stormforged
-## Version: v0.2.0
+## Version: v1.0.0
 ## Notes: Tracks raid, loot and attendance
-## Author: Wenlock@EU-Firemaw
+## Author: Hokie@Kirtonos-Alliance / Moncholy@Kirtonos-Alliance
 ## LoadOnDemand: 0
 ## DefaultState: enabled
 ## SavedVariables: MRT_Options, MRT_RaidLog, MRT_PlayerDB, MRT_NumOfCurrentRaid, MRT_NumOfLastBoss
 ## X-Max-Interface: 11305
 ## X-Min-Interface: 11305
-## X-Curse-Project-ID: 344365
+## X-Curse-Project-ID: 399582
 
 embeds.xml
 localization.lua
