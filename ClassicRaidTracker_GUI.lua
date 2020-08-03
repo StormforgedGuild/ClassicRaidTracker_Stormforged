@@ -973,6 +973,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     if (lootNote == nil or lootNote == "" or lootNote == " ") then lootNote = nil; end
     -- sanity-check values here - especially the itemlink / looter is free text / cost has to be a number
     local itemName, itemLink, itemId, itemString, itemRarity, itemColor, _, _, _, _, _, _, _, _ = MRT_GetDetailedItemInformation(itemLinkFromText);
+    MRT_Debug("MRT_GUI_LootModifyAccept:itemColor: "..itemColor);
     if (not itemName) then
         MRT_Print(MRT_L.GUI["No itemLink found"]);
         return;
@@ -1530,7 +1531,13 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
     elseif (raidnum) then
         local index = 1;
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
-            MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
+            --MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
+            -- SF: if unassigned, make it red.
+            if v["Looter"] == "unassigned" then
+                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"]};
+            else 
+                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
+            end 
             index = index + 1;
         end
         MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
