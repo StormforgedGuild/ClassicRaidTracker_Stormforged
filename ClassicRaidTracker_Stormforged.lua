@@ -1291,13 +1291,13 @@ function autoAssign (itemName)
     local SF_AUTOASSIGN_ITEM_LIST = {
         ["Elementium Ore"] = "bank";
         ["Sulfuron Ingot"] = "bank";
-        ["Felheart Bracers"] = "bank";
-        ["Belt of Might"] = "bank";
-        ["Giantstalker's Bracers"] = "bank";
-        ["Giantstalker's Belt"] = "bank";
-        ["Bracers of Might"] = "bank";
-        ["Felheart Belt"] = "bank";
-        ["Nightslayer Belt"] = "bank";
+        --["Felheart Bracers"] = "bank";
+        --["Belt of Might"] = "bank";
+        --["Giantstalker's Bracers"] = "bank";
+        --["Giantstalker's Belt"] = "bank";
+        --["Bracers of Might"] = "bank";
+        --["Felheart Belt"] = "bank";
+        --["Nightslayer Belt"] = "bank";
         ["Stringy Wolf Meat"] = "bank";
     }
     local retval = SF_AUTOASSIGN_ITEM_LIST[itemName];
