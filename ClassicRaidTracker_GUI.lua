@@ -963,6 +963,7 @@ function MRT_GUI_PlayerDropDownList_Toggle()
 end
 
 function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
+    MRT_Debug("MRT_GUI_LootModifyAccept:Called!");
     local itemLinkFromText = MRT_GUI_FourRowDialog_EB1:GetText();
     local looter = MRT_GUI_FourRowDialog_EB2:GetText();
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
@@ -1065,13 +1066,15 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
     if (boss_select == nil) then
         if (raidnum_selected == raidnum) then
-            MRT_GUI_BossLootTableUpdate(nil);
+            MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(nil,true)");
+            MRT_GUI_BossLootTableUpdate(nil, true);
         end
         return;
     end
     local bossnum_selected = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
     if (raidnum_selected == raidnum and bossnum_selected == bossnum) then
-        MRT_GUI_BossLootTableUpdate(bossnum);
+        MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(bossnum,true)");
+        MRT_GUI_BossLootTableUpdate(bossnum, true);
     end
 end
 
@@ -1501,7 +1504,12 @@ function MRT_GUI_RaidBosskillsTableUpdate(raidnum)
 end
 
 -- update bossloot table
-function MRT_GUI_BossLootTableUpdate(bossnum)
+function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
+    if skipsort then 
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True");
+    else
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil ");
+    end
     local MRT_GUI_BossLootTableData = {};
     local raidnum;
     -- check if a raid is selected
@@ -1532,7 +1540,12 @@ function MRT_GUI_BossLootTableUpdate(bossnum)
     end
     table.sort(MRT_GUI_BossLootTableData, function(a, b) return (a[3] < b[3]); end);
     --MRT_GUI_BossLootTable:ClearSelection();
-    MRT_GUI_BossLootTable:SetData(MRT_GUI_BossLootTableData, true);
+    if skipsort then 
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True about to call SetData");
+    else
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil about to call SetData");
+    end
+    MRT_GUI_BossLootTable:SetData(MRT_GUI_BossLootTableData, true, skipsort);
     lastSelectedBossNum = bossnum;
 end
 

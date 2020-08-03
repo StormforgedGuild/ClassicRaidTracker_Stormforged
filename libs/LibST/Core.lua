@@ -557,10 +557,20 @@ do
 	-- @description Sets the data for the scrolling table
 	-- @usage st:SetData(datatable)
 	-- @see http://www.wowace.com/addons/lib-st/pages/set-data/
-	local function SetData (self, data, isMinimalDataformat)
+	local function SetData (self, data, isMinimalDataformat, skipsort)
+		if skipsort then
+			MRT_Debug("STSetData: skipsort ==True ");
+		else 
+			MRT_Debug("STSetData: skipsort == false ");
+		end
 		self.isMinimalDataformat = isMinimalDataformat;
 		self.data = data;
-		self:SortData();
+		--SF: skipsort so that we don't do goofy sort
+		if not skipsort then
+			self:SortData();
+		else 
+			self:Refresh();
+		end
 	end
 
 	--- API for a ScrollingTable table
