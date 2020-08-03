@@ -843,6 +843,7 @@ function MRT_GUI_LootAdd()
     table.sort(playerData, function(a, b) return (a[1] < b[1]); end );
     tinsert(playerData, 1, { "disenchanted" } );
     tinsert(playerData, 1, { "bank" } );
+    tinsert(playerData,1, {"unassigned"});
     MRT_GUI_PlayerDropDownTable:SetData(playerData, true);
     if (#playerData < 9) then
         MRT_GUI_PlayerDropDownTable:SetDisplayRows(#playerData, 15);
@@ -897,6 +898,7 @@ function MRT_GUI_LootModify()
     table.sort(playerData, function(a, b) return (a[1] < b[1]); end );
     tinsert(playerData, 1, { "disenchanted" } );
     tinsert(playerData, 1, { "bank" } );
+    tinsert(playerData,1, {"unassigned"});
     MRT_GUI_PlayerDropDownTable:SetData(playerData, true);
     if (#playerData < 9) then
         MRT_GUI_PlayerDropDownTable:SetDisplayRows(#playerData, 15);
