@@ -52,7 +52,7 @@ local MRT_Defaults = {
         ["General_MasterEnable"] = true,                                            -- AddonEnable: true / nil
         ["General_OptionsVersion"] = 13,                                            -- OptionsVersion - Counter, which increases after a new option has been added - if new option is added, then increase counter and add to update options function
         ["General_DebugEnabled"] = false,                                           --
-        ["General_SlashCmdHandler"] = "mrt",                                        --
+        ["General_SlashCmdHandler"] = "storm",                                      --
         ["General_PrunnRaidLog"] = false,                                           -- Prunning - shall old be deleted after a certain amount of time
         ["General_PrunningTime"] = 90,                                              -- Prunning time, after log shall be deleted (days)
         ["General_ShowMinimapIcon"] = true,                                        --
@@ -465,7 +465,7 @@ function MRT_Initialize(frame)
     MRT_LDB_DS = LDB:NewDataObject("Classic RaidTracker_Stormforged", {
         icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_disabled",
         label = MRT_ADDON_TITLE,
-        text = "MRT",
+        text = "Storm",
         type = "data source",
         OnClick = function(self, button)
             if (button == "LeftButton") then
