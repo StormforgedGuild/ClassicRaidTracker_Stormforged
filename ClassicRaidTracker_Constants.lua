@@ -60,6 +60,15 @@ MRT_ItemValues = {
 --  Zone name list  --
 ----------------------
 MRT_RaidZones = {
+    -- Classic Raids
+    [34] = true,        -- Stockades
+    [469] = true,       -- Blackwing Lair
+    [409] = true,       -- Molten Core
+    [509] = true,       -- Ruins of Ahn'Qiraj
+    [531] = true,       -- Temple of Ahn'Qiraj
+    [249] = true,       -- Onyxia's Lair
+    [533] = true,       -- Naxxramas
+    
     -- Burning Crusade
     [532] = true,       -- Karazhan
     [565] = true,       -- Gruul's Lair
@@ -162,6 +171,7 @@ MRT_LegacyRaidZonesBC = {
 }
 
 MRT_LegacyRaidZonesClassic = {
+    [34] = true,        -- Stockades
     [469] = true,       -- Blackwing Lair
     [409] = true,       -- Molten Core
     [509] = true,       -- Ruins of Ahn'Qiraj
