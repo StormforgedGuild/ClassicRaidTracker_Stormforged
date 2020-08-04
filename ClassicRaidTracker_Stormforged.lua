@@ -928,19 +928,34 @@ function MRT_CheckZoneAndSizeStatus()
         -- If there is no active raid, just start one
         if (not MRT_NumOfCurrentRaid) then
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
-            MRT_CreateNewRaid(localInstanceInfoName, maxPlayers, diffID);
+            --SF: Use Short Name if it's Classic
+            if not MRT_LegacyRaidZonesClassic[areaID] then
+                MRT_CreateNewRaid(localInstanceInfoName, maxPlayers, diffID);
+            else
+                MRT_CreateNewRaid(MRT_LegacyRaidShortName[areaID], maxPlayers, diffID);
+            end
             return;
         end
         -- There is an active raid, check if diffID changed, if yes, start a new raid
         if (MRT_RaidLog[MRT_NumOfCurrentRaid]["DiffID"] ~= diffID) then
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
-            MRT_CreateNewRaid(localInstanceInfoName, maxPlayers, diffID);
+            --SF: Use Short Name if it's Classic
+            if not MRT_LegacyRaidZonesClassic[areaID] then
+                MRT_CreateNewRaid(localInstanceInfoName, maxPlayers, diffID);
+            else
+                MRT_CreateNewRaid(MRT_LegacyRaidShortName[areaID], maxPlayers, diffID);
+            end
             return;
         end
         -- diffID not changed. If instance changed, check if auto create on new instance is on.
         if ((MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= localInstanceInfoName) and MRT_Options["Tracking_CreateNewRaidOnNewZone"]) then
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
-            MRT_CreateNewRaid(localInstanceInfoName, maxPlayers, diffID);
+            --SF: Use Short Name if it's Classic
+            if not MRT_LegacyRaidZonesClassic[areaID] then
+                MRT_CreateNewRaid(localInstanceInfoName, maxPlayers, diffID);
+            else
+                MRT_CreateNewRaid(MRT_LegacyRaidShortName[areaID], maxPlayers, diffID);
+            end
             return;
         end
     else
