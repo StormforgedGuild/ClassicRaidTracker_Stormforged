@@ -35,8 +35,8 @@ local _L = ClassicRaidTracker._L
 -------------------------------
 --  Globals/Default Options  --
 -------------------------------
-MRT_ADDON_TITLE = GetAddOnMetadata("Stormforged Raid Tracker", "Title");
-MRT_ADDON_VERSION = GetAddOnMetadata("Stormforged Raid Tracker", "Version");
+MRT_ADDON_TITLE = GetAddOnMetadata("ClassicRaidTracker_Stormforged", "Title");
+MRT_ADDON_VERSION = GetAddOnMetadata("ClassicRaidTracker_Stormforged", "Version");
 MRT_NumOfCurrentRaid = nil;
 MRT_NumOfLastBoss = nil;
 MRT_Options = {};
@@ -188,7 +188,7 @@ end
 function MRT_OnEvent(frame, event, ...)
     if (event == "ADDON_LOADED") then
         local addonName = ...;
-        if (addonName == "Stormforged Raid Tracker") then
+        if (addonName == "ClassicRaidTracker_Stormforged") then
             MRT_Debug("Initializing MRT...");
             frame:UnregisterEvent("ADDON_LOADED");
             MRT_Initialize(frame);
