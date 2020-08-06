@@ -35,7 +35,7 @@ local LDBIcon = LibStub("LibDBIcon-1.0")
 --  Register panels  --
 -----------------------
 function MRT_Options_MainPanel_OnLoad(panel)
-    panel.name = "Stormforged Raid Tracker"
+    panel.name = "Classic RaidTracker_Stormforged"
     panel.okay = function(self) MRT_Options_OnOkay(self) end
     panel.cancel = function(self) MRT_Options_OnCancel(self) end
     InterfaceOptions_AddCategory(panel)
@@ -43,25 +43,25 @@ end
 
 function MRT_Options_TrackingPanel_OnLoad(panel)
     panel.name = MRT_L.Options["TP_Title"]
-    panel.parent = "Stormforged Raid Tracker"
+    panel.parent = "Classic RaidTracker_Stormforged"
     InterfaceOptions_AddCategory(panel)
 end
 
 function MRT_Options_ItemsTrackingPanel_OnLoad(panel)
     panel.name = MRT_L.Options["ITP_Title"]
-    panel.parent = "Stormforged Raid Tracker"
+    panel.parent = "Classic RaidTracker_Stormforged"
     InterfaceOptions_AddCategory(panel)
 end
 
 function MRT_Options_AttendancePanel_OnLoad(panel)
     panel.name = MRT_L.Options["AP_Title"]
-    panel.parent = "Stormforged Raid Tracker"
+    panel.parent = "Classic RaidTracker_Stormforged"
     InterfaceOptions_AddCategory(panel)
 end
 
 function MRT_Options_ExportPanel_OnLoad(panel)
     panel.name = MRT_L.Options["EP_Title"]
-    panel.parent = "Stormforged Raid Tracker"
+    panel.parent = "Classic RaidTracker_Stormforged"
     InterfaceOptions_AddCategory(panel)
 end
 
@@ -203,10 +203,10 @@ function MRT_Options_OnOkay(panel)
     -- update minimap icon
     if (MRT_Options["General_ShowMinimapIcon"]) then
         MRT_Options.MiniMap_SV.hide = false
-        LDBIcon:Show("Stormforged Raid Tracker")
+        LDBIcon:Show("Classic RaidTracker_Stormforged")
     else
         MRT_Options.MiniMap_SV.hide = true
-        LDBIcon:Hide("Stormforged Raid Tracker")
+        LDBIcon:Hide("Classic RaidTracker_Stormforged")
     end
     -- TrackingPanel
     MRT_Options["Tracking_Log10MenRaids"] =

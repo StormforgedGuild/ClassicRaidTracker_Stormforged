@@ -35,8 +35,8 @@ local _L = ClassicRaidTracker._L
 -------------------------------
 --  Globals/Default Options  --
 -------------------------------
-MRT_ADDON_TITLE = GetAddOnMetadata("Stormforged Raid Tracker", "Title");
-MRT_ADDON_VERSION = GetAddOnMetadata("Stormforged Raid Tracker", "Version");
+MRT_ADDON_TITLE = GetAddOnMetadata("ClassicRaidTracker_Stormforged", "Title");
+MRT_ADDON_VERSION = GetAddOnMetadata("ClassicRaidTracker_Stormforged", "Version");
 MRT_NumOfCurrentRaid = nil;
 MRT_NumOfLastBoss = nil;
 MRT_Options = {};
@@ -188,7 +188,7 @@ end
 function MRT_OnEvent(frame, event, ...)
     if (event == "ADDON_LOADED") then
         local addonName = ...;
-        if (addonName == "Stormforged Raid Tracker") then
+        if (addonName == "ClassicRaidTracker_Stormforged") then
             MRT_Debug("Initializing MRT...");
             frame:UnregisterEvent("ADDON_LOADED");
             MRT_Initialize(frame);
@@ -371,7 +371,7 @@ end
 function MRT_SlashCmdHandler(msg)
     local msg_lower = string.lower(msg);
     if (msg_lower == 'options' or msg_lower == 'o') then
-        InterfaceOptionsFrame_OpenToCategory("Stormforged Raid Tracker");
+        InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker_Stormforged");
         return;
     elseif (msg_lower == 'dkpcheck') then
         MRT_AddBosskill(MRT_L.Core["GuildAttendanceBossEntry"]);
@@ -462,7 +462,7 @@ function MRT_Initialize(frame)
         SlashCmdList["MIZUSRAIDTRACKER"] = function(msg) MRT_SlashCmdHandler(msg); end
     end
     -- set up LDB data source
-    MRT_LDB_DS = LDB:NewDataObject("Stormforged Raid Tracker", {
+    MRT_LDB_DS = LDB:NewDataObject("Classic RaidTracker_Stormforged", {
         icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_disabled",
         label = MRT_ADDON_TITLE,
         text = "Storm",
@@ -471,8 +471,8 @@ function MRT_Initialize(frame)
             if (button == "LeftButton") then
                 MRT_GUI_Toggle();
             elseif (button == "RightButton") then
-                InterfaceOptionsFrame_OpenToCategory("Stormforged Raid Tracker");
-                InterfaceOptionsFrame_OpenToCategory("Stormforged Raid Tracker");
+                InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker_Stormforged");
+                InterfaceOptionsFrame_OpenToCategory("Classic RaidTracker_Stormforged");
             end
         end,
         OnTooltipShow = function(tooltip)
@@ -483,7 +483,7 @@ function MRT_Initialize(frame)
         end,
     });
     -- set up minimap icon
-    LDBIcon:Register("Stormforged Raid Tracker", MRT_LDB_DS, MRT_Options["MiniMap_SV"]);
+    LDBIcon:Register("Classic RaidTracker_Stormforged", MRT_LDB_DS, MRT_Options["MiniMap_SV"]);
     -- set up drop down menu for the DKPFrame
     MRT_DKPFrame_DropDownTable = ScrollingTable:CreateST(MRT_DKPFrame_DropDownTableColDef, 9, nil, nil, MRT_GetDKPValueFrame);
     MRT_DKPFrame_DropDownTable.head:SetHeight(1);
