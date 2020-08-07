@@ -864,6 +864,7 @@ function MRT_GUI_LootAdd()
     tinsert(playerData, 1, { "disenchanted" } );
     tinsert(playerData, 1, { "bank" } );
     tinsert(playerData,1, {"unassigned"});
+    tinsert(playerData, 1, {"pug"} );
     MRT_GUI_PlayerDropDownTable:SetData(playerData, true);
     if (#playerData < 9) then
         MRT_GUI_PlayerDropDownTable:SetDisplayRows(#playerData, 15);
@@ -919,6 +920,7 @@ function MRT_GUI_LootModify()
     tinsert(playerData, 1, { "disenchanted" } );
     tinsert(playerData, 1, { "bank" } );
     tinsert(playerData,1, {"unassigned"});
+    tinsert(playerData, 1, {"pug"} );
     MRT_GUI_PlayerDropDownTable:SetData(playerData, true);
     if (#playerData < 9) then
         MRT_GUI_PlayerDropDownTable:SetDisplayRows(#playerData, 15);
