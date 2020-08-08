@@ -244,6 +244,7 @@ MRT_L.GUI = {
     Cell_Hard = "Hard",
     Cell_Normal = "Normal",
     Col_Cost = "Cost",
+    Col_OffSpec = "OS",
     Col_Date = "Date",
     Col_Difficulty = "Mode",
     Col_Join = "Join",

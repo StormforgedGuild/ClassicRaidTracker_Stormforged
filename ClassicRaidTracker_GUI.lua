@@ -50,6 +50,7 @@ local lastRaidNum = nil;
 local lastLooter = nil;
 local lastValue = nil;
 local lastNote = nil;
+local lastOS = nil
 
 -- table definitions
 local MRT_RaidLogTableColDef = {
@@ -111,7 +112,7 @@ local MRT_BossLootTableColDef = {
                                            end);
         end,
     },
-    {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 160},
+    {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 120},
     {["name"] = MRT_L.GUI["Col_Looter"], ["width"] = 85},
     {["name"] = MRT_L.GUI["Col_Cost"], ["width"] = 45},
     {["name"] = "", ["width"] = 1},                            -- invisible column for itemString (needed for tooltip)
@@ -141,6 +142,35 @@ local MRT_BossLootTableColDef = {
             end
         end,
     },
+    {                                                          -- col for OffSpec
+    ["name"] = MRT_L.GUI["Col_OffSpec"], 
+    ["width"] = 30,
+    ["DoCellUpdate"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, fShow, self, ...)
+        -- Show Checkbox
+        if fShow then
+            local itemId = self:GetCell(realrow, column);
+            MRT_Debug("DoCellUpdateCB: Column: " ..column);
+            
+            if itemId then
+                cellFrame:SetBackdrop( { bgFile = "Interface\\BUTTONS\\ui-checkbox-check", insets = { left = 0, right = 2, top = 2, bottom = 2 }, } );
+            else
+                cellFrame:SetBackdrop( { bgFile = "Interface\\BUTTONS\\checkbuttonglow", insets = { left = 0, right = 2, top = 2, bottom = 2 }, } );
+            end
+        end
+        -- tooltip handling
+        --[[ local itemLink = self:GetCell(realrow, 6);
+        cellFrame:SetScript("OnEnter", function()
+                                         MRT_GUI_ItemTT:SetOwner(cellFrame, "ANCHOR_RIGHT");
+                                         MRT_GUI_ItemTT:SetHyperlink(itemLink);
+                                         MRT_GUI_ItemTT:Show();
+                                       end);
+        cellFrame:SetScript("OnLeave", function()
+                                         MRT_GUI_ItemTT:Hide();
+                                         MRT_GUI_ItemTT:SetOwner(UIParent, "ANCHOR_NONE");
+                                       end);  ]]
+    end,      
+
+},                  
 };
 local MRT_BossAttendeesTableColDef = {
     {["name"] = "", ["width"] = 1},                            -- invisible column for storing the attendee number index from the raidlog-table
@@ -187,10 +217,13 @@ end
 --  Helper Function to detect dirty dialog                   --
 ---------------------------------------------------------------
 
-function isDirty (strLooter, strValue, strNote)
-    if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) then
+function isDirty (strLooter, strValue, strNote, strOS)
+    MRT_Debug("isDirty fired!");
+    if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) and (strOS == lastOS) then
+        MRT_Debug("isDirty = false");
         return false;
     else
+        MRT_Debug("isDirty = true");
         return true;
     end
 end
@@ -226,7 +259,7 @@ function MRT_GUI_ParseValues()
         ["OnDoubleClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             MRT_Debug("Doubleclick fired!");
             if MRT_GUI_FourRowDialog:IsVisible() then
-                if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText()) then
+                if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked()) then
                     MRT_Debug("STOnDoubleClick: isDirty == True");
                     MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                 end
@@ -240,7 +273,7 @@ function MRT_GUI_ParseValues()
             MRT_Debug("MRT_Onclick fired!");
             doOnClick(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             if MRT_GUI_FourRowDialog:IsVisible() then
-                if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText()) then
+                if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked()) then
                     MRT_Debug("STOnClick: isDirty == True");
                     MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                 end
@@ -908,7 +941,13 @@ function MRT_GUI_LootModify()
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
     lastBossNum = bossnum;
     local lootnote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"];
-
+    local lootoffspec = MRT_RaidLog[raidnum]["Loot"][lootnum]["Offspec"];
+    
+    if lootoffspec then
+        MRT_Debug("MRT_GUI_LootModify: lootoffspec: True");
+    else
+        MRT_Debug("MRT_GUI_LootModify: lastLooter: False");
+    end
 
     -- Force item into cache:
     GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
@@ -939,6 +978,18 @@ function MRT_GUI_LootModify()
     MRT_Debug("MRT_GUI_LootModify: lastLooter: "..lastLooter);
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
     MRT_GUI_FourRowDialog_EB3:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    -- figure out how to get check box info
+    if lootoffspec then 
+        MRT_GUI_FourRowDialog_CB1:SetChecked(true);
+    else
+        MRT_GUI_FourRowDialog_CB1:SetChecked(false);
+    end
+    lastOS = MRT_GUI_FourRowDialog_CB1:GetChecked();
+    if lastOS then 
+        MRT_Debug("MRT_GUI_LootModify: lastOS = True");
+    else
+        MRT_Debug("MRT_GUI_LootModify: lastOS = False");
+    end
     lastValue = MRT_GUI_FourRowDialog_EB3:GetText();
     MRT_Debug("MRT_GUI_LootModify: lastValue: "..lastValue);
     MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
@@ -971,6 +1022,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     local looter = MRT_GUI_FourRowDialog_EB2:GetText();
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
     local lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
+    local offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
     if (cost == "") then cost = 0; end
     cost = tonumber(cost);
     if (lootNote == nil or lootNote == "" or lootNote == " ") then lootNote = nil; end
@@ -1000,8 +1052,15 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
         ["Looter"] = looter,
         ["DKPValue"] = cost,
         ["Note"] = lootNote,
+        ["Offspec"] = offspec,
     }
     if (lootnum) then
+        MRT_Debug("MRT_GUI_LootModifyAccept:lootnum if ");
+        if MRT_LootInfo["Offspec"] then
+            MRT_Debug("MRT_GUI_LootModifyAccept:Offspec = True");
+        else
+            MRT_Debug("MRT_GUI_LootModifyAccept:Offspec = False");
+        end
         local oldLootDB = MRT_RaidLog[raidnum]["Loot"][lootnum];
         -- create a copy of the old loot data for the api
         local oldItemInfoTable = {}
@@ -1524,24 +1583,41 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
     end
     -- if a bossnum is given, just list loot of this boss
     if (bossnum) then
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
         local index = 1;
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             if (v["BossNumber"] == bossnum) then
-                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
+                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                if v["Offspec"] then
+                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                else
+                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                end
                 index = index + 1;
             end
         end
         MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_BossLootTitle"]);
     -- there is only a raidnum and no bossnum, list raid loot
     elseif (raidnum) then
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
         local index = 1;
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             --MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
             -- SF: if unassigned, make it red.
             if v["Looter"] == "unassigned" then
-                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"]};
+                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                if v["Offspec"] then
+                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                else
+                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                end
             else 
-                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
+                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                if v["Offspec"] then
+                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData3;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                else
+                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData3;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                end
             end 
             index = index + 1;
         end

@@ -417,6 +417,7 @@ MRT_L.GUI["Cell_LFR"] = "LFR"
 MRT_L.GUI["Cell_Normal"] = "Normal"
 --[[Translation missing --]]
 MRT_L.GUI["Col_Cost"] = "Cost"
+MRT_L.GUI["Col_OffSpec"] = "OS"
 --[[Translation missing --]]
 MRT_L.GUI["Col_Date"] = "Date"
 --[[Translation missing --]]

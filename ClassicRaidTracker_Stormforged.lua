@@ -1340,6 +1340,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     local dkpValue = 0;
     local lootAction = nil;
     local itemNote = nil;
+    local offspec = false;
     local supressCostDialog = nil;
     local gp1 = nil;
     -- if EPGP GP system is enabled, get GP values
@@ -1432,6 +1433,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         ["BossNumber"] = MRT_NumOfLastBoss,
         ["Time"] = MRT_GetCurrentTime(),
         ["Note"] = dNote, -- itemNote
+        ["OffSpec"] = offspec, --OffSpec costing
     };
     tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"], MRT_LootInfo);
     -- get current loot mode
@@ -1472,6 +1474,7 @@ function MRT_ManualAddLoot(itemLink, looter, cost)
     end
     if (not MRT_NumOfLastBoss) then MRT_AddBosskill(MRT_L.Core["Trash Mob"]); end
     local itemName, _, itemId, itemString, itemRarity, itemColor, itemLevel, _, itemType, itemSubType, _, _, _, _ = MRT_GetDetailedItemInformation(itemLink);
+    local offspec = false;
     if (not itemName) then
         MRT_Debug("MRT_ManualAddLoot(): Failed horribly when trying to get item informations.");
         return;
@@ -1487,6 +1490,7 @@ function MRT_ManualAddLoot(itemLink, looter, cost)
         ["DKPValue"] = cost,
         ["BossNumber"] = MRT_NumOfLastBoss,
         ["Time"] = MRT_GetCurrentTime(),
+        ["OffSpec"] = offspec,
     };
     tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"], lootInfo);
     local itemNum = #MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"];
