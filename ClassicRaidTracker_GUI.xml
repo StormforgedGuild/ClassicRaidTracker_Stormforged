@@ -373,11 +373,11 @@
                 local cost;
                 self:SetChecked(enable and true or false)
                 if enable then
-                    cost = MRT_GUI_FourRowDialog_EB3:GetText();
-                    MRT_GUI_FourRowDialog_EB3:SetText(cost*.25);
+                    --cost = MRT_GUI_FourRowDialog_EB3:GetText();
+                    --MRT_GUI_FourRowDialog_EB3:SetText(cost*.25);
                 else
-                    cost = MRT_GUI_FourRowDialog_EB3:GetText();
-                    MRT_GUI_FourRowDialog_EB3:SetText(cost/.25);
+                    --cost = MRT_GUI_FourRowDialog_EB3:GetText();
+                    --MRT_GUI_FourRowDialog_EB3:SetText(cost/.25);
                 end
             </OnClick>
             <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
