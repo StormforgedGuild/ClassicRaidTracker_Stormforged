@@ -154,7 +154,7 @@ local MRT_BossLootTableColDef = {
             if itemId then
                 cellFrame:SetBackdrop( { bgFile = "Interface\\BUTTONS\\ui-checkbox-check", insets = { left = 0, right = 2, top = 2, bottom = 2 }, } );
             else
-                cellFrame:SetBackdrop( { bgFile = "Interface\\BUTTONS\\checkbuttonglow", insets = { left = 0, right = 2, top = 2, bottom = 2 }, } );
+                --cellFrame:SetBackdrop( { bgFile = "Interface\\BUTTONS\\checkbuttonglow", insets = { left = 0, right = 2, top = 2, bottom = 2 }, } );
             end
         end
         -- tooltip handling
