@@ -351,9 +351,39 @@
         </Anchors>
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
-          <OnTabPressed>MRT_GUI_FourRowDialog_EB4:SetFocus();</OnTabPressed>
+          <OnTabPressed>MRT_GUI_FourRowDialog_CB1:SetFocus();</OnTabPressed>
         </Scripts>
       </EditBox>
+       <CheckButton name="$parent_CB1" inherits="OptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_EB3" x="0" y="0"/>
+        </Anchors>
+        <Layers>
+          <Layer level="OVERLAY">
+            <FontString name="$parent_Text" inherits="GameFontWhite" text="OS">
+              <Anchors>
+                <Anchor point="LEFT" relativePoint="TOP" x="-9" y="5"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+        <Scripts>
+            <OnClick>
+                local enable = self:GetChecked()
+                local cost;
+                self:SetChecked(enable and true or false)
+                if enable then
+                    cost = MRT_GUI_FourRowDialog_EB3:GetText();
+                    MRT_GUI_FourRowDialog_EB3:SetText(cost*.25);
+                else
+                    cost = MRT_GUI_FourRowDialog_EB3:GetText();
+                    MRT_GUI_FourRowDialog_EB3:SetText(cost/.25);
+                end
+            </OnClick>
+            <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
+          <OnTabPressed>MRT_GUI_FourRowDialog_EB4:SetFocus();</OnTabPressed>
+        </Scripts>
+      </CheckButton>
       <EditBox name="$parent_EB4" inherits="MRT_GUI_Editbox_Template">
         <Anchors>
           <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent_EB3">
