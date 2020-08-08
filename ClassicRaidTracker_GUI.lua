@@ -874,6 +874,7 @@ function MRT_GUI_LootAdd()
     MRT_GUI_PlayerDropDownTable.frame:Hide();
     -- prepare dialog
     MRT_GUI_FourRowDialog_Title:SetText(MRT_L.GUI["Add loot data"]);
+    MRT_GUI_FourRowDialog_EB1:SetEnabled(true);
     MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
     MRT_GUI_FourRowDialog_EB1:SetText("");
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
@@ -975,7 +976,9 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     if (lootNote == nil or lootNote == "" or lootNote == " ") then lootNote = nil; end
     -- sanity-check values here - especially the itemlink / looter is free text / cost has to be a number
     local itemName, itemLink, itemId, itemString, itemRarity, itemColor, _, _, _, _, _, _, _, _ = MRT_GetDetailedItemInformation(itemLinkFromText);
-    MRT_Debug("MRT_GUI_LootModifyAccept:itemColor: "..itemColor);
+    if itemColor then 
+        MRT_Debug("MRT_GUI_LootModifyAccept:itemColor: "..itemColor);
+    end
     if (not itemName) then
         MRT_Print(MRT_L.GUI["No itemLink found"]);
         return;
