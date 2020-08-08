@@ -351,7 +351,7 @@
         </Anchors>
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
-          <OnTabPressed>MRT_GUI_FourRowDialog_CB1:SetFocus();</OnTabPressed>
+          <OnTabPressed>MRT_GUI_FourRowDialog_EB4:SetFocus();</OnTabPressed>
         </Scripts>
       </EditBox>
        <CheckButton name="$parent_CB1" inherits="OptionsCheckButtonTemplate">
@@ -380,8 +380,6 @@
                     MRT_GUI_FourRowDialog_EB3:SetText(cost/.25);
                 end
             </OnClick>
-            <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
-          <OnTabPressed>MRT_GUI_FourRowDialog_EB4:SetFocus();</OnTabPressed>
         </Scripts>
       </CheckButton>
       <EditBox name="$parent_EB4" inherits="MRT_GUI_Editbox_Template">
@@ -392,7 +390,7 @@
         </Anchors>
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
-          <OnTabPressed>MRT_GUI_FourRowDialog_EB1:SetFocus();</OnTabPressed>
+          <OnTabPressed>MRT_GUI_FourRowDialog_EB2:SetFocus();</OnTabPressed>
         </Scripts>
       </EditBox>
       <Button name="$parent_DropDownButton" inherits="MRT_GUI_DropDownButtonTemplate">
