@@ -607,10 +607,12 @@ do
 		return (realrow > self.offset and realrow <= (self.displayRows + self.offset))
 	end
 
-	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, st, ...)
+	
+	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, bdonotdeselect, ...)
 		MRT_Debug("ST_doOnclick fired!");
-		local st = table;
+		st = table;
 		if button == "LeftButton" then	-- LS: only handle on LeftButton click (right passes thru)
+			MRT_Debug("ST_doOnclick button == Leftbutton");
 			if not (row or realrow) then
 				MRT_Debug("ST_doOnclick sorting!");
 				for i, col in ipairs(st.cols) do
@@ -628,9 +630,16 @@ do
 				table:SortData();
 
 			else
+				MRT_Debug("ST_doOnclick row or realrow");
 				if table:GetSelection() == realrow then
-					--table:ClearSelection();
+					if not bdonotdeselect then
+						MRT_Debug("ST_doOnclick not bdonotdeselct");
+						table:ClearSelection();
+					else 
+						MRT_Debug("ST_doOnclick bdonotdeselct");
+					end
 				else
+					MRT_Debug("ST_doOnclick setselction");
 					table:SetSelection(realrow);
 				end
 			end
@@ -708,7 +717,7 @@ do
 			["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)		-- LS: added "button" argument
 				MRT_Debug("ST_Onclick fired!");
 				doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...);
-				
+				return true;
 				--[[ if button == "LeftButton" then	-- LS: only handle on LeftButton click (right passes thru)
 					if not (row or realrow) then
 						for i, col in ipairs(st.cols) do

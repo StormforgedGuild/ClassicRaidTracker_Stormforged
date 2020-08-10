@@ -149,7 +149,7 @@ local MRT_BossLootTableColDef = {
         -- Show Checkbox
         if fShow then
             local itemId = self:GetCell(realrow, column);
-            MRT_Debug("DoCellUpdateCB: Column: " ..column);
+            --MRT_Debug("DoCellUpdateCB: Column: " ..column);
             
             if itemId then
                 cellFrame:SetBackdrop( { bgFile = "Interface\\BUTTONS\\ui-checkbox-check", insets = { left = 0, right = 2, top = 2, bottom = 2 }, } );
@@ -269,9 +269,10 @@ function MRT_GUI_ParseValues()
                 MRT_GUI_LootModify();
             end;
         end,
-        ["OnClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
+        ["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             MRT_Debug("MRT_Onclick fired!");
-            doOnClick(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
+            donotdeselect = false;
+            doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ..., true)
             if MRT_GUI_FourRowDialog:IsVisible() then
                 if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked()) then
                     MRT_Debug("STOnClick: isDirty == True");
