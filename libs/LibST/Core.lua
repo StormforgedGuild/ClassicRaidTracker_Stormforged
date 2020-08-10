@@ -608,7 +608,7 @@ do
 	end
 
 	
-	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, bdonotdeselect, ...)
+	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, disabledeselect, ...)
 		MRT_Debug("ST_doOnclick fired!");
 		st = table;
 		if button == "LeftButton" then	-- LS: only handle on LeftButton click (right passes thru)
@@ -632,11 +632,11 @@ do
 			else
 				MRT_Debug("ST_doOnclick row or realrow");
 				if table:GetSelection() == realrow then
-					if not bdonotdeselect then
-						MRT_Debug("ST_doOnclick not bdonotdeselct");
+					if not disabledeselect then				--disable deselect in loot table
+						MRT_Debug("ST_doOnclick not disabledeselect");
 						table:ClearSelection();
 					else 
-						MRT_Debug("ST_doOnclick bdonotdeselct");
+						MRT_Debug("ST_doOnclick disabledeselect"); -- do nothing in the loot table
 					end
 				else
 					MRT_Debug("ST_doOnclick setselction");
