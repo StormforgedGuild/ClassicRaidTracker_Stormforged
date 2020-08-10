@@ -346,6 +346,7 @@
         </Scripts>
       </EditBox>
       <EditBox name="$parent_EB3" inherits="MRT_GUI_Editbox_Template">
+        <Size x="115" y="32"/>
         <Anchors>
           <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent_EB2" x="0" y="-50"/>
         </Anchors>
@@ -356,13 +357,13 @@
       </EditBox>
        <CheckButton name="$parent_CB1" inherits="OptionsCheckButtonTemplate">
         <Anchors>
-          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_EB3" x="0" y="0"/>
+          <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_EB3" x="0" y="-4"/>
         </Anchors>
         <Layers>
           <Layer level="OVERLAY">
-            <FontString name="$parent_Text" inherits="GameFontWhite" text="OS">
+            <FontString name="$parent_Text" inherits="GameFontWhite" text="OffSpec">
               <Anchors>
-                <Anchor point="LEFT" relativePoint="TOP" x="-9" y="5"/>
+                <Anchor point="LEFT" relativePoint="TOP" x="-10" y="10"/>
               </Anchors>
             </FontString>
           </Layer>
@@ -384,7 +385,7 @@
       </CheckButton>
       <EditBox name="$parent_EB4" inherits="MRT_GUI_Editbox_Template">
         <Anchors>
-          <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent_EB3">
+          <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent_EB3">
             <Offset x="0" y="-50"/>
           </Anchor>
         </Anchors>
