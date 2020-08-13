@@ -278,7 +278,9 @@
   <Frame name="MRT_GUI_FourRowDialog" toplevel="true" hidden="true" enableMouse="true" movable="true" enableKeyboard="true" parent="UIParent">
     <Size x="215" y="283"/>
     <Anchors>
-      <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent"/>
+      <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent">
+        <Offset x="394" y="3"/>
+      </Anchor>
     </Anchors>
     <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
       <TileSize val="32"/>

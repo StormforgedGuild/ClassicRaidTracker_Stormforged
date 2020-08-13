@@ -426,7 +426,12 @@ function MRT_GUI_Toggle()
             MRT_GUI_RaidLogTable:SetSelection(1);
         else
             MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);
-            MRT_GUI_RaidLogTable:ClearSelection();
+            local blnIsRowVisible = MRT_GUI_RaidLogTable:GetRow(1); -- get first row
+            if not blnIsRowVisible then  -- if there is no row, then it is empty
+                MRT_GUI_RaidLogTable:ClearSelection();
+            else
+                MRT_GUI_RaidLogTable:SetSelection(1);   --if there is a row, select the most current
+            end 
         end
     else
         MRT_GUIFrame:Hide();
