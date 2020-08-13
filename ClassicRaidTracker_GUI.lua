@@ -272,7 +272,7 @@ function MRT_GUI_ParseValues()
         ["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             MRT_Debug("MRT_Onclick fired!");
             donotdeselect = false;
-            doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ..., true)
+            doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ..., true)  --passing true so that we don't deselect in the loot table.
             if MRT_GUI_FourRowDialog:IsVisible() then
                 if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked()) then
                     MRT_Debug("STOnClick: isDirty == True");
@@ -418,6 +418,15 @@ function MRT_GUI_Toggle()
         else
             MRT_GUI_RaidAttendeesTableUpdate(lastSelectedRaidNum);
             MRT_GUI_BossDetailsTableUpdate(lastSelectedBossNum);
+        end
+        --select active raid
+        if (MRT_NumOfCurrentRaid) then
+            MRT_Debug("MRT_GUI_TOGGLE MRT_NumOfCurrentRaid: " .. MRT_NumOfCurrentRaid);
+            MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false);
+            MRT_GUI_RaidLogTable:SetSelection(1);
+        else
+            MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);
+            MRT_GUI_RaidLogTable:ClearSelection();
         end
     else
         MRT_GUIFrame:Hide();
@@ -1381,6 +1390,7 @@ function MRT_GUI_StartNewRaidAccept()
     -- create new raid
     MRT_CreateNewRaid(zoneName, raidSize, diffId);
     MRT_GUI_CompleteTableUpdate();
+    MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false); -- disable add raid button
 end
 
 function MRT_GUI_MakeAttendanceCheck()
@@ -1406,12 +1416,14 @@ function MRT_GUI_EndCurrentRaid()
         return;
     end
     MRT_EndActiveRaid();
+    MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);  --enable start new raid button.
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
         return;
     end
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     MRT_GUI_RaidAttendeesTableUpdate(raidnum);
+    
 end
 
 function MRT_GUI_ResumeLastRaid()

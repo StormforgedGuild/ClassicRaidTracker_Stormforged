@@ -652,6 +652,9 @@
         <Anchors>
           <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent"></Anchor>
         </Anchors>
+        <Scripts>
+            <OnMouseUp>MRT_GUI_HideDialogs();</OnMouseUp>
+        </Scripts>
       </Button>
     </Frames>
     <Scripts>
