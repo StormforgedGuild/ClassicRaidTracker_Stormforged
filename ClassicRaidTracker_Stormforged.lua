@@ -924,9 +924,11 @@ function MRT_CheckZoneAndSizeStatus()
             if (MRT_NumOfCurrentRaid) then MRT_EndActiveRaid(); end
             return;
         end
+        MRT_Debug("MRT_CheckZoneAndSizeStatus: At this point, we should have something that should be tracked");
         -- At this point, we should have something that should be tracked.
         -- If there is no active raid, just start one
         if (not MRT_NumOfCurrentRaid) then
+            MRT_Debug("no current raid, create one");
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
             --SF: Use Short Name if it's Classic
             if not MRT_LegacyRaidZonesClassic[areaID] then

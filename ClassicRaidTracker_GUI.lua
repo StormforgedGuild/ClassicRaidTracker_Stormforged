@@ -423,9 +423,11 @@ function MRT_GUI_Toggle()
         if (MRT_NumOfCurrentRaid) then
             MRT_Debug("MRT_GUI_TOGGLE MRT_NumOfCurrentRaid: " .. MRT_NumOfCurrentRaid);
             MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false);
+            MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(true);
             MRT_GUI_RaidLogTable:SetSelection(1);
         else
             MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);
+            MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(false);
             local blnIsRowVisible = MRT_GUI_RaidLogTable:GetRow(1); -- get first row
             if not blnIsRowVisible then  -- if there is no row, then it is empty
                 MRT_GUI_RaidLogTable:ClearSelection();
@@ -1396,6 +1398,7 @@ function MRT_GUI_StartNewRaidAccept()
     MRT_CreateNewRaid(zoneName, raidSize, diffId);
     MRT_GUI_CompleteTableUpdate();
     MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false); -- disable add raid button
+    MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(true); --enable end raid button
 end
 
 function MRT_GUI_MakeAttendanceCheck()
@@ -1422,6 +1425,7 @@ function MRT_GUI_EndCurrentRaid()
     end
     MRT_EndActiveRaid();
     MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);  --enable start new raid button.
+    MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(false); --disable end raid button.
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
         return;
