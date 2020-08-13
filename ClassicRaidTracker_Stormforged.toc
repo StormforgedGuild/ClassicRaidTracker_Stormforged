@@ -10,6 +10,7 @@
 ## X-Min-Interface: 11305
 ## X-Curse-Project-ID: 399582
 
+
 embeds.xml
 localization.lua
 localization_deDE.lua
