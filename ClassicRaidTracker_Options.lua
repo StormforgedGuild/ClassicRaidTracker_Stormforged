@@ -93,6 +93,8 @@ function MRT_Options_ParseValues()
         MRT_L.Options["TP_LogAVRaids"])
     MRT_Options_TrackingPanel_LogClassicRaids_CB_Text:SetText(
         MRT_L.Options["TP_LogClassicRaids"])
+    --MRT_Options_TrackingPanel_LogClassicRaids_CB:SetChecked(true); --SF: always set for Stormforged
+    MRT_Options_TrackingPanel_LogClassicRaids_CB:SetEnabled(false);  --SF: don't enable this option.
     MRT_Options_TrackingPanel_LogBCRaids_CB_Text:SetText(
         MRT_L.Options["TP_LogBCRaids"])
     MRT_Options_TrackingPanel_LogWotLKRaids_CB_Text:SetText(
@@ -107,6 +109,7 @@ function MRT_Options_ParseValues()
         MRT_L.Options["TP_LogLootModePersonal"])
     MRT_Options_TrackingPanel_CreateNewRaidOnNewZone_CB_Text:SetText(
         MRT_L.Options["TP_CreateNewRaidOnNewZone"])
+        MRT_Options_TrackingPanel_CreateNewRaidOnNewZone_CB:SetEnabled(false); -- set default to false for Stormforged
     MRT_Options_TrackingPanel_UseServerTime_CB_Text:SetText(
         MRT_L.Options["TP_UseServerTime"])
     -- ItemsTrackingPanel
@@ -116,14 +119,16 @@ function MRT_Options_ParseValues()
     MRT_Options_ItemsTrackingPanel_AskForDKPValue_CB_Text:SetText(
         MRT_L.Options["TP_AskForDKPValue"])
     MRT_Options_ItemsTrackingPanel_AskForDKPValuePersonal_CB_Text:SetText(
-        MRT_L.Options["TP_AskForDKPValuePersonal"])
+        MRT_L.Options["TP_AskForDKPValuePersonal"])   
     MRT_Options_ItemsTrackingPanel_MinItemQualityToGetCost_SliderText:SetText(
         MRT_L.Options["TP_MinItemQualityToGetCost_Desc"])
     MRT_Options_ItemsTrackingPanel_OnlyTrackItemsAbove_Text:SetText(
         MRT_L.Options["TP_OnlyTrackItemsAbove"])
     MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB_Text:SetText(
         MRT_L.Options["ITP_UseEPGP_GP_Values"])
-    MRT_Options_ItemsTrackingPanel_ChooseAutoFocus_Title:SetText(
+    --MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:SetChecked(true); --SF: always set for Stormforged
+    MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:SetEnabled(false);  --SF: don't enable this option.
+        MRT_Options_ItemsTrackingPanel_ChooseAutoFocus_Title:SetText(
         MRT_L.Options["ITP_AutoFocus_Title"])
     MRT_Options_ItemsTrackingPanel_Create_ChooseAutoFocus_DropDownMenu()
     MRT_Options_ItemsTrackingPanel_IgnoreEnchantingMats_CB_Text:SetText(

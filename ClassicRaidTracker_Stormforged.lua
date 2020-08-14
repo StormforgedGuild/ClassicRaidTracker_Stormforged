@@ -84,7 +84,7 @@ local MRT_Defaults = {
         ["Tracking_MinItemQualityToLog"] = 4,                                       -- 0:poor, 1:common, 2:uncommon, 3:rare, 4:epic, 5:legendary, 6:artifact
         ["Tracking_MinItemQualityToGetDKPValue"] = 4,                               -- 0:poor, 1:common, 2:uncommon, 3:rare, 4:epic, 5:legendary, 6:artifact
         ["Tracking_AskCostAutoFocus"] = 2,                                          -- 1: always AutoFocus, 2: when not in combat, 3: never
-        ["Tracking_CreateNewRaidOnNewZone"] = true,
+        ["Tracking_CreateNewRaidOnNewZone"] = false,                                -- set default to false... bad things happen when true.
         ["Tracking_OnlyTrackItemsAboveILvl"] = 0,
         ["Tracking_UseServerTime"] = false,
         ["ItemTracking_IgnoreEnchantingMats"] = true,
@@ -588,7 +588,8 @@ function MRT_UpdateSavedOptions()
         MRT_Options["General_OptionsVersion"] = 12;
     end
     if MRT_Options["General_OptionsVersion"] == 12 then
-        MRT_Options["ItemTracking_UseEPGPValues"] = false;
+        --MRT_Options["ItemTracking_UseEPGPValues"] = false;
+        MRT_Options["ItemTracking_UseEPGPValues"] = true; -- setting to true always for SF
         MRT_Options["General_OptionsVersion"] = 13;
     end
     if MRT_Options["General_OptionsVersion"] == 13 then
