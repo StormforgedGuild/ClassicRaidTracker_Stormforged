@@ -950,6 +950,17 @@ function MRT_CheckZoneAndSizeStatus()
             end
             return;
         end
+        -- If instance changed, check to see if it's the same zone name.  If not, create.  If so do nothing.
+        if (MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= MRT_LegacyRaidShortName[areaID]) then
+            MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
+            --SF: Use Short Name if it's Classic
+            if not MRT_LegacyRaidZonesClassic[areaID] then
+                MRT_CreateNewRaid(localInstanceInfoName, maxPlayers, diffID);
+            else
+                MRT_CreateNewRaid(MRT_LegacyRaidShortName[areaID], maxPlayers, diffID);
+            end
+            return;
+        end
         -- diffID not changed. If instance changed, check if auto create on new instance is on.
         if ((MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= localInstanceInfoName) and MRT_Options["Tracking_CreateNewRaidOnNewZone"]) then
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
