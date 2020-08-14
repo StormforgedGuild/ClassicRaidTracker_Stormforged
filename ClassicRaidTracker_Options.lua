@@ -109,7 +109,7 @@ function MRT_Options_ParseValues()
         MRT_L.Options["TP_LogLootModePersonal"])
     MRT_Options_TrackingPanel_CreateNewRaidOnNewZone_CB_Text:SetText(
         MRT_L.Options["TP_CreateNewRaidOnNewZone"])
-        MRT_Options_TrackingPanel_CreateNewRaidOnNewZone_CB:SetEnabled(false); -- set default to false for Stormforged
+        --MRT_Options_TrackingPanel_CreateNewRaidOnNewZone_CB:SetEnabled(false); -- disable this UI for SF.. 
     MRT_Options_TrackingPanel_UseServerTime_CB_Text:SetText(
         MRT_L.Options["TP_UseServerTime"])
     -- ItemsTrackingPanel
