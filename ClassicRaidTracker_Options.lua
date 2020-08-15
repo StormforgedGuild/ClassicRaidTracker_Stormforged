@@ -94,7 +94,7 @@ function MRT_Options_ParseValues()
     MRT_Options_TrackingPanel_LogClassicRaids_CB_Text:SetText(
         MRT_L.Options["TP_LogClassicRaids"])
     --MRT_Options_TrackingPanel_LogClassicRaids_CB:SetChecked(true); --SF: always set for Stormforged
-    MRT_Options_TrackingPanel_LogClassicRaids_CB:SetEnabled(false);  --SF: don't enable this option.
+    --MRT_Options_TrackingPanel_LogClassicRaids_CB:SetEnabled(false);  --SF: don't enable this option.
     MRT_Options_TrackingPanel_LogBCRaids_CB_Text:SetText(
         MRT_L.Options["TP_LogBCRaids"])
     MRT_Options_TrackingPanel_LogWotLKRaids_CB_Text:SetText(
@@ -127,7 +127,7 @@ function MRT_Options_ParseValues()
     MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB_Text:SetText(
         MRT_L.Options["ITP_UseEPGP_GP_Values"])
     --MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:SetChecked(true); --SF: always set for Stormforged
-    MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:SetEnabled(false);  --SF: don't enable this option.
+    --MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:SetEnabled(false);  --SF: don't enable this option.
         MRT_Options_ItemsTrackingPanel_ChooseAutoFocus_Title:SetText(
         MRT_L.Options["ITP_AutoFocus_Title"])
     MRT_Options_ItemsTrackingPanel_Create_ChooseAutoFocus_DropDownMenu()
