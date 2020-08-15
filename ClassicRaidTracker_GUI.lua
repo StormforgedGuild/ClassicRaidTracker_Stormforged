@@ -141,7 +141,7 @@ local MRT_BossLootTableColDef = {
                 MRT_GUI_ItemTT:SetOwner(UIParent, "ANCHOR_NONE");
             end
         end,
-    },
+    }, 
     {                                                          -- col for OffSpec
     ["name"] = MRT_L.GUI["Col_OffSpec"], 
     ["width"] = 30,
@@ -930,7 +930,7 @@ function MRT_GUI_LootAdd()
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
     MRT_GUI_FourRowDialog_EB2:SetText("");
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
-    MRT_GUI_FourRowDialog_EB3:SetText("");
+    MRT_GUI_FourRowDialog_EB3:SetText("0");                         --setting default to zero so that we won't get errors with OS
     MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
     MRT_GUI_FourRowDialog_EB4:SetText("");
     MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);

@@ -349,7 +349,6 @@ do
 				b1 = b1(self.data, self.cols, rowb, sortbycol, self);
 			end
 		end
-
 		if type(a1) ~= type(b1) then
 			local typea, typeb = type(a1), type(b1);
 			if typea == "number" and typeb == "string" then
@@ -366,7 +365,18 @@ do
 				end
 			end
 		end
-
+		if (type(a1) == "boolean") or (not a1) then
+			if a1 then
+				a1 = 1;
+			else 
+				a1 = 0
+			end
+			if b1 then
+				b1 = 1;
+			else 
+				b1 = 0;
+			end
+		end
 		if a1 == b1 then
 			if column.sortnext then
 				local nextcol = self.cols[column.sortnext];
