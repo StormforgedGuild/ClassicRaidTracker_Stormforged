@@ -1619,12 +1619,21 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
         local index = 1;
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             if (v["BossNumber"] == bossnum) then
-                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
-                if v["Offspec"] then
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                if v["Looter"] == "unassigned" then
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    if v["Offspec"] then
+                        MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                    else
+                        MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                    end
                 else
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
-                end
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    if v["Offspec"] then
+                        MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                    else
+                        MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                    end
+                end 
                 index = index + 1;
             end
         end
