@@ -929,10 +929,11 @@ function MRT_GUI_LootAdd()
     -- prepare dialog
     MRT_GUI_FourRowDialog_Title:SetText(MRT_L.GUI["Add loot data"]);
     MRT_GUI_FourRowDialog_EB1:SetEnabled(true);
+    MRT_GUI_FourRowDialog_EB1:SetAutoFocus(true);
     MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
     MRT_GUI_FourRowDialog_EB1:SetText("");
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
-    MRT_GUI_FourRowDialog_EB2:SetText("");
+    MRT_GUI_FourRowDialog_EB2:SetText("unassigned");
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
     MRT_GUI_FourRowDialog_EB3:SetText("0");                         --setting default to zero so that we won't get errors with OS
     MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
@@ -1024,8 +1025,13 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Modify"]);
     MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum); end);
     MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
+    MRT_GUI_FourRowDialog_EB1:SetAutoFocus(false);
+    MRT_GUI_FourRowDialog_EB1:SetCursorPosition(1);
+
+    MRT_GUI_FourRowDialog_EB2:SetFocus();
     MRT_GUI_FourRowDialog:Show();
-    MRT_GUI_FourRowDialog_EB1:SetEnabled(false);
+    --MRT_GUI_FourRowDialog_EB1:SetEnabled(false);
+    
 end
 
 function MRT_GUI_PlayerDropDownList_Toggle()
