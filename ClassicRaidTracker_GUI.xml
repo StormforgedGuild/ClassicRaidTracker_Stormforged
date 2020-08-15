@@ -345,7 +345,12 @@
               if (not gp1) then
                 MRT_GUI_FourRowDialog_EB3:SetText("0");
               else
-                MRT_GUI_FourRowDialog_EB3:SetText(gp1);
+                local GPtext = MRT_GUI_FourRowDialog_EB3:GetText();
+                if (GPtext == "") or (GPText == "0") then
+                  MRT_GUI_FourRowDialog_EB3:SetText(gp1);
+                else
+                  --GP already set, do nothing.
+                end 
               end
               MRT_GUI_FourRowDialog_EB1:HighlightText(0,0);
             end 
@@ -392,10 +397,14 @@
                 self:SetChecked(enable and true or false)
                 if enable then
                     cost = MRT_GUI_FourRowDialog_EB3:GetText();
-                    MRT_GUI_FourRowDialog_EB3:SetText(cost*.25);
+                    if cost ~= "" then
+                      MRT_GUI_FourRowDialog_EB3:SetText(cost*.25);
+                    end
                 else
                     cost = MRT_GUI_FourRowDialog_EB3:GetText();
-                    MRT_GUI_FourRowDialog_EB3:SetText(cost/.25);
+                    if cost ~= "" then
+                      MRT_GUI_FourRowDialog_EB3:SetText(cost/.25);
+                    end
                 end
             </OnClick>
         </Scripts>
