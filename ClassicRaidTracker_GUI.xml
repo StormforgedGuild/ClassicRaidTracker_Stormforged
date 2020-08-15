@@ -347,9 +347,9 @@
               else
                 MRT_GUI_FourRowDialog_EB3:SetText(gp1);
               end
+              MRT_GUI_FourRowDialog_EB1:HighlightText(0,0);
             end 
           </OnEditFocusLost>
-
         </Scripts>
       </EditBox>
       <EditBox name="$parent_EB2" inherits="MRT_GUI_Editbox_Template">
@@ -408,7 +408,7 @@
         </Anchors>
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
-          <OnTabPressed>MRT_GUI_FourRowDialog_EB2:SetFocus();</OnTabPressed>
+          <OnTabPressed>MRT_GUI_FourRowDialog_EB1:SetFocus();</OnTabPressed>
         </Scripts>
       </EditBox>
       <Button name="$parent_DropDownButton" inherits="MRT_GUI_DropDownButtonTemplate">
