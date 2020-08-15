@@ -899,10 +899,14 @@ function MRT_GUI_LootAdd()
         return;
     end
     local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
-    if (boss_select == nil) then
+    --[[ if (boss_select == nil) then
         MRT_Print(MRT_L.GUI["No boss selected"]);
         return;
+    end ]]
+    if (boss_select == nil) then
+       MRT_GUI_RaidBosskillsTable:SetSelection(1);
     end
+    local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
     -- gather playerdata and fill drop down menu
@@ -932,7 +936,7 @@ function MRT_GUI_LootAdd()
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
     MRT_GUI_FourRowDialog_EB3:SetText("0");                         --setting default to zero so that we won't get errors with OS
     MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
-    MRT_GUI_FourRowDialog_EB4:SetText("");
+    MRT_GUI_FourRowDialog_EB4:SetText("Loot added manually");
     MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
     MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
     MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
@@ -1040,6 +1044,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
     local lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
     local offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
+    local newloot = false;
     if (cost == "") then cost = 0; end
     cost = tonumber(cost);
     if (lootNote == nil or lootNote == "" or lootNote == " ") then lootNote = nil; end
@@ -1116,6 +1121,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
             end
         end
     else
+        newloot = true;
         MRT_LootInfo["ItemCount"] = 1;
         MRT_LootInfo["Time"] = MRT_RaidLog[raidnum]["Bosskills"][bossnum]["Date"] + 15;
         tinsert(MRT_RaidLog[raidnum]["Loot"], MRT_LootInfo);
@@ -1157,6 +1163,10 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     if (raidnum_selected == raidnum and bossnum_selected == bossnum) then
         MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(bossnum,true)");
         MRT_GUI_BossLootTableUpdate(bossnum, true);
+    end
+    if newloot then
+        MRT_Debug("MRT_GUI_Accept:new loot update the table");
+        MRT_GUI_BossLootTableUpdate(bossnum);
     end
 end
 
