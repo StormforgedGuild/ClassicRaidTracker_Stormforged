@@ -289,7 +289,7 @@ function MRT_GUI_ParseValues()
     --MRT_GUI_BossAttendeesTable:EnableSelection(true);
     -- parse button local / anchor buttons relative to tables
     MRT_GUIFrame_RaidLog_Export_Button:SetText(MRT_L.GUI["Button_Export"]);
-    MRT_GUIFrame_RaidLog_Export_Button:SetPoint("TOPLEFT", MRT_GUIFrame_EndCurrentRaid_Button, "RIGHT", 10, 19);
+    MRT_GUIFrame_RaidLog_Export_Button:SetPoint("TOPLEFT", MRT_GUIFrame_StartNewRaid_Button, "RIGHT", 10, 19);
     MRT_GUIFrame_RaidLog_Delete_Button:SetText(MRT_L.GUI["Button_Delete_Raid"]);
     MRT_GUIFrame_RaidLog_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_RaidLog_Export_Button, "RIGHT", 10, 0);
     --MRT_GUIFrame_RaidLog_ExportNormal_Button:SetText(MRT_L.GUI["Button_ExportNormal"]);
@@ -325,7 +325,7 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_StartNewRaid_Button:SetText(MRT_L.GUI["Button_StartNewRaid"]);
     MRT_GUIFrame_StartNewRaid_Button:SetPoint("TOPRIGHT", MRT_GUIFrame_RaidLogTitle, "TOPRIGHT", 240, -5);
     --MRT_GUIFrame_MakeAttendanceCheck_Button:SetText(MRT_L.GUI["Button_MakeGuildAttendanceCheck"]);
-    MRT_GUIFrame_EndCurrentRaid_Button:SetText(MRT_L.GUI["Button_EndCurrentRaid"]);
+    --MRT_GUIFrame_EndCurrentRaid_Button:SetText(MRT_L.GUI["Button_EndCurrentRaid"]);
     --MRT_GUIFrame_ResumeLastRaid_Button:SetText(MRT_L.GUI["Button_ResumeLastRaid"]);
     -- Create difficulty drop down menu
     mrt:UI_CreateTwoRowDDM()
@@ -422,12 +422,14 @@ function MRT_GUI_Toggle()
         --select active raid
         if (MRT_NumOfCurrentRaid) then
             MRT_Debug("MRT_GUI_TOGGLE MRT_NumOfCurrentRaid: " .. MRT_NumOfCurrentRaid);
-            MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false);
-            MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(true);
+            --MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false);
+            MRT_GUIFrame_StartNewRaid_Button:SetText(MRT_L.GUI["Button_EndCurrentRaid"]);
+            --MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(true);
             MRT_GUI_RaidLogTable:SetSelection(1);
         else
-            MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);
-            MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(false);
+            MRT_GUIFrame_StartNewRaid_Button:SetText(MRT_L.GUI["Button_StartNewRaid"]);
+            --MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);
+            --MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(false);
             local blnIsRowVisible = MRT_GUI_RaidLogTable:GetRow(1); -- get first row
             if not blnIsRowVisible then  -- if there is no row, then it is empty
                 MRT_GUI_RaidLogTable:ClearSelection();
@@ -1369,25 +1371,31 @@ function MRT_GUI_TakeSnapshot()
 end
 
 function MRT_GUI_StartNewRaid()
-    if (MRT_NumOfCurrentRaid) then
-        MRT_Print(MRT_L.GUI["Active raid found. End current one first."]);
-        return;
+    local startorend = MRT_GUIFrame_StartNewRaid_Button:GetText();
+
+    if (startorend == MRT_L.GUI["Button_StartNewRaid"]) then 
+        if (MRT_NumOfCurrentRaid) then
+            MRT_Print(MRT_L.GUI["Active raid found. End current one first."]);
+            return;
+        end
+        if (not MRT_IsInRaid()) then
+            MRT_Print(MRT_L.GUI["Player not in raid."]);
+            return;
+        end
+        MRT_GUI_TwoRowDialog_Title:SetText(MRT_L.GUI["Button_StartNewRaid"]);
+        MRT_GUI_TwoRowDialog_DDM:Show();
+        MRT_GUI_TwoRowDialog_EB1_Text:SetText(MRT_L.GUI["Zone name"]);
+        MRT_GUI_TwoRowDialog_EB1:SetText("");
+        MRT_GUI_TwoRowDialog_EB1:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUI_TwoRowDialog_EB1, "StartNewRaid_ZoneNameEB"); end);
+        MRT_GUI_TwoRowDialog_EB1:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
+        MRT_GUI_TwoRowDialog_EB2:Hide();
+        MRT_GUI_TwoRowDialog_OKButton:SetText(MRT_L.Core["MB_Ok"]);
+        MRT_GUI_TwoRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_StartNewRaidAccept(); end);
+        MRT_GUI_TwoRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
+        MRT_GUI_TwoRowDialog:Show();
+    else
+        MRT_GUI_EndCurrentRaid();
     end
-    if (not MRT_IsInRaid()) then
-        MRT_Print(MRT_L.GUI["Player not in raid."]);
-        return;
-    end
-    MRT_GUI_TwoRowDialog_Title:SetText(MRT_L.GUI["Button_StartNewRaid"]);
-    MRT_GUI_TwoRowDialog_DDM:Show();
-    MRT_GUI_TwoRowDialog_EB1_Text:SetText(MRT_L.GUI["Zone name"]);
-    MRT_GUI_TwoRowDialog_EB1:SetText("");
-    MRT_GUI_TwoRowDialog_EB1:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUI_TwoRowDialog_EB1, "StartNewRaid_ZoneNameEB"); end);
-    MRT_GUI_TwoRowDialog_EB1:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
-    MRT_GUI_TwoRowDialog_EB2:Hide();
-    MRT_GUI_TwoRowDialog_OKButton:SetText(MRT_L.Core["MB_Ok"]);
-    MRT_GUI_TwoRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_StartNewRaidAccept(); end);
-    MRT_GUI_TwoRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
-    MRT_GUI_TwoRowDialog:Show();
 end
 
 function MRT_GUI_StartNewRaidAccept()
@@ -1413,8 +1421,9 @@ function MRT_GUI_StartNewRaidAccept()
     -- create new raid
     MRT_CreateNewRaid(zoneName, raidSize, diffId);
     MRT_GUI_CompleteTableUpdate();
-    MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false); -- disable add raid button
-    MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(true); --enable end raid button
+    MRT_GUIFrame_StartNewRaid_Button:SetText(MRT_L.GUI["Button_EndCurrentRaid"]); -- rename raid button to end
+    --MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false); -- disable add raid button
+    --MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(true); --enable end raid button
 end
 
 function MRT_GUI_MakeAttendanceCheck()
@@ -1440,15 +1449,15 @@ function MRT_GUI_EndCurrentRaid()
         return;
     end
     MRT_EndActiveRaid();
-    MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);  --enable start new raid button.
-    MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(false); --disable end raid button.
+    MRT_GUIFrame_StartNewRaid_Button:SetText(MRT_L.GUI["Button_StartNewRaid"]);  --rename raid button to start
+    --MRT_GUIFrame_StartNewRaid_Button:SetEnabled(true);  --enable start new raid button.
+    --MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(false); --disable end raid button.
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
         return;
     end
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     MRT_GUI_RaidAttendeesTableUpdate(raidnum);
-    
 end
 
 function MRT_GUI_ResumeLastRaid()

@@ -631,6 +631,7 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
+
       <!-- <Button name="$parent_MakeAttendanceCheck_Button" inherits="MRT_GUI_Button_Template" text="(L) Make guild attendance check">
         <Size x="180" y="22"/>
         <Anchors>
@@ -642,7 +643,8 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button> -->
-      <Button name="$parent_EndCurrentRaid_Button" inherits="MRT_GUI_BIG_Button_Template" text="FIXME: EndRaid">
+
+      <!-- <Button name="$parent_EndCurrentRaid_Button" inherits="MRT_GUI_BIG_Button_Template" text="">
         <Anchors>
           <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_StartNewRaid_Button" x="10" y="0"/>
         </Anchors>
@@ -651,7 +653,8 @@
           <OnEnter></OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
-      </Button>
+      </Button> -->
+
 <!--     <Button name="$parent_ResumeLastRaid_Button" inherits="MRT_GUI_Button_Template" text="Resume last raid (L)">
         <Size x="85" y="22"/>
         <Anchors>
