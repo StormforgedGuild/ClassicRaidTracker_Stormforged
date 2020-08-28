@@ -63,7 +63,7 @@ local MRT_RaidAttendeesTableColDef = {
     {["name"] = "", ["width"] = 1},                            -- invisible column for storing the player number index from the raidlog-table
     {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 70},
     {["name"] = MRT_L.GUI["Col_Join"], ["width"] = 40},
-   {["name"] = MRT_L.GUI["Col_Leave"], ["width"] = 40},
+   {["name"] = MRT_L.GUI["Col_PR"], ["width"] = 40},
 };
 --SF: Old RaidBosskillstable
 --[[ local MRT_RaidBosskillsTableColDef = {
@@ -292,6 +292,8 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_RaidLog_Export_Button:SetPoint("TOPLEFT", MRT_GUIFrame_StartNewRaid_Button, "RIGHT", 10, 19);
     MRT_GUIFrame_RaidLog_Delete_Button:SetText(MRT_L.GUI["Button_Delete_Raid"]);
     MRT_GUIFrame_RaidLog_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_RaidLog_Export_Button, "RIGHT", 10, 0);
+    MRT_GUIFrame_Import_PR_Button:SetText(MRT_L.GUI["Button_Import_PR"]);
+    MRT_GUIFrame_Import_PR_Button:SetPoint("LEFT", MRT_GUIFrame_RaidLog_Delete_Button, "RIGHT", 10, 0);
     --MRT_GUIFrame_RaidLog_ExportNormal_Button:SetText(MRT_L.GUI["Button_ExportNormal"]);
     --MRT_GUIFrame_RaidLog_ExportNormal_Button:SetPoint("TOP", MRT_GUIFrame_RaidLog_Export_Button, "BOTTOM", 0, -5);
     --MRT_GUIFrame_RaidLog_ExportHeroic_Button:SetText(MRT_L.GUI["Button_ExportHeroic"]);
@@ -496,6 +498,12 @@ function MRT_GUI_RaidDelete()
     StaticPopupDialogs.MRT_GUI_ZeroRowDialog.OnAccept = function() MRT_GUI_RaidDeleteAccept(raidnum); end
     StaticPopup_Show("MRT_GUI_ZeroRowDialog");
 end
+
+function MRT_GUI_ImportPR()
+    MRT_GUI_HideDialogs();
+    MRT_ExportFrame_Show(export,true);
+end
+
 
 function MRT_GUI_RaidDeleteAccept(raidnum)
     table.remove(MRT_RaidLog, raidnum);
@@ -1570,11 +1578,12 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
     if (raidnum) then
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
-            if (v["Leave"]) then
-                MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), date("%H:%M", v["Leave"])};
-            else
-                MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), ""};
-            end
+            --always show PR
+            --if (v["Leave"]) then
+                MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), v["PR"]};
+            --else
+               -- MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), ""};
+           -- end
             index = index + 1;
         end
     end

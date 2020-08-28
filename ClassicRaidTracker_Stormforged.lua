@@ -42,6 +42,7 @@ MRT_NumOfLastBoss = nil;
 MRT_Options = {};
 MRT_RaidLog = {};
 MRT_PlayerDB = {};
+MRT_SFExport = {};
 
 MRT_ArrayBossID = {};
 MRT_ArrayBosslast = nil;
@@ -724,6 +725,32 @@ function MRT_VersionUpdate()
         end
         MRT_Options["DB_Version"] = 3;
     end
+    if (MRT_Options["DB_Version"] == 3) then
+        if (#MRT_RaidLog > 0) then
+            local currentrealm = GetRealmName();
+            for i, raidInfoTable in ipairs(MRT_RaidLog) do
+                local realm;
+                if (raidInfoTable["Realm"]) then
+                    realm = raidInfoTable["Realm"];
+                else
+                    realm = currentrealm;
+                    raidInfoTable["Realm"] = realm;
+                end
+                if (MRT_PlayerDB[realm] == nil) then
+                    MRT_PlayerDB[realm] = {};
+                end
+                for j, playerInfo in pairs(raidInfoTable["Players"]) do
+                    local name = playerInfo["Name"];
+                    if (playerInfo["PR"]) then
+                        MRT_PlayerDB[realm][name]["PR"] = playerInfo["PR"];
+                        playerInfo["PR"] = nil;
+                    end
+                end
+            end
+        end
+        MRT_Options["DB_Version"] = 4;
+    end
+    
 end
 
 
@@ -995,10 +1022,13 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
         local playerRaceL, playerRace = UnitRace(UnitID);
         local playerSex = UnitSex(UnitID);
         local playerGuild = GetGuildInfo(UnitID);
+        local playerPR = getPlayerPR(playerName);  -- write a function that returns player PR from website export
+        MRT_Debug("CreateNewRaid: playerPR: " ..playerPR);
         local playerInfo = {
             ["Name"] = playerName,
             ["Join"] = currentTime,
             ["Leave"] = nil,
+            ["PR"] = playerPR,
         };
         local playerDBEntry = {
             ["Name"] = playerName,
@@ -1009,6 +1039,7 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
             ["Level"] = playerLvl,
             ["Sex"] = playerSex,
             ["Guild"] = playerGuild,
+            ["PR"] = playerPR,
         };
         if ((playerOnline or MRT_Options["Attendance_TrackOffline"]) and (not MRT_Options["Attendance_GroupRestriction"] or (playerSubGroup <= (raidSize / 5)))) then
             tinsert(MRT_RaidInfo["Players"], playerInfo);
@@ -1055,10 +1086,12 @@ function MRT_ResumeLastRaid()
         local playerRaceL, playerRace = UnitRace(UnitID);
         local playerSex = UnitSex(UnitID);
         local playerGuild = GetGuildInfo(UnitID);
+        local playerPR = 0;  -- write a function that returns player PR from website export
         local playerInfo = {
             ["Name"] = playerName,
             ["Join"] = currentTime,
             ["Leave"] = nil,
+            ["PR"] = playerPR,
         }
         local playerDBEntry = {
             ["Name"] = playerName,
@@ -1069,6 +1102,7 @@ function MRT_ResumeLastRaid()
             ["Level"] = playerLvl,
             ["Sex"] = playerSex,
             ["Guild"] = playerGuild,
+            ["PR"] = playerPR,
         };
         if (MRT_PlayerDB[realm] == nil) then
             MRT_PlayerDB[realm] = {};
@@ -1094,6 +1128,7 @@ function MRT_ResumeLastRaid()
             ["Name"] = playerName,
             ["Join"] = now,
             ["Leave"] = nil,
+            ["PR"] = playerPR,
         };
         tinsert(MRT_RaidLog[numOfLastRaid]["Players"], playerInfo);
     end
@@ -1146,10 +1181,12 @@ function MRT_RaidRosterUpdate(frame)
                 local UnitID = "raid"..tostring(i);
                 local playerRaceL, playerRace = UnitRace(UnitID);
                 local playerSex = UnitSex(UnitID);
+                local playerPR = getPlayerPR(playerName);  -- write a function that returns player PR from website export
                 local playerInfo = {
                     ["Name"] = playerName,
                     ["Join"] = MRT_GetCurrentTime(),
                     ["Leave"] = nil,
+                    ["PR"] = playerPR
                 };
                 tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Players"], playerInfo);
             end
@@ -1159,6 +1196,7 @@ function MRT_RaidRosterUpdate(frame)
                 local playerRaceL, playerRace = UnitRace(UnitID);
                 local playerSex = UnitSex(UnitID);
                 local playerGuild = GetGuildInfo(UnitID);
+                local playerPR = getPlayerPR(playerName);  -- write a function that returns player PR from website export
                 local playerDBEntry = {
                     ["Name"] = playerName,
                     ["Race"] = playerRace,
@@ -1168,6 +1206,7 @@ function MRT_RaidRosterUpdate(frame)
                     ["Level"] = playerLvl,
                     ["Sex"] = playerSex,
                     ["Guild"] = playerGuild,
+                    ["PR"] = playerPR,
                 };
                 MRT_PlayerDB[realm][playerName] = playerDBEntry;
             end
@@ -1189,7 +1228,34 @@ function MRT_RaidRosterUpdate(frame)
         end
     end
 end
+function getPlayerPR(PlayerName)
+    local retPR 
+    if not MRT_SFExport then
+        return "";
+    else
+        MRT_Debug("getPlayerPR: about to start loop");        
+        local playerCount = MRT_SFExport["info"]["total_players"];
 
+        for key, value in pairs(MRT_SFExport["players"]) do
+            MRT_Debug("getPlayerPR: inside loop");
+            MRT_Debug("getPlayerPR: key = "..key);
+            MRT_Debug("getPlayerPR: value[name]: "..value["name"]);        
+            MRT_Debug("getPlayerPR: value[main_name]: "..value["main_name"]); 
+            if (value["name"] == PlayerName) then
+                MRT_Debug("getPlayerPR: Found player"); 
+                --MRT_Debug("getPlayerPR: Value[Points]: " .. value["points"]["points_earned"]); 
+                for k, v in pairs(value["points"]) do
+                    MRT_Debug("getPlayerPR: inside mini loop for points table"); 
+                    MRT_Debug("getPlayerPR: k: " ..k); 
+                    MRT_Debug("getPlayerPR: v[pts_currnnt] "..v["points_current"]);        
+                    return (v["points_current"]);
+                end
+                return "";
+            end
+        end
+        return "";
+    end
+end
 -- @param man_diff: used by GUI when a bosskill was added manually
 --                  valid values: "H", "N", nil
 function MRT_AddBosskill(bossname, man_diff, bossID)
@@ -1839,6 +1905,8 @@ function MRT_Core_Frames_ParseLocal()
     MRT_ExportFrame_Title:SetText(" "..MRT_L.Core["Export_Frame_Title"]);
     MRT_ExportFrame_ExplanationText:SetText(MRT_L.Core["Export_Explanation"]);
     MRT_ExportFrame_OKButton:SetText(MRT_L.Core["Export_Button"]);
+    MRT_ExportFrame_ImportButton:SetText(MRT_L.Core["Import_Button"]);
+
 end
 
 -- GetNPCID - returns the NPCID or nil, if GUID was no NPC

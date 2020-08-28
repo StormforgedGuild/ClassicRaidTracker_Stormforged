@@ -5,7 +5,7 @@
 ## Author: Hokie@Kirtonos-Alliance / Moncholy@Kirtonos-Alliance
 ## LoadOnDemand: 0
 ## DefaultState: enabled
-## SavedVariables: MRT_Options, MRT_RaidLog, MRT_PlayerDB, MRT_NumOfCurrentRaid, MRT_NumOfLastBoss
+## SavedVariables: MRT_Options, MRT_RaidLog, MRT_PlayerDB, MRT_NumOfCurrentRaid, MRT_NumOfLastBoss, MRT_SFExport
 ## X-Max-Interface: 11305
 ## X-Min-Interface: 11305
 ## X-Curse-Project-ID: 399582

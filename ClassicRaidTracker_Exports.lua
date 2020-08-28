@@ -36,18 +36,47 @@ local LBZR = LBZ:GetReverseLookupTable()
 ------------------------------
 --  export frame functions  --
 ------------------------------
-function MRT_ExportFrame_Show(export)
-    MRT_ExportFrame_EB:SetText(export)
-    MRT_ExportFrame_EB:HighlightText()
-    MRT_ExportFrame:Show()
+function MRT_ExportFrame_Show(export,import)
+    if not import then
+        MRT_ExportFrame_EB:SetText(export)
+        MRT_ExportFrame_EB:HighlightText()
+        MRT_ExportFrame:Show()
+    else 
+        MRT_ExportFrame_EB:SetText("")
+        MRT_ExportFrame_EB:GetRegions():SetNonSpaceWrap(false);
+        --MRT_ExportFrame_EB:HighlightText()
+        MRT_ExportFrame_ImportButton:Show();
+        MRT_ExportFrame_ExplanationText:SetText(MRT_L.Core["Import_Explanation"]);
+        MRT_ExportFrame:Show()
+    end
 end
 
 function MRT_ExportFrame_Hide() MRT_ExportFrame:Hide() end
 
+function MRT_ImportButtonClick()
+    local strData = prepstring(MRT_ExportFrame_EB:GetText());
+    --MRT_SFExport = loadstring(strData);
+    strData = "MRT_SFExport = {"..strData.."}"
+    MRT_Debug("strData = ".. strData);
+    loadstring(strData)();
+    --loadstring(strData)();
+    MRT_ExportFrame:Hide();
+    --UpdatePlayerPR();
+end
 ------------------------
 --  helper functions  --
 ------------------------
--- returns a table with bonus - returns nil, if no bonus IDs
+function prepstring(imp)
+    local retString = imp;
+    retString = string.gsub(retString,"eqdkp =", "[\"eqdkp\"] =");
+    retString = string.gsub(retString,"game =", ",[\"game\"] =");
+    retString = string.gsub(retString,"info =", ",[\"info\"] =");
+    retString = string.gsub(retString,"players =", ",[\"players\"] =");
+    retString = string.gsub(retString,"multidkp_pools =", ",[\"multidkp_pools\"] =");
+    retString = string.gsub(retString,"itempools =", ",[\"itempools\"] =");
+    retString = string.gsub(retString,"status =", ",[\"status\"] =");
+    return retString;
+end
 function mrt:GetBonusIDs(itemData)
     local function returnFormat(itemID, enchant, gem1, gem2, gem3, gem4,
                                 suffixID, uniqueID, level, specializationID,
