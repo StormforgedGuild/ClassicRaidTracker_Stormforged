@@ -248,6 +248,7 @@ function MRT_GUI_ParseValues()
 
  --   MRT_GUIFrame_RaidAttendees_Filter:SetText(MRT_L.GUI["Header_Title"]);
     MRT_GUIFrame_RaidAttendees_Filter:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 7, -5);
+    MRT_GUIFrame_RaidAttendees_Filter:SetAutoFocus(false);
 
  --   MRT_GUIFrame_RaidAttendeesTitle:SetText(MRT_L.GUI["Tables_RaidAttendeesTitle"]);
  --   MRT_GUIFrame_RaidAttendeesTitle:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 0, -15);
@@ -260,6 +261,7 @@ function MRT_GUI_ParseValues()
     MRT_GUI_RaidBosskillsTable:Hide();
 
     MRT_GUIFrame_BossLoot_Filter:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 205, -15);
+    MRT_GUIFrame_BossLoot_Filter:SetAutoFocus(false);
     MRT_GUIFrame_BossLoot_Add_Button:SetText(MRT_L.GUI["Button_Small_Add"]);
     MRT_GUIFrame_BossLoot_Add_Button:SetPoint("RIGHT", MRT_GUIFrame_BossLoot_Filter, "RIGHT", 26, 0);
     MRT_GUIFrame_BossLoot_Delete_Button:SetText(MRT_L.GUI["Button_Small_Delete"]);
@@ -1608,10 +1610,22 @@ function MRT_GUI_RaidLogTableUpdate()
     lastShownNumOfRaids = #MRT_RaidLog;
 end
 
+function MRT_GUI_RaidAttendeeFilter()
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local strText = MRT_GUIFrame_RaidAttendees_Filter:GetText();
+    MRT_GUI_RaidAttendeesTableUpdate(raidnum,strText);
+end
+
+function MRT_GUI_RaidAttendeeResetFilter()
+    MRT_GUIFrame_RaidAttendees_Filter:ClearFocus();
+end
+
 -- update raid attendees table
-function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
+function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
     MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate Called!");
     local MRT_GUI_RaidAttendeesTableData = {};
+    local indexofsub
     if (raidnum) then
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
@@ -1629,19 +1643,35 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
                 end 
             end ]]
             --always get modified.
-            v["PR"] = getModifiedPR(raidnum, v["Name"]);
-            MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
-            MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], v["PR"], date("%H:%M", v["Join"])};
-            --else
-               -- MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), ""};
-           -- end
-            index = index + 1;
+            -- add check here for filter
+            if not filter then
+                v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], v["PR"], date("%H:%M", v["Join"])};
+                index = index + 1;
+            else 
+                indexofsub = substr(v["Name"], filter);
+                if not indexofsub then
+                    --skip
+                else 
+                    v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                    MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], v["PR"], date("%H:%M", v["Join"])};
+                    index = index + 1;
+                end
+            end
         end
     end
     table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[2] < b[2]); end);
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
 end
+
+function substr(str1, str2)
+    local s1 = string.lower(str1);
+    local s2 = string.lower(str2);
+    return string.find(s1,s2);
+end 
 -- function to get adjusted PR from bossloottable
 function getModifiedPR(raidnum, PlayerName)
     MRT_Debug("getModifiedPR Called!");
