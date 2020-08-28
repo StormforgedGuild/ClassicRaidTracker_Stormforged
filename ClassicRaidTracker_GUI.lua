@@ -50,7 +50,8 @@ local lastRaidNum = nil;
 local lastLooter = nil;
 local lastValue = nil;
 local lastNote = nil;
-local lastOS = nil
+local lastOS = nil;
+local lootFilterHack = 0;
 
 -- table definitions
 local MRT_RaidLogTableColDef = {
@@ -1611,11 +1612,26 @@ function MRT_GUI_RaidLogTableUpdate()
 end
 
 function MRT_GUI_RaidAttendeeFilter()
+    MRT_Debug("MRT_GUI_RaidAttendeeFilter Called!");
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local strText = MRT_GUIFrame_RaidAttendees_Filter:GetText();
     MRT_GUI_RaidAttendeesTableUpdate(raidnum,strText);
 end
+
+function MRT_GUI_BossLootFilter()
+    MRT_Debug("MRT_GUI_BossLootFilter Called!");
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local strText = MRT_GUIFrame_BossLoot_Filter:GetText();
+    MRT_Debug("MRT_GUI_BossLootFilter: strText = " ..strText);
+    if lootFilterHack > 0 then
+        MRT_GUI_BossLootTableUpdate(nil, false, strText);
+    else
+        lootFilterHack = lootFilterHack + 1;
+    end
+end
+
 
 function MRT_GUI_RaidAttendeeResetFilter()
     MRT_GUIFrame_RaidAttendees_Filter:ClearFocus();
@@ -1740,7 +1756,7 @@ function MRT_GUI_RaidBosskillsTableUpdate(raidnum)
 end
 
 -- update bossloot table
-function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
+function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     if skipsort then 
         MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True");
     else
@@ -1748,6 +1764,8 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
     end
     local MRT_GUI_BossLootTableData = {};
     local raidnum;
+    local indexofsub1;
+    local indexofsub2;
     -- check if a raid is selected
     if (MRT_GUI_RaidLogTable:GetSelection()) then
         raidnum = MRT_GUI_RaidLogTable:GetCell(MRT_GUI_RaidLogTableSelection, 1);
@@ -1781,25 +1799,33 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
     elseif (raidnum) then
         MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
         local index = 1;
+
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             --MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
             -- SF: if unassigned, make it red.
-            if v["Looter"] == "unassigned" then
-                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
-                if v["Offspec"] then
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
-                else
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
-                end
+
+            if not filter then
+                if v["Looter"] == "unassigned" then
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                else 
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                end 
+                index = index + 1;
             else 
-                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
-                if v["Offspec"] then
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData3;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                indexofsub1 = substr(v["ItemName"], filter);
+                indexofsub2 = substr(v["Looter"], filter);
+                if not indexofsub1 and not indexofsub2 then
+                    --skip
                 else
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData3;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                    ---
+                    if v["Looter"] == "unassigned" then
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    else 
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    end 
+                    index = index + 1;
                 end
-            end 
-            index = index + 1;
+            end
         end
     --    MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
     -- if either raidnum nor bossnum, show an empty table
