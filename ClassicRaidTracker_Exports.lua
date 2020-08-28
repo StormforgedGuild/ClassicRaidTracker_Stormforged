@@ -32,6 +32,8 @@ local deformat = LibStub("LibDeformat-3.0")
 local LBB = LibStub("LibBabble-Boss-3.0")
 local LBZ = LibStub("LibBabble-Zone-3.0")
 local LBZR = LBZ:GetReverseLookupTable()
+local textBuffer= {};
+local pasted; 
 
 ------------------------------
 --  export frame functions  --
@@ -42,9 +44,34 @@ function MRT_ExportFrame_Show(export,import)
         MRT_ExportFrame_EB:HighlightText()
         MRT_ExportFrame:Show()
     else 
+          textBuffer={};
+          pasted = "";
+          local i, lastPaste =  0, 0
+          local function clearBuffer(self)
+            self:SetScript('OnUpdate', nil)
+            pasted = strtrim(table.concat(textBuffer))
+            MRT_ExportFrame_EB:ClearFocus();
+            pasted = pasted:match( "^%s*(.-)%s*$" );
+            if (#pasted > 20) then
+              MRT_ExportFrame_EB:SetMaxBytes(2500);
+              MRT_ExportFrame_EB:SetText(strsub(pasted, 1, 2500));
+            end
+          end
+    
+          MRT_ExportFrame_EB:SetScript('OnChar', function(self, c)
+            if lastPaste ~= GetTime() then
+              textBuffer, i, lastPaste = {}, 0, GetTime()
+              self:SetScript('OnUpdate', clearBuffer)
+            end
+            i = i + 1
+            textBuffer[i] = c
+          end)
+
         MRT_ExportFrame_EB:SetText("")
-        MRT_ExportFrame_EB:GetRegions():SetNonSpaceWrap(false);
+        --MRT_ExportFrame_EB:SetVisibleTextByteLimit(1000);
         --MRT_ExportFrame_EB:HighlightText()
+        MRT_ExportFrame_EB:SetMaxBytes(1) -- limit the max length of anything entered into the box, this is what prevents the lag
+
         MRT_ExportFrame_ImportButton:Show();
         MRT_ExportFrame_ExplanationText:SetText(MRT_L.Core["Import_Explanation"]);
         MRT_ExportFrame:Show()
@@ -54,7 +81,7 @@ end
 function MRT_ExportFrame_Hide() MRT_ExportFrame:Hide() end
 
 function MRT_ImportButtonClick()
-    local strData = prepstring(MRT_ExportFrame_EB:GetText());
+    local strData = prepstring(pasted);
     --MRT_SFExport = loadstring(strData);
     strData = "MRT_SFExport = {"..strData.."}"
     MRT_Debug("strData = ".. strData);
