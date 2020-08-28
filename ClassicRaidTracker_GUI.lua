@@ -1693,10 +1693,13 @@ function getModifiedPR(raidnum, PlayerName)
     MRT_Debug("getModifiedPR Called!");
     local pPR, pEP, pGP = getSFEPGP(PlayerName);
     local intLootGP = 0;
-    intpEP = tonumber(pEP);
     if not pGP then
         pGP = "0";
     end 
+    if not pEP then
+        pEP = "0";
+    end
+    intpEP = tonumber(pEP);
     MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
     intpGP = tonumber(pGP) + 2000;
     MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
