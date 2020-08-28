@@ -1562,6 +1562,9 @@ function MRT_ManualAddLoot(itemLink, looter, cost)
         MRT_Debug("MRT_ManualAddLoot(): Failed horribly when trying to get item informations.");
         return;
     end
+    if (MRT_NumOfLastBoss == nil) then
+        MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
+    end
     local lootInfo = {
         ["ItemLink"] = itemLink,
         ["ItemString"] = itemString,

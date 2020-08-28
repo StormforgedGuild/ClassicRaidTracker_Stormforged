@@ -660,7 +660,8 @@ function MRT_GUI_BossDelete()
     end
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
-    local bossname = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 3);
+    --local bossname = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 3);
+    local bossname = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 2);
     StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = string.format(MRT_L.GUI["Confirm boss entry deletion"], bossnum, bossname);
     StaticPopupDialogs.MRT_GUI_ZeroRowDialog.OnAccept = function() MRT_GUI_BossDeleteAccept(raidnum, bossnum); end
     StaticPopup_Show("MRT_GUI_ZeroRowDialog");
@@ -915,12 +916,27 @@ function MRT_GUI_LootAdd()
         MRT_Print(MRT_L.GUI["No boss selected"]);
         return;
     end ]]
+    local createdTrash = false;
     if (boss_select == nil) then
-       MRT_GUI_RaidBosskillsTable:SetSelection(1);
+        if (MRT_NumOfLastBoss == nil) or (MRT_NumOfLastBoss == 0) then
+            MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
+            boss_select = 1;
+            createdTrash = true;
+        else
+            MRT_Debug("MRT_GUI_LootAdd: MRT_NumOfLastBoss = " ..MRT_NumOfLastBoss);    
+            MRT_GUI_RaidBosskillsTable:SetSelection(1);
+            boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
+        end
     end
-    local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
+    
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-    local bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
+    if createdTrash then
+        --no boss is available, add one and select
+        bossnum = 1;
+    else
+        MRT_Debug("MRT_GUI_LootAdd: boss_select: " ..boss_select);
+        local bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
+    end
     -- gather playerdata and fill drop down menu
     local playerData = {};
     for i, val in ipairs(MRT_RaidLog[raidnum]["Bosskills"][bossnum]["Players"]) do
@@ -1165,6 +1181,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
         end
     end
     -- do table update, if selected loot table was modified
+    MRT_GUI_RaidDetailsTableUpdate(raidnum);
     local item_select = MRT_GUI_BossLootTable:GetSelection();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then return; end
