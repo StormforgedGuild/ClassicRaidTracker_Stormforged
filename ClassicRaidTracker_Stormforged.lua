@@ -42,7 +42,10 @@ MRT_NumOfLastBoss = nil;
 MRT_Options = {};
 MRT_RaidLog = {};
 MRT_PlayerDB = {};
+MRT_LastPRImport = nil;
 MRT_SFExport = {};
+
+
 
 MRT_ArrayBossID = {};
 MRT_ArrayBosslast = nil;
@@ -743,7 +746,7 @@ function MRT_VersionUpdate()
                     local name = playerInfo["Name"];
                     if (playerInfo["PR"]) then
                         MRT_PlayerDB[realm][name]["PR"] = playerInfo["PR"];
-                        playerInfo["PR"] = nil;
+                        playerInfo["PR"] = "";
                     end
                 end
             end
@@ -1237,17 +1240,17 @@ function getPlayerPR(PlayerName)
         local playerCount = MRT_SFExport["info"]["total_players"];
 
         for key, value in pairs(MRT_SFExport["players"]) do
-            MRT_Debug("getPlayerPR: inside loop");
-            MRT_Debug("getPlayerPR: key = "..key);
-            MRT_Debug("getPlayerPR: value[name]: "..value["name"]);        
-            MRT_Debug("getPlayerPR: value[main_name]: "..value["main_name"]); 
+            --MRT_Debug("getPlayerPR: inside loop");
+            --MRT_Debug("getPlayerPR: key = "..key);
+            --MRT_Debug("getPlayerPR: value[name]: "..value["name"]);        
+            --MRT_Debug("getPlayerPR: value[main_name]: "..value["main_name"]); 
             if (value["name"] == PlayerName) then
                 MRT_Debug("getPlayerPR: Found player"); 
                 --MRT_Debug("getPlayerPR: Value[Points]: " .. value["points"]["points_earned"]); 
                 for k, v in pairs(value["points"]) do
-                    MRT_Debug("getPlayerPR: inside mini loop for points table"); 
-                    MRT_Debug("getPlayerPR: k: " ..k); 
-                    MRT_Debug("getPlayerPR: v[pts_currnnt] "..v["points_current"]);        
+                    --MRT_Debug("getPlayerPR: inside mini loop for points table"); 
+                    --MRT_Debug("getPlayerPR: k: " ..k); 
+                    --MRT_Debug("getPlayerPR: v[pts_currnnt] "..v["points_current"]);        
                     return (v["points_current"]);
                 end
                 return "";

@@ -812,10 +812,12 @@ function MRT_GUI_RaidAttendeeAddAccept(raidnum)
     end
     MRT_GUI_HideDialogs();
     -- if we reach this point, we should have a valid raidnum, playername, join timestamp and leave timestamp - now add them to the raid attendee list...
+    
     local playerInfo = {
         ["Name"] = playerName,
         ["Join"] = joinTimestamp,
         ["Leave"] = leaveTimestamp,
+        ["PR"] = getPlayerPR();
     };
     tinsert(MRT_RaidLog[raidnum]["Players"], playerInfo);
     -- ... and as boss attendee to the relevant bosses
@@ -1498,7 +1500,16 @@ end
 -----------------------
 function MRT_GUI_SetTT(frame, button)
     MRT_GUI_TT:SetOwner(frame, "ANCHOR_BOTTOMRIGHT");
-    MRT_GUI_TT:SetText(MRT_L.GUI["TT_"..button]);
+    if button == "Import_PR" then
+        if not MRT_LastPRImport then
+            MRT_GUI_TT:SetText(MRT_L.GUI["TT_"..button]);
+        else
+            local strDate = date("%c", MRT_LastPRImport)     
+            MRT_GUI_TT:SetText("Last Imported PR - " ..strDate);  
+        end
+    else
+        MRT_GUI_TT:SetText(MRT_L.GUI["TT_"..button]);
+    end 
     MRT_GUI_TT:Show();
 end
 
@@ -1574,13 +1585,24 @@ end
 
 -- update raid attendees table
 function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
+    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate Called!");
     local MRT_GUI_RaidAttendeesTableData = {};
     if (raidnum) then
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
             --always show PR
             --if (v["Leave"]) then
-                MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), v["PR"]};
+            MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[Name]: ".. v["Name"]);
+            if v["PR"] == "" then
+                MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR] == empty");
+                v["PR"] = getPlayerPR(v["Name"]);
+            else
+                if not v["PR"] then
+                    v["PR"] = getPlayerPR(v["Name"]);
+                end 
+            end
+            MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+            MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), v["PR"]};
             --else
                -- MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), ""};
            -- end

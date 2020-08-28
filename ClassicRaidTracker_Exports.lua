@@ -85,6 +85,7 @@ function MRT_ImportButtonClick()
     --MRT_SFExport = loadstring(strData);
     strData = "MRT_SFExport = {"..strData.."}"
     MRT_Debug("strData = ".. strData);
+    MRT_LastPRImport = MRT_GetCurrentTime();
     loadstring(strData)();
     --loadstring(strData)();
     MRT_ExportFrame:Hide();

@@ -353,7 +353,7 @@ MRT_L.GUI["TT_Loot_Modify"] = "Modify data of selected item."
 MRT_L.GUI["TT_RA_Add"] = "Add an attendee to the raid attendee list."
 MRT_L.GUI["TT_RA_Delete"] = "Delete selected raid attendee."
 MRT_L.GUI["TT_Raid_Delete"] = "Delete selected raid."
-MRT_L.GUI["TT_Import_PR"] = "Import Player"
+MRT_L.GUI["TT_Import_PR"] = "Import Player PR"
 MRT_L.GUI["TT_Raid_Export"] = "Export selected raid."
 MRT_L.GUI["TT_Raid_ExportH"] =
     "Export all heroic mode encounters of selected raid."
