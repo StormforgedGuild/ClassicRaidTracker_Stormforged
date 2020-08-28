@@ -1629,9 +1629,36 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
                 end 
             end ]]
             --always get modified.
+            v["Class"] = getPlayerClass(v["Name"]);
             v["PR"] = getModifiedPR(raidnum, v["Name"]);
+
             MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
-            MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], v["PR"], date("%H:%M", v["Join"])};
+
+            classColor = "ff9d9d9d";
+            if v["Class"] == "Hunter"
+            then classColor = "ff00FF7F";
+            elseif v["Class"] == "Druid"
+            then classColor = "ffFF4500";   
+            elseif v["Class"] == "Mage"
+            then classColor = "ffFF6EB4";   
+            elseif v["Class"] == "Paladin"
+            then classColor = "ffC67171";   
+            elseif v["Class"] == "Rogue"
+            then classColor = "ffFFFFE0";   
+            elseif v["Class"] == "Warlock"
+            then classColor = "ffDA70D6";   
+            elseif v["Class"] == "Warrior"
+            then classColor = "ffCD661D";   
+            elseif v["Class"] == "Shaman"
+            then classColor = "ff0000ff";   
+            elseif v["Class"] == "Priest"
+            then classColor = "ffffffff";  
+            end
+
+            MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"])};
+           -- MRT_GUI_RaidAttendeesTableData[index] = {k, "|cffff0000"..v["Name"], v["PR"], date("%H:%M", v["Join"])};
+           -- MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+
             --else
                -- MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), ""};
            -- end
@@ -1644,16 +1671,16 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
 end
 -- function to get adjusted PR from bossloottable
 function getModifiedPR(raidnum, PlayerName)
-    MRT_Debug("getModifiedPR Called!");
+    --MRT_Debug("getModifiedPR Called!");
     local pPR, pEP, pGP = getSFEPGP(PlayerName);
     local intLootGP = 0;
     intpEP = tonumber(pEP);
     if not pGP then
         pGP = "0";
     end 
-    MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
+    --MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
     intpGP = tonumber(pGP) + 2000;
-    MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
+    --MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
     for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
         if v["Looter"] == PlayerName then
             MRT_Debug("getModifiedPR:Found Player in Loot table");
