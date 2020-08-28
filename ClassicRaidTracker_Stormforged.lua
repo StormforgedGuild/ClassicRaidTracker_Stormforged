@@ -1230,7 +1230,7 @@ function MRT_RaidRosterUpdate(frame)
 end
 function getPlayerPR(PlayerName)
     local retPR 
-    if not MRT_SFExport then
+    if not MRT_SFExport["info"] then
         return "";
     else
         MRT_Debug("getPlayerPR: about to start loop");        
