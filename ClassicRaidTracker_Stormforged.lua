@@ -1231,6 +1231,8 @@ function MRT_RaidRosterUpdate(frame)
         end
     end
 end
+-- GetPlayerPR  There are potentially 3 ways to get a PR.  PlayerDB, MRT_SFExport (imported from website), or adjusted PR based on selected Raid.
+-- Current implementation is only from MRT_SFExport (PlayerDB is updated on new raid, but that data is not currently being used.)
 function getPlayerPR(PlayerName)
     local retPR 
     if not MRT_SFExport["info"] then
@@ -1238,7 +1240,6 @@ function getPlayerPR(PlayerName)
     else
         MRT_Debug("getPlayerPR: about to start loop");        
         local playerCount = MRT_SFExport["info"]["total_players"];
-
         for key, value in pairs(MRT_SFExport["players"]) do
             --MRT_Debug("getPlayerPR: inside loop");
             --MRT_Debug("getPlayerPR: key = "..key);
@@ -1257,6 +1258,32 @@ function getPlayerPR(PlayerName)
             end
         end
         return "";
+    end
+end
+--getSFEPGP gets the EP and GP for a given player
+function getSFEPGP(PlayerName)
+    MRT_Debug("getSFEPGP: Called!");        
+    MRT_Debug("getSFEPGP: PlayerName: "..PlayerName);
+    if not MRT_SFExport["info"] then
+        return "";
+    else
+        --MRT_Debug("getSFEPGP: about to start loop");        
+        local playerCount = MRT_SFExport["info"]["total_players"];
+        for key, value in pairs(MRT_SFExport["players"]) do
+            --MRT_Debug("getSFEPGP: in for loop");
+            --MRT_Debug("getSFEPGP: key = "..key);
+            --MRT_Debug("getSFEPGP: PlayerName = "..PlayerName);
+            --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
+            --MRT_Debug("getSFEPGP: value[main_name]: "..value["main_name"]);  
+            if (value["name"] == PlayerName) then
+                --MRT_Debug("getSFEPGP: Found player"); 
+                --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
+                for k, v in pairs(value["points"]) do
+                    return (v["points_current"]), (v["points_earned"]), (v["points_spent"]); --don't forget actual points spent is points_spent + 2000
+                end
+            end
+        end
+        return "", "0", "0";
     end
 end
 -- @param man_diff: used by GUI when a bosskill was added manually

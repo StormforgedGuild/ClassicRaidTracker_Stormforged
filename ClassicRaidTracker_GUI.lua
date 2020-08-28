@@ -1618,14 +1618,18 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
             --always show PR
             --if (v["Leave"]) then
             MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[Name]: ".. v["Name"]);
-            if v["PR"] == "" then
+           --[[  if v["PR"] == "" then
                 MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR] == empty");
-                v["PR"] = getPlayerPR(v["Name"]);
+                --v["PR"] = getPlayerPR(v["Name"]);
+                v["PR"] = getModifiedPR(raidnum, v["Name"]);
             else
                 if not v["PR"] then
-                    v["PR"] = getPlayerPR(v["Name"]);
+                    --v["PR"] = getPlayerPR(v["Name"]);
+                    v["PR"] = getModifiedPR(raidnum, v["Name"]);
                 end 
-            end
+            end ]]
+            --always get modified.
+            v["PR"] = getModifiedPR(raidnum, v["Name"]);
             MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
             MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], v["PR"], date("%H:%M", v["Join"])};
             --else
@@ -1637,6 +1641,40 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
     table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[2] < b[2]); end);
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
+end
+-- function to get adjusted PR from bossloottable
+function getModifiedPR(raidnum, PlayerName)
+    MRT_Debug("getModifiedPR Called!");
+    local pPR, pEP, pGP = getSFEPGP(PlayerName);
+    local intLootGP = 0;
+    intpEP = tonumber(pEP);
+    if not pGP then
+        pGP = "0";
+    end 
+    MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
+    intpGP = tonumber(pGP) + 2000;
+    MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
+    for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
+        if v["Looter"] == PlayerName then
+            MRT_Debug("getModifiedPR:Found Player in Loot table");
+            intLootGP = intLootGP + tonumber(v["DKPValue"]);
+            MRT_Debug("getModifiedPR:intLoopGP = " ..tostring(intLoopGP));
+        end 
+    end
+    if intLootGP == 0 then
+        MRT_Debug("getModifiedPR:intLootGP = 0");
+        if not pPR then
+            return "0";
+        else 
+            return pPR;
+        end
+    else 
+        MRT_Debug("getModifiedPR:intLootGP <> 0");
+        local newGP = intpGP + intLootGP
+        local newPR = intpEP / newGP
+        local retval = math.floor(newPR * 100)/100;
+        return tostring(retval);
+    end
 end
 
 -- update bosskill table
