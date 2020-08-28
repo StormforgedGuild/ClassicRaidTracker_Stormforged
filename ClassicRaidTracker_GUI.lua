@@ -61,9 +61,10 @@ local MRT_RaidLogTableColDef = {
 };
 local MRT_RaidAttendeesTableColDef = {
     {["name"] = "", ["width"] = 1},                            -- invisible column for storing the player number index from the raidlog-table
-    {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 70},
-    {["name"] = MRT_L.GUI["Col_Join"], ["width"] = 40},
-   {["name"] = MRT_L.GUI["Col_PR"], ["width"] = 40},
+    {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 75},
+    {["name"] = MRT_L.GUI["Col_PR"], ["width"] = 40},
+    {["name"] = MRT_L.GUI["Col_Join"], ["width"] = 35},
+
 };
 --SF: Old RaidBosskillstable
 --[[ local MRT_RaidBosskillsTableColDef = {
@@ -234,28 +235,45 @@ end
 function MRT_GUI_ParseValues()
     -- Parse title strings
     MRT_GUIFrame_Title:SetText(MRT_L.GUI["Header_Title"]);
-    MRT_GUIFrame_RaidLogTitle:SetText(MRT_L.GUI["Tables_RaidLogTitle"]);
-    MRT_GUIFrame_RaidLogTitle:SetPoint("TOPLEFT", MRT_GUIFrame, "TOPLEFT", 25, -60);
+  --  MRT_GUIFrame_RaidLogTitle:SetText(MRT_L.GUI["Tables_RaidLogTitle"]);
+    MRT_GUIFrame_RaidLogTitle:SetPoint("TOPLEFT", MRT_GUIFrame, "TOPLEFT", 25, -10);
 
  --   MRT_GUIFrame_RaidBosskillsTitle:SetText(MRT_L.GUI["Tables_RaidBosskillsTitle"]);
   --  MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
     --MRT_GUIFrame_BossAttendeesTitle:SetText(MRT_L.GUI["Tables_BossAttendeesTitle"]);
     -- Create and anchor tables
     MRT_GUI_RaidLogTable = ScrollingTable:CreateST(MRT_RaidLogTableColDef, 4, nil, nil, MRT_GUIFrame);
-    MRT_GUI_RaidLogTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 0, -15);
+    MRT_GUI_RaidLogTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLog_Export_Button, "BOTTOMLEFT", 0, -20);
     MRT_GUI_RaidLogTable:EnableSelection(true);
-    MRT_GUIFrame_RaidAttendeesTitle:SetText(MRT_L.GUI["Tables_RaidAttendeesTitle"]);
-    MRT_GUIFrame_RaidAttendeesTitle:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 0, -15);
-    MRT_GUI_RaidAttendeesTable = ScrollingTable:CreateST(MRT_RaidAttendeesTableColDef, 16, nil, nil, MRT_GUIFrame);
-    MRT_GUI_RaidAttendeesTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidAttendeesTitle, "BOTTOMLEFT", 0, -15);
+
+ --   MRT_GUIFrame_RaidAttendees_Filter:SetText(MRT_L.GUI["Header_Title"]);
+    MRT_GUIFrame_RaidAttendees_Filter:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 7, -5);
+
+ --   MRT_GUIFrame_RaidAttendeesTitle:SetText(MRT_L.GUI["Tables_RaidAttendeesTitle"]);
+ --   MRT_GUIFrame_RaidAttendeesTitle:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 0, -15);
+    MRT_GUI_RaidAttendeesTable = ScrollingTable:CreateST(MRT_RaidAttendeesTableColDef, 18, nil, nil, MRT_GUIFrame);
+    MRT_GUI_RaidAttendeesTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidAttendees_Filter, "BOTTOMLEFT",-7, -18);
     MRT_GUI_RaidAttendeesTable:EnableSelection(true);
     MRT_GUI_RaidBosskillsTable = ScrollingTable:CreateST(MRT_RaidBosskillsTableColDef, 6, nil, nil, MRT_GUIFrame);
     MRT_GUI_RaidBosskillsTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidBosskillsTitle, "BOTTOMLEFT", 0, -15);
     MRT_GUI_RaidBosskillsTable:EnableSelection(true);
     MRT_GUI_RaidBosskillsTable:Hide();
-    MRT_GUI_BossLootTable = ScrollingTable:CreateST(MRT_BossLootTableColDef, 10, 32, nil, MRT_GUIFrame);           -- ItemId should be squared - so use 30x30 -> 30 pixels high
+
+    MRT_GUIFrame_BossLoot_Filter:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 205, -15);
+    MRT_GUIFrame_BossLoot_Add_Button:SetText(MRT_L.GUI["Button_Small_Add"]);
+    MRT_GUIFrame_BossLoot_Add_Button:SetPoint("RIGHT", MRT_GUIFrame_BossLoot_Filter, "RIGHT", 26, 0);
+    MRT_GUIFrame_BossLoot_Delete_Button:SetText(MRT_L.GUI["Button_Small_Delete"]);
+    MRT_GUIFrame_BossLoot_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Add_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_BossLoot_Modify_Button:SetText(MRT_L.GUI["Button_Modify"]);
+    MRT_GUIFrame_BossLoot_Modify_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Delete_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_BossLoot_RaidLink_Button:SetText("Link");
+    MRT_GUIFrame_BossLoot_RaidLink_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Modify_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetText("Bid");
+    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidLink_Button, "RIGHT", 0, 0);
+
+    MRT_GUI_BossLootTable = ScrollingTable:CreateST(MRT_BossLootTableColDef, 12, 32, nil, MRT_GUIFrame);           -- ItemId should be squared - so use 30x30 -> 30 pixels high
     MRT_GUI_BossLootTable.head:SetHeight(15);                                                                     -- Manually correct the height of the header (standard is rowHight - 30 pix would be different from others tables around and looks ugly)
-    MRT_GUI_BossLootTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 200, -40);
+    MRT_GUI_BossLootTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_BossLoot_Filter, "BOTTOMLEFT", -5, -20);
     MRT_GUI_BossLootTable:EnableSelection(true);
     MRT_GUI_BossLootTable:RegisterEvents({
         ["OnDoubleClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
@@ -284,14 +302,12 @@ function MRT_GUI_ParseValues()
             end;
             return true;
         end,
-
-
         
     });
     
     -- parse button local / anchor buttons relative to raid title
     MRT_GUIFrame_RaidLog_Export_Button:SetText(MRT_L.GUI["Button_Export"]);
-    MRT_GUIFrame_RaidLog_Export_Button:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "TOPLEFT", -3, 32);
+    MRT_GUIFrame_RaidLog_Export_Button:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", -3, -12);
     MRT_GUIFrame_Import_PR_Button:SetText(MRT_L.GUI["Button_Import_PR"]);
     MRT_GUIFrame_Import_PR_Button:SetPoint("LEFT", MRT_GUIFrame_RaidLog_Export_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_StartNewRaid_Button:SetText(MRT_L.GUI["Button_StartNewRaid"]);
@@ -299,34 +315,39 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_RaidLog_Delete_Button:SetText(MRT_L.GUI["Button_Delete_Raid"]);
     MRT_GUIFrame_RaidLog_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_StartNewRaid_Button, "RIGHT", 0, 0);
 
-
-    MRT_GUIFrame_RaidAttendees_Add_Button:SetText(MRT_L.GUI["Button_Add"]);
-    MRT_GUIFrame_RaidAttendees_Add_Button:SetPoint("TOPLEFT", MRT_GUI_RaidAttendeesTable.frame, "BOTTOMLEFT", 0, -5);
-    MRT_GUIFrame_RaidAttendees_Delete_Button:SetText(MRT_L.GUI["Button_Delete"]);
-    MRT_GUIFrame_RaidAttendees_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_RaidAttendees_Add_Button, "RIGHT", 10, 0);
-    MRT_GUIFrame_BossLoot_Add_Button:SetText(MRT_L.GUI["Button_Add"]);
-    MRT_GUIFrame_BossLoot_Add_Button:SetPoint("TOPLEFT", MRT_GUI_BossLootTable.frame, "BOTTOMLEFT", 0, -5);
-    MRT_GUIFrame_BossLoot_Modify_Button:SetText(MRT_L.GUI["Button_Modify"]);
-    MRT_GUIFrame_BossLoot_Modify_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Add_Button, "RIGHT", 8, 0);
-    MRT_GUIFrame_BossLoot_Delete_Button:SetText(MRT_L.GUI["Button_Delete"]);
-    MRT_GUIFrame_BossLoot_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Modify_Button, "RIGHT", 8, 0);
-    MRT_GUIFrame_BossLoot_RaidLink_Button:SetText("Link");
-    MRT_GUIFrame_BossLoot_RaidLink_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Delete_Button, "RIGHT", 8, 0);
-    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetText("Bid");
-    MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidLink_Button, "RIGHT", 8, 0);
-
+    MRT_GUIFrame_RaidAttendees_Add_Button:SetText(MRT_L.GUI["Button_Small_Add"]);
+    MRT_GUIFrame_RaidAttendees_Add_Button:SetPoint("TOPLEFT", MRT_GUIFrame_RaidAttendees_Filter, "RIGHT", 1, 11);
+    MRT_GUIFrame_RaidAttendees_Delete_Button:SetText(MRT_L.GUI["Button_Small_Delete"]);
+    MRT_GUIFrame_RaidAttendees_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_RaidAttendees_Add_Button, "RIGHT", 0, 0);
 
     -- Create difficulty drop down menu
     mrt:UI_CreateTwoRowDDM()
     -- Insert table data
     MRT_GUI_CompleteTableUpdate();
 
+    --Above the raid list
     local l = MRT_GUIFrame:CreateLine()
     print(l)
-    l:SetThickness(2)
+    l:SetThickness(1)
     l:SetColorTexture(235,231,223,.5)
-    l:SetStartPoint("TOPLEFT",230,-79)
-    l:SetEndPoint("TOPLEFT",600,-79)
+    l:SetStartPoint("TOPLEFT",26,-48)
+    l:SetEndPoint("TOPLEFT",201,-48)
+
+    --Above the player list
+    local l = MRT_GUIFrame:CreateLine()
+    print(l)
+    l:SetThickness(1)
+    l:SetColorTexture(235,231,223,.5)
+    l:SetStartPoint("TOPLEFT",26,-171)
+    l:SetEndPoint("TOPLEFT",201,-171)
+
+    --Above the loot list
+    local l = MRT_GUIFrame:CreateLine()
+    print(l)
+    l:SetThickness(1)
+    l:SetColorTexture(235,231,223,.5)
+    l:SetStartPoint("TOPLEFT",227,-57)
+    l:SetEndPoint("TOPLEFT",595,-57)
 
     -- Create and anchor drop down menu table for add/modify loot dialog
     MRT_GUI_PlayerDropDownTable = ScrollingTable:CreateST(MRT_PlayerDropDownTableColDef, 9, nil, nil, MRT_GUI_FourRowDialog);
@@ -1606,7 +1627,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
                 end 
             end
             MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
-            MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), v["PR"]};
+            MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], v["PR"], date("%H:%M", v["Join"])};
             --else
                -- MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), ""};
            -- end
