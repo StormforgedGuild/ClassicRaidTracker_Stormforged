@@ -25,6 +25,9 @@
   <Button name="MRT_GUI_SMALL_Button_Template" inherits="GameMenuButtonTemplate" virtual="true" hidden="false" text="FIXME!">
     <Size x="70" y="22"/>
   </Button>
+  <Button name="MRT_GUI_EXTRA_SMALL_Button_Template" inherits="GameMenuButtonTemplate" virtual="true" hidden="false" text="FIXME!">
+    <Size x="22" y="22"/>
+  </Button>
   <Button name="MRT_GUI_DropDownButtonTemplate" virtual="true" hidden="false">
     <Size x="24" y="24"/>
     <NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\UI-ChatIcon-ScrollDown-Up">
@@ -467,7 +470,7 @@
         <FontString name="$parent_RaidLogTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
-              <Offset x="30" y="-50"/>
+              <Offset x="30" y="-100"/>
             </Anchor>
           </Anchors>
         </FontString>
@@ -488,7 +491,7 @@
         <FontString name="$parent_BossLootTitle" inherits="GameFontNormal">
           <Anchors>
             <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parent_RaidLogTitle">
-              <Offset x="155" y="-67"/>
+              <Offset x="155" y="-30"/>
             </Anchor>
           </Anchors>
         </FontString>
@@ -502,21 +505,21 @@
       </Layer>
     </Layers>
     <Frames>
-      <Button name="$parent_RaidLog_Export_Button" inherits="MRT_GUI_BIG_Button_Template">
+      <Button name="$parent_RaidLog_Export_Button" inherits="MRT_GUI_SMALL_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_RaidExportComplete();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Raid_Export");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
-      <Button name="$parent_RaidLog_Delete_Button" inherits="MRT_GUI_BIG_Button_Template">
+      <Button name="$parent_RaidLog_Delete_Button" inherits="MRT_GUI_EXTRA_SMALL_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_RaidDelete();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Raid_Delete");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
-      <Button name="$parent_Import_PR_Button" inherits="MRT_GUI_BIG_Button_Template">
+      <Button name="$parent_Import_PR_Button" inherits="MRT_GUI_SMALL_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_ImportPR();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Import_PR");</OnEnter>
@@ -628,7 +631,7 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button> -->
-      <Button name="$parent_StartNewRaid_Button" inherits="MRT_GUI_BIG_Button_Template" text="(L) StartRaid">
+      <Button name="$parent_StartNewRaid_Button" inherits="MRT_GUI_EXTRA_SMALL_Button_Template" text="(L) StartRaid">
         <!-- <Anchors>
           <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_TakeSnapshot_Button" x="0" y="-15"/>
         </Anchors> -->
