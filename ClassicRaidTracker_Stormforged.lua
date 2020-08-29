@@ -1246,7 +1246,7 @@ function getPlayerClass(PlayerName)
             --MRT_Debug("getSFEPGP: PlayerName = "..PlayerName);
             --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
             --MRT_Debug("getSFEPGP: value[main_name]: "..value["main_name"]);  
-            if (value["name"] == PlayerName) then
+            if strcomp(value["name"], PlayerName) then
                 MRT_Debug("getPlayerClass: Found player"); 
                 return value["class_name"];
                 --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        

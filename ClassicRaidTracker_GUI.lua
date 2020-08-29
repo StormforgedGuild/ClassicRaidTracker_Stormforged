@@ -1698,21 +1698,21 @@ end
 function getClassColor(class)
     local classColor = "ff9d9d9d";
     if class == "Hunter"
-    then classColor = "ff00FF7F";
+    then classColor = "ffA9D271";
     elseif class == "Druid"
-    then classColor = "ffFF4500";   
+    then classColor = "ffFF7D0A";   
     elseif class == "Mage"
-    then classColor = "ff0000ff";   
+    then classColor = "ff40C7EB";   
     elseif class == "Paladin"
-    then classColor = "ffFF6EB4";   
+    then classColor = "ffF58CBA";   
     elseif class == "Rogue"
-    then classColor = "ffFFFFE0";   
+    then classColor = "ffFFF569";   
     elseif class == "Warlock"
-    then classColor = "ffDA70D6";   
+    then classColor = "ff8787ED";   
     elseif class == "Warrior"
-    then classColor = "ffCD661D";   
+    then classColor = "ffC79C6E";   
     elseif class == "Shaman"
-    then classColor = "ff0000ff";   
+    then classColor = "ff0070DE";   
     elseif class == "Priest"
     then classColor = "ffffffff";  
     end 
