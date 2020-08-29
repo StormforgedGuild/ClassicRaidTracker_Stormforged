@@ -225,19 +225,40 @@
         </FontString>
         <FontString name="$parent_ExplanationText" inherits="GameFontWhite" justifyH="CENTER" justifyV="MIDDLE" text="MRT_ExportFrame_ExplanationText">
           <Anchors>
-            <Anchor point="CENTER" relativePoint="BOTTOM" relativeTo="$parent">
-              <Offset x="0" y="100"/>
+            <Anchor point="CENTER" relativePoint="TOP" relativeTo="$parent">
+              <Offset x="0" y="-42"/>
+            </Anchor>
+          </Anchors>
+        </FontString>
+
+        <FontString name="$parent_ExplanationText2" inherits="GameFontWhite" justifyH="CENTER" justifyV="MIDDLE" text="MRT_ExportFrame_ExplanationText">
+          <Anchors>
+            <Anchor point="CENTER" relativePoint="TOP" relativeTo="$parent">
+              <Offset x="0" y="-100"/>
             </Anchor>
           </Anchors>
         </FontString>
       </Layer>
     </Layers>
+
     <Frames>
+    <EditBox name="MRT_Export_URL" inherits="InputBoxTemplate" virtual="true" historyLines="0" enableKeyboard="true" enableMouse="true" letters="400">
+        <Size x="375" y="40"/>
+        <FontString inherits="ChatFontNormal">
+           <Color r="1" g="64.7" b="0" a="1"/>
+        </FontString>
+        <Anchors>
+            <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+              <Offset x="5" y="-50"/>
+            </Anchor>
+        </Anchors>
+     </EditBox>
+
       <ScrollFrame name="$parent_ScrollFrame" inherits="UIPanelScrollFrameTemplate">
         <Size x="350" y="150"/>
         <Anchors>
           <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
-            <Offset x="-10" y="-40"/>
+            <Offset x="-10" y="-125"/>
           </Anchor>
         </Anchors>
         <ScrollChild>
@@ -250,11 +271,29 @@
           </EditBox>
         </ScrollChild>
       </ScrollFrame>
+      <ScrollFrame name="$parent_ScrollFrame2" inherits="UIPanelScrollFrameTemplate">
+        <Size x="350" y="150"/>
+        <Anchors>
+          <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
+            <Offset x="-10" y="-125"/>
+          </Anchor>
+        </Anchors>
+        <ScrollChild>
+          <EditBox name="MRT_ExportFrame_EB2" multiLine="true" enableKeyboard="true" letters="0" countInvisibleLetters="true">
+            <Size x="350" y="150"/>
+            <Scripts>
+              <OnEscapePressed>MRT_ExportFrame_Hide();</OnEscapePressed>
+            </Scripts>
+            <FontString inherits="ChatFontNormal"/>            
+          </EditBox>
+        </ScrollChild>
+      </ScrollFrame>
+
       <Button name="$parent_OKButton" hidden="false" inherits="GameMenuButtonTemplate">
         <Size x="95" y="22"/>
         <Anchors>
           <Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent">
-            <Offset x="0" y="32"/>
+            <Offset x="80" y="32"/>
           </Anchor>
         </Anchors>
         <Scripts>
@@ -265,7 +304,7 @@
         <Size x="95" y="22"/>
         <Anchors>
           <Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent">
-            <Offset x="0" y="55"/>
+            <Offset x="-80" y="32"/>
           </Anchor>
         </Anchors>
         <Scripts>
@@ -276,7 +315,7 @@
         <Size x="386" y="160"/>
         <Anchors>
           <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">
-            <Offset x="0" y="-35"/>
+            <Offset x="0" y="-119"/>
           </Anchor>
         </Anchors>
         <Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">

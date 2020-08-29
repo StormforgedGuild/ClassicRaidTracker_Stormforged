@@ -40,8 +40,14 @@ local pasted;
 ------------------------------
 function MRT_ExportFrame_Show(export,import)
     if not import then
-        MRT_ExportFrame_EB:SetText(export)
-        MRT_ExportFrame_EB:HighlightText()
+        MRT_ExportFrame_Title:SetText("Export");
+        MRT_ExportFrame_ScrollFrame:Hide();
+        MRT_ExportFrame_ScrollFrame2:Show();
+        MRT_ExportFrame_EB2:SetText(export);
+        MRT_ExportFrame_ExplanationText:SetText("Open the raid import page on the website using the URL below");
+        MRT_ExportFrame_ExplanationText2:SetText("Copy (Ctrl+C) the Raid Export String from box below.\n Paste (Ctrl+V) into the Website.");
+        MRT_Export_URL:SetText("https://www.stormforged.org/plugins/raidlogimport/admin/dkp.php?s=");
+        MRT_ExportFrame_EB2:HighlightText();
         MRT_ExportFrame:Show()
     else 
           textBuffer={};
@@ -67,13 +73,16 @@ function MRT_ExportFrame_Show(export,import)
             textBuffer[i] = c
           end)
 
-        MRT_ExportFrame_EB:SetText("")
-        --MRT_ExportFrame_EB:SetVisibleTextByteLimit(1000);
-        --MRT_ExportFrame_EB:HighlightText()
+        MRT_ExportFrame_ScrollFrame2:Hide();
+        MRT_ExportFrame_ScrollFrame:Show();
+        MRT_ExportFrame_EB:SetText("");
         MRT_ExportFrame_EB:SetMaxBytes(1) -- limit the max length of anything entered into the box, this is what prevents the lag
 
+        MRT_ExportFrame_Title:SetText("Import");
         MRT_ExportFrame_ImportButton:Show();
-        MRT_ExportFrame_ExplanationText:SetText(MRT_L.Core["Import_Explanation"]);
+        MRT_Export_URL:SetText("https://www.stormforged.org/admin/manage_export.php?s=");
+        MRT_ExportFrame_ExplanationText:SetText("Copy (Ctrl+C) the PR Import String from the webite URL below.");
+        MRT_ExportFrame_ExplanationText2:SetText("Paste (Ctrl+V) the PR Import String into the URL below & click Import.");
         MRT_ExportFrame:Show()
     end
 end
@@ -192,7 +201,7 @@ function MRT_CreateRaidExport(raidID, bossID, difficulty)
         MRT_ExportFrame_ExplanationText:SetText(MRT_L.Core["Export_Explanation"])
     end
     -- Show the data export
-    MRT_ExportFrame_Show(dkpstring)
+    MRT_ExportFrame_Show(dkpstring, false)
 end
 
 -- complete rewrite of the old function based on the experience of newer functions
