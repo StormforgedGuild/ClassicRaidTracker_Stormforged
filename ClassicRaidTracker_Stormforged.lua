@@ -1238,7 +1238,7 @@ function getPlayerClass(PlayerName)
     if not MRT_SFExport["info"] then
         return "";
     else
-        MRT_Debug("getPlayerClass: about to start loop");        
+      --  MRT_Debug("getPlayerClass: about to start loop");        
         local playerCount = MRT_SFExport["info"]["total_players"];
         for key, value in pairs(MRT_SFExport["players"]) do
             --MRT_Debug("getSFEPGP: in for loop");
@@ -1247,7 +1247,7 @@ function getPlayerClass(PlayerName)
             --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
             --MRT_Debug("getSFEPGP: value[main_name]: "..value["main_name"]);  
             if strcomp(value["name"], PlayerName) then
-                MRT_Debug("getPlayerClass: Found player"); 
+           --    MRT_Debug("getPlayerClass: Found player"); 
                 return value["class_name"];
                 --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
            --     for k, v in pairs(value["points"]) do
@@ -1274,7 +1274,7 @@ function getPlayerPR(PlayerName)
             --MRT_Debug("getPlayerPR: value[name]: "..value["name"]);        
             --MRT_Debug("getPlayerPR: value[main_name]: "..value["main_name"]); 
             if strcomp(value["name"], PlayerName) then
-                MRT_Debug("getPlayerPR: Found player"); 
+                --MRT_Debug("getPlayerPR: Found player"); 
                 --MRT_Debug("getPlayerPR: Value[Points]: " .. value["points"]["points_earned"]); 
                 for k, v in pairs(value["points"]) do
                     --MRT_Debug("getPlayerPR: inside mini loop for points table"); 

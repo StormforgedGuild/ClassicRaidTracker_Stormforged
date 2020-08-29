@@ -402,13 +402,11 @@ local SF_ITEM_DATA = {
   ["Vek'lor's Diadem"] = 3125,
   ["Vek'nilash's Circlet"] = 3125,
   ["Ouro's Intact Hide"] = 4688,
-  ["Skin of the Great Sandworm"] = 3125,
+  ["Skin of the Great Sandworm"] = 1563,
   ["Vest of Swift Execution"] = 4688,
   ["Breastplate of Annihilation"] = 4688,
   ["Imperial Qiraji Armaments"] = 8750,
   ["Imperial Qiraji Regalia"] = 8750,
-  ["Husk of the Old God"] = 3125,
-  ["Carapace of the Old God"] = 3125,
 }
 
 

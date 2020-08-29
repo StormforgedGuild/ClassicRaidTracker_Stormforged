@@ -1639,7 +1639,7 @@ end
 
 -- update raid attendees table
 function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
-    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate Called!");
+  --  MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate Called!");
     local MRT_GUI_RaidAttendeesTableData = {};
     local indexofsub
     if (raidnum) then
@@ -1647,7 +1647,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
             --always show PR
             --if (v["Leave"]) then
-            MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[Name]: ".. v["Name"]);
+         --   MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[Name]: ".. v["Name"]);
            --[[  if v["PR"] == "" then
                 MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR] == empty");
                 --v["PR"] = getPlayerPR(v["Name"]);
@@ -1669,7 +1669,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
                 
                 classColor = getClassColor(v["Class"]);         
 
-                MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+           --     MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
                 MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"])};
                 index = index + 1;
             else 
@@ -1682,7 +1682,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
                     
                     classColor = getClassColor(v["Class"]); 
 
-                    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+            --        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
                     MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"])};
                     index = index + 1;
                 end
@@ -1736,25 +1736,25 @@ function getModifiedPR(raidnum, PlayerName)
         pEP = "0";
     end
     intpEP = tonumber(pEP);
-    MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
+  --  MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
     intpGP = tonumber(pGP) + 2000;
     --MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
     for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
         if v["Looter"] == PlayerName then
-            MRT_Debug("getModifiedPR:Found Player in Loot table");
+ --           MRT_Debug("getModifiedPR:Found Player in Loot table");
             intLootGP = intLootGP + tonumber(v["DKPValue"]);
-            MRT_Debug("getModifiedPR:intLoopGP = " ..tostring(intLoopGP));
+  --          MRT_Debug("getModifiedPR:intLoopGP = " ..tostring(intLoopGP));
         end 
     end
     if intLootGP == 0 then
-        MRT_Debug("getModifiedPR:intLootGP = 0");
+     --   MRT_Debug("getModifiedPR:intLootGP = 0");
         if not pPR then
             return "0";
         else 
             return pPR;
         end
     else 
-        MRT_Debug("getModifiedPR:intLootGP <> 0");
+    --    MRT_Debug("getModifiedPR:intLootGP <> 0");
         local newGP = intpGP + intLootGP
         local newPR = intpEP / newGP
         local retval = math.floor(newPR * 100)/100;
@@ -1811,23 +1811,34 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     end
     -- if a bossnum is given, just list loot of this boss
     if (bossnum) then
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
         local index = 1;
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             if (v["BossNumber"] == bossnum) then
+
+                MRT_Debug("In Loot Index");
+                classColor = "ff9d9d9d";
+                local playerClass = getPlayerClass(v["Looter"]);   
+                classColor = getClassColor(playerClass);      
+
                 if v["Looter"] == "unassigned" then
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
                     if v["Offspec"] then
-                        MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                    --    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
                     else
-                        MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                    --    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
                     end
                 else
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    classColor = "ff9d9d9d";
+                    local class = getPlayerClass(v["Looter"]);   
+                    classColor = getClassColor(class);      
+                    MRT_Debug(classColor);
+
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
                     if v["Offspec"] then
-                        MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                      --  MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
                     else
-                        MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                    --    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
                     end
                 end 
                 index = index + 1;
@@ -1842,12 +1853,15 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             --MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
             -- SF: if unassigned, make it red.
+            classColor = "ff9d9d9d";
+            local playerClass = getPlayerClass(v["Looter"]);   
+            classColor = getClassColor(playerClass);      
 
             if not filter then
                 if v["Looter"] == "unassigned" then
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
                 else 
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
                 end 
                 index = index + 1;
             else 
