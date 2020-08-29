@@ -1273,8 +1273,8 @@ function getPlayerPR(PlayerName)
             --MRT_Debug("getPlayerPR: key = "..key);
             --MRT_Debug("getPlayerPR: value[name]: "..value["name"]);        
             --MRT_Debug("getPlayerPR: value[main_name]: "..value["main_name"]); 
-            if (value["name"] == PlayerName) then
-                --MRT_Debug("getPlayerPR: Found player"); 
+            if strcomp(value["name"], PlayerName) then
+                MRT_Debug("getPlayerPR: Found player"); 
                 --MRT_Debug("getPlayerPR: Value[Points]: " .. value["points"]["points_earned"]); 
                 for k, v in pairs(value["points"]) do
                     --MRT_Debug("getPlayerPR: inside mini loop for points table"); 
@@ -1303,7 +1303,7 @@ function getSFEPGP(PlayerName)
             --MRT_Debug("getSFEPGP: PlayerName = "..PlayerName);
             --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
             --MRT_Debug("getSFEPGP: value[main_name]: "..value["main_name"]);  
-            if (value["name"] == PlayerName) then
+            if strcomp(value["name"],PlayerName) then
                 --MRT_Debug("getSFEPGP: Found player"); 
                 --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
                 for k, v in pairs(value["points"]) do
@@ -1313,6 +1313,12 @@ function getSFEPGP(PlayerName)
         end
         return "", "0", "0";
     end
+end
+
+function strcomp(str1, str2)
+    local s1 = string.lower(str1);
+    local s2 = string.lower(str2);
+    return (s1==s2);
 end
 -- @param man_diff: used by GUI when a bosskill was added manually
 --                  valid values: "H", "N", nil
