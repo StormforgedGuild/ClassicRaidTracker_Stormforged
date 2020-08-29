@@ -937,6 +937,8 @@ function MRT_GUI_LootAdd()
             MRT_Debug("MRT_GUI_LootAdd: MRT_NumOfLastBoss = " ..MRT_NumOfLastBoss);    
             MRT_GUI_RaidBosskillsTable:SetSelection(1);
             boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
+            --use last boss since the table is gone.
+            --boss_select = 1;
         end
     end
     
@@ -947,6 +949,8 @@ function MRT_GUI_LootAdd()
     else
         MRT_Debug("MRT_GUI_LootAdd: boss_select: " ..boss_select);
         local bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
+        MRT_GUI_RaidBosskillsTable:ClearSelection();
+        --local bossnum = MRT_NumOfLastBoss;
     end
     -- gather playerdata and fill drop down menu
     local playerData = {};
