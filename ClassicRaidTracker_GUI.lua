@@ -50,7 +50,8 @@ local lastRaidNum = nil;
 local lastLooter = nil;
 local lastValue = nil;
 local lastNote = nil;
-local lastOS = nil
+local lastOS = nil;
+local lootFilterHack = 0;
 
 -- table definitions
 local MRT_RaidLogTableColDef = {
@@ -248,6 +249,7 @@ function MRT_GUI_ParseValues()
 
  --   MRT_GUIFrame_RaidAttendees_Filter:SetText(MRT_L.GUI["Header_Title"]);
     MRT_GUIFrame_RaidAttendees_Filter:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 7, -5);
+    MRT_GUIFrame_RaidAttendees_Filter:SetAutoFocus(false);
 
  --   MRT_GUIFrame_RaidAttendeesTitle:SetText(MRT_L.GUI["Tables_RaidAttendeesTitle"]);
  --   MRT_GUIFrame_RaidAttendeesTitle:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 0, -15);
@@ -260,6 +262,7 @@ function MRT_GUI_ParseValues()
     MRT_GUI_RaidBosskillsTable:Hide();
 
     MRT_GUIFrame_BossLoot_Filter:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 205, -15);
+    MRT_GUIFrame_BossLoot_Filter:SetAutoFocus(false);
     MRT_GUIFrame_BossLoot_Add_Button:SetText(MRT_L.GUI["Button_Small_Add"]);
     MRT_GUIFrame_BossLoot_Add_Button:SetPoint("RIGHT", MRT_GUIFrame_BossLoot_Filter, "RIGHT", 26, 0);
     MRT_GUIFrame_BossLoot_Delete_Button:SetText(MRT_L.GUI["Button_Small_Delete"]);
@@ -1608,10 +1611,37 @@ function MRT_GUI_RaidLogTableUpdate()
     lastShownNumOfRaids = #MRT_RaidLog;
 end
 
+function MRT_GUI_RaidAttendeeFilter()
+    MRT_Debug("MRT_GUI_RaidAttendeeFilter Called!");
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local strText = MRT_GUIFrame_RaidAttendees_Filter:GetText();
+    MRT_GUI_RaidAttendeesTableUpdate(raidnum,strText);
+end
+
+function MRT_GUI_BossLootFilter()
+    MRT_Debug("MRT_GUI_BossLootFilter Called!");
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local strText = MRT_GUIFrame_BossLoot_Filter:GetText();
+    MRT_Debug("MRT_GUI_BossLootFilter: strText = " ..strText);
+    if lootFilterHack > 0 then
+        MRT_GUI_BossLootTableUpdate(nil, false, strText);
+    else
+        lootFilterHack = lootFilterHack + 1;
+    end
+end
+
+
+function MRT_GUI_RaidAttendeeResetFilter()
+    MRT_GUIFrame_RaidAttendees_Filter:ClearFocus();
+end
+
 -- update raid attendees table
-function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
+function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
     MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate Called!");
     local MRT_GUI_RaidAttendeesTableData = {};
+    local indexofsub
     if (raidnum) then
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
@@ -1629,56 +1659,84 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum)
                 end 
             end ]]
             --always get modified.
-            v["Class"] = getPlayerClass(v["Name"]);
-            v["PR"] = getModifiedPR(raidnum, v["Name"]);
-
-            MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
 
             classColor = "ff9d9d9d";
-            if v["Class"] == "Hunter"
-            then classColor = "ff00FF7F";
-            elseif v["Class"] == "Druid"
-            then classColor = "ffFF4500";   
-            elseif v["Class"] == "Mage"
-            then classColor = "ffFF6EB4";   
-            elseif v["Class"] == "Paladin"
-            then classColor = "ffC67171";   
-            elseif v["Class"] == "Rogue"
-            then classColor = "ffFFFFE0";   
-            elseif v["Class"] == "Warlock"
-            then classColor = "ffDA70D6";   
-            elseif v["Class"] == "Warrior"
-            then classColor = "ffCD661D";   
-            elseif v["Class"] == "Shaman"
-            then classColor = "ff0000ff";   
-            elseif v["Class"] == "Priest"
-            then classColor = "ffffffff";  
+
+            -- add check here for filter
+            if not filter then
+                v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                v["Class"] = getPlayerClass(v["Name"]);
+                
+                classColor = getClassColor(v["Class"]);         
+
+                MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"])};
+                index = index + 1;
+            else 
+                indexofsub = substr(v["Name"], filter);
+                if not indexofsub then
+                    --skip
+                else 
+                    v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                    v["Class"] = getPlayerClass(v["Name"]);
+                    
+                    classColor = getClassColor(v["Class"]); 
+
+                    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                    MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"])};
+                    index = index + 1;
+                end
             end
 
-            MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"])};
-           -- MRT_GUI_RaidAttendeesTableData[index] = {k, "|cffff0000"..v["Name"], v["PR"], date("%H:%M", v["Join"])};
-           -- MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
-
-            --else
-               -- MRT_GUI_RaidAttendeesTableData[index] = {k, v["Name"], date("%H:%M", v["Join"]), ""};
-           -- end
-            index = index + 1;
         end
     end
     table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[2] < b[2]); end);
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
 end
+
+function getClassColor(class)
+    local classColor = "ff9d9d9d";
+    if class == "Hunter"
+    then classColor = "ff00FF7F";
+    elseif class == "Druid"
+    then classColor = "ffFF4500";   
+    elseif class == "Mage"
+    then classColor = "ff0000ff";   
+    elseif class == "Paladin"
+    then classColor = "ffFF6EB4";   
+    elseif class == "Rogue"
+    then classColor = "ffFFFFE0";   
+    elseif class == "Warlock"
+    then classColor = "ffDA70D6";   
+    elseif class == "Warrior"
+    then classColor = "ffCD661D";   
+    elseif class == "Shaman"
+    then classColor = "ff0000ff";   
+    elseif class == "Priest"
+    then classColor = "ffffffff";  
+    end 
+    return classColor;
+end
+
+function substr(str1, str2)
+    local s1 = string.lower(str1);
+    local s2 = string.lower(str2);
+    return string.find(s1,s2);
+end 
 -- function to get adjusted PR from bossloottable
 function getModifiedPR(raidnum, PlayerName)
     --MRT_Debug("getModifiedPR Called!");
     local pPR, pEP, pGP = getSFEPGP(PlayerName);
     local intLootGP = 0;
-    intpEP = tonumber(pEP);
     if not pGP then
         pGP = "0";
     end 
-    --MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
+    if not pEP then
+        pEP = "0";
+    end
+    intpEP = tonumber(pEP);
+    MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
     intpGP = tonumber(pGP) + 2000;
     --MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
     for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
@@ -1737,7 +1795,7 @@ function MRT_GUI_RaidBosskillsTableUpdate(raidnum)
 end
 
 -- update bossloot table
-function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
+function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     if skipsort then 
         MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True");
     else
@@ -1745,6 +1803,8 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
     end
     local MRT_GUI_BossLootTableData = {};
     local raidnum;
+    local indexofsub1;
+    local indexofsub2;
     -- check if a raid is selected
     if (MRT_GUI_RaidLogTable:GetSelection()) then
         raidnum = MRT_GUI_RaidLogTable:GetCell(MRT_GUI_RaidLogTableSelection, 1);
@@ -1778,25 +1838,33 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort)
     elseif (raidnum) then
         MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
         local index = 1;
+
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             --MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
             -- SF: if unassigned, make it red.
-            if v["Looter"] == "unassigned" then
-                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
-                if v["Offspec"] then
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
-                else
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
-                end
+
+            if not filter then
+                if v["Looter"] == "unassigned" then
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                else 
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                end 
+                index = index + 1;
             else 
-                MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
-                if v["Offspec"] then
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData3;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
+                indexofsub1 = substr(v["ItemName"], filter);
+                indexofsub2 = substr(v["Looter"], filter);
+                if not indexofsub1 and not indexofsub2 then
+                    --skip
                 else
-                    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData3;dkpvalue: ".. v["DKPValue"].. "Offspec: False");
+                    ---
+                    if v["Looter"] == "unassigned" then
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    else 
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    end 
+                    index = index + 1;
                 end
-            end 
-            index = index + 1;
+            end
         end
     --    MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
     -- if either raidnum nor bossnum, show an empty table

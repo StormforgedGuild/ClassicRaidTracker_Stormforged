@@ -609,11 +609,19 @@
       <EditBox name="$parent_RaidAttendees_Filter" inherits="InputBoxTemplate" virtual="true" historyLines="0" enableKeyboard="true" enableMouse="true" letters="400">
         <Size x="100" y="32"/>
         <FontString inherits="ChatFontNormal"/>
+        <Scripts>
+          <OnTextChanged>MRT_GUI_RaidAttendeeFilter();</OnTextChanged>
+          <OnEscapePressed>MRT_GUI_RaidAttendeeResetFilter();</OnEscapePressed>
+        </Scripts>
+
       </EditBox>
 
       <EditBox name="$parent_BossLoot_Filter" inherits="InputBoxTemplate" virtual="true" historyLines="0" enableKeyboard="true" enableMouse="true" letters="400">
         <Size x="100" y="32"/>
         <FontString inherits="ChatFontNormal"/>
+         <Scripts>
+          <OnTextChanged>MRT_GUI_BossLootFilter();</OnTextChanged>
+        </Scripts>
       </EditBox>
 
 
