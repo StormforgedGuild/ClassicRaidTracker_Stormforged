@@ -173,9 +173,8 @@ local MRT_BossLootTableColDef = {
                                          MRT_GUI_ItemTT:Hide();
                                          MRT_GUI_ItemTT:SetOwner(UIParent, "ANCHOR_NONE");
                                        end);  ]]
-    end,      
-
-},                  
+    end,
+    },                  
 };
 local MRT_BossAttendeesTableColDef = {
     {["name"] = "", ["width"] = 1},                            -- invisible column for storing the attendee number index from the raidlog-table
