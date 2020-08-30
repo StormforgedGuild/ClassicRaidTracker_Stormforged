@@ -40,7 +40,6 @@ local pasted;
 ------------------------------
 function MRT_ExportFrame_Show(export,import)
     if not import then
---        MRT_ExportFrame:SetBackdropColor(1,0,0,1);
         MRT_ExportFrame_Title:SetText("Export");
         MRT_ExportFrame_ScrollFrame:Hide();
         MRT_ExportFrame_ScrollFrame2:Show();
@@ -98,7 +97,7 @@ function MRT_ImportButtonClick()
     loadstring(strData)();
     MRT_LastPRImport = MRT_GetCurrentTime();
     --loadstring(strData)();
-    stopEncouragingImport();
+    ImportReminder();
     MRT_ExportFrame:Hide();
     --UpdatePlayerPR();
 end

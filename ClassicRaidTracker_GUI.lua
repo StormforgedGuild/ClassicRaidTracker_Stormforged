@@ -33,6 +33,7 @@ local mrt = ClassicRaidTracker
 --------------
 local deformat = LibStub("LibDeformat-3.0");
 local ScrollingTable = LibStub("ScrollingTable");
+local ag -- import reminder animationgroup
 
 local MRT_GUI_RaidLogTableSelection = nil;
 local MRT_GUI_RaidBosskillsTableSelection = nil;
@@ -373,7 +374,7 @@ function MRT_GUI_ParseValues()
         end
     });
 
-
+    ag = MRT_GUIFrame_Import_PR_Button:CreateAnimationGroup(); -- import button animationgroup
 end
 
 function mrt:UI_CreateTwoRowDDM()
@@ -456,31 +457,7 @@ function MRT_GUI_Toggle()
             end 
         end
 
-        --Import Reminder
-         if not MRT_LastPRImport then
-               MRT_Debug("No import detected");
-             encourageImport();
-          else
-             MRT_Debug_Always("Import detected");
-        
-            -- local baseline = MRT_GetCurrentTime()
-            -- baseline = baseline - 60;  --2 days
-            -- MRT_Debug(MRT_MakeEQDKP_Time(baseline));
-            -- MRT_Debug(MRT_MakeEQDKP_Time(MRT_LastPRImport));
-
-            local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-            local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-            baseline = MRT_RaidLog [raidnum]["StartTime"];
-
-            MRT_Debug(MRT_MakeEQDKP_Time(baseline));
-            MRT_Debug(MRT_MakeEQDKP_Time(MRT_LastPRImport));
-
-            if (MRT_NumOfCurrentRaid) then
-                if (MRT_LastPRImport < baseline) then
-                    encourageImport();
-                end
-            end
-          end
+        ImportReminder();
 
     else
         MRT_GUIFrame:Hide();
@@ -488,16 +465,40 @@ function MRT_GUI_Toggle()
     end
 end
 
-local ag -- import button animationgroup
+-- enable reminder if your in an active raid that hasn't imported since raid start
+function ImportReminder()
 
-function encourageImport()
+    --disable reminder by default
+    stopEncouragingImport();
 
+    --if not in active raid, don't show reminder
+    if (not MRT_NumOfCurrentRaid) then
+        MRT_Debug("IR: No Active Raid Detected");
+        return; 
+    end
+
+    --if no raid selected, don't show reminder
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    if (not raid_select) then
+        MRT_Debug("IR: No raid selected");
+        return;
+    end
+
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    baseline = MRT_RaidLog [raidnum]["StartTime"];
+    MRT_Debug(MRT_MakeEQDKP_Time(baseline));
+    MRT_Debug(MRT_MakeEQDKP_Time(MRT_LastPRImport));
+
+    --if the last import was before the start time of current raid, remind to import
+    if (MRT_LastPRImport < baseline) then
+        encourageImport();
+    end
+
+end
+
+ function encourageImport()
     MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontGreen");
- --   local font = MRT_GUIFrame_Import_PR_Button:GetNormalFontObject();
-  --  font:SetTextColor(1, 0.5, 0.25, 1.0);
-  --  MRT_GUIFrame_Import_PR_Button:SetNormalFontObject(font);
   
-    ag = MRT_GUIFrame_Import_PR_Button:CreateAnimationGroup()    
     local FadeOut = ag:CreateAnimation("Alpha");
     FadeOut:SetToAlpha(.25);
     FadeOut:SetFromAlpha(1);
@@ -514,14 +515,12 @@ function encourageImport()
   
     ag:SetLooping("Repeat")
     ag:Play();
-  
   end
   
   function stopEncouragingImport()
       MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontWhite");
       ag:Stop();
   end
-
 
 ----------------------
 --  Button handler  --
@@ -536,28 +535,6 @@ function MRT_GUI_RaidExportComplete()
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     MRT_CreateRaidExport(raidnum, nil, nil);
 end
-
---[[ function MRT_GUI_RaidExportNormal()
-    MRT_GUI_HideDialogs();
-    local raid_select = 8;
-    if (raid_select == nil) then
-        MRT_Print(MRT_L.GUI["No raid selected"]);
-        return;
-    end
-    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-    MRT_CreateRaidExport(raidnum, nil, "N");
-end ]]
-
---[[ function MRT_GUI_RaidExportHard()
-    MRT_GUI_HideDialogs();
-    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-    if (raid_select == nil) then
-        MRT_Print(MRT_L.GUI["No raid selected"]);
-        return;
-    end
-    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-    MRT_CreateRaidExport(raidnum, nil, "H");
-end ]]
 
 function MRT_GUI_RaidDelete()
     MRT_GUI_HideDialogs();
@@ -581,7 +558,6 @@ function MRT_GUI_ImportPR()
     MRT_ExportFrame_Show(export,true);
 end
 
-
 function MRT_GUI_RaidDeleteAccept(raidnum)
     table.remove(MRT_RaidLog, raidnum);
     -- Modify MRT_NumOfCurrentRaid if there is an active raid
@@ -593,8 +569,6 @@ function MRT_GUI_RaidDeleteAccept(raidnum)
 end
 
 function MRT_GUI_BossAdd()
-
-
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1635,6 +1609,7 @@ function MRT_GUI_OnUpdateHandler()
         MRT_GUI_RaidLogTableSelection = raidnum;
         if (raidnum) then
             MRT_GUI_RaidDetailsTableUpdate(MRT_GUI_RaidLogTable:GetCell(raidnum, 1));
+            ImportReminder();
         else
             MRT_GUI_RaidDetailsTableUpdate(nil);
         end
