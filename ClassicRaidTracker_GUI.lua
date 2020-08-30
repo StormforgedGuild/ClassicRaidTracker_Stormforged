@@ -599,6 +599,7 @@ function MRT_GUI_BossAdd()
     MRT_GUI_ThreeRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
     MRT_GUI_ThreeRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_BossAddAccept(raidnum); end);
     MRT_GUI_ThreeRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
+    
     MRT_GUI_ThreeRowDialog:Show();
 end
 
@@ -1042,6 +1043,7 @@ function MRT_GUI_LootAdd()
     MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
     MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
     MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
+    MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
     MRT_GUI_FourRowDialog:Show();
 end
 
@@ -1128,6 +1130,7 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
     MRT_GUI_FourRowDialog_EB1:SetAutoFocus(false);
     MRT_GUI_FourRowDialog_EB1:SetCursorPosition(1);
+    MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
 
     MRT_GUI_FourRowDialog_EB2:SetFocus();
     MRT_GUI_FourRowDialog:Show();
@@ -1278,6 +1281,29 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     end
 end
 
+function MRT_GUI_LootRaidWinner()
+    --MRT_GUI_HideDialogs();
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    if (raid_select == nil) then
+        MRT_Print(MRT_L.GUI["No raid selected"]);
+        return;
+    end
+    local loot_select = MRT_GUI_BossLootTable:GetSelection();
+    if (loot_select == nil) then
+        MRT_Print(MRT_L.GUI["No loot selected"]);
+        return;
+    end
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    local lootName = MRT_GUI_BossLootTable:GetCell(loot_select, 3);
+    local looter = string.upper(MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]);
+    local cost = MRT_GUI_BossLootTable:GetCell(loot_select, 5);
+
+    --"Congratz! %s receives %s for %sGP",   
+    local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
+    SendChatMessage(rwMessage, "Raid");
+end
+
 function MRT_GUI_LootRaidLink()
     --MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
@@ -1292,13 +1318,9 @@ function MRT_GUI_LootRaidLink()
     end
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
-    local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
-    local lootName = MRT_GUI_BossLootTable:GetCell(loot_select, 3);
 
     local rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
     SendChatMessage(rwMessage, "Raid");
-
-
 end
 
 function MRT_GUI_LootRaidAnnounce()
@@ -1316,12 +1338,9 @@ function MRT_GUI_LootRaidAnnounce()
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
-    local lootName = MRT_GUI_BossLootTable:GetCell(loot_select, 3);
 
     local rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
     SendChatMessage(rwMessage, "RAID_WARNING");
-
-
 end
 
 
