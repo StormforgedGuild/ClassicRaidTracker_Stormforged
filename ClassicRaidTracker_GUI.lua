@@ -120,7 +120,8 @@ local MRT_BossLootTableColDef = {
     {["name"] = MRT_L.GUI["Col_Looter"], ["width"] = 85},
     {["name"] = MRT_L.GUI["Col_Cost"], ["width"] = 45},
     {["name"] = "", ["width"] = 1},                            -- invisible column for itemString (needed for tooltip)
-    {
+    {["name"] = MRT_L.GUI["Col_Time"], ["width"] = 45},
+--[[ {
         ["name"] = MRT_L.GUI["Note"],
         ["width"] = 30,
         ["DoCellUpdate"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, fShow, self, ...)
@@ -145,7 +146,7 @@ local MRT_BossLootTableColDef = {
                 MRT_GUI_ItemTT:SetOwner(UIParent, "ANCHOR_NONE");
             end
         end,
-    }, 
+    }, ]]
     {                                                          -- col for OffSpec
     ["name"] = MRT_L.GUI["Col_OffSpec"], 
     ["width"] = 30,
@@ -1935,13 +1936,17 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             if (v["BossNumber"] == bossnum) then
 
-                MRT_Debug("In Loot Index");
+                --Set Class Color
                 classColor = "ff9d9d9d";
                 local playerClass = getPlayerClass(v["Looter"]);   
-                classColor = getClassColor(playerClass);      
+                classColor = getClassColor(playerClass);     
+
+                --GetDate 
+                lootTime = date("%I:%M", v["Time"]);
+                MRT_Debug(lootTime);
 
                 if v["Looter"] == "unassigned" then
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
                     if v["Offspec"] then
                     --    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
                     else
@@ -1953,7 +1958,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                     classColor = getClassColor(class);      
                     MRT_Debug(classColor);
 
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
                     if v["Offspec"] then
                       --  MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
                     else
@@ -1972,15 +1977,21 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             --MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
             -- SF: if unassigned, make it red.
+            
+            --Set Class Color
             classColor = "ff9d9d9d";
             local playerClass = getPlayerClass(v["Looter"]);   
             classColor = getClassColor(playerClass);      
 
+            --GetDate 
+            lootTime = date("%I:%M", v["Time"]);
+            MRT_Debug(lootTime);
+
             if not filter then
                 if v["Looter"] == "unassigned" then
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
                 else 
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
                 end 
                 index = index + 1;
             else 
@@ -1991,9 +2002,9 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 else
                     ---
                     if v["Looter"] == "unassigned" then
-                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
                     else 
-                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"], v["Offspec"]};
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
                     end 
                     index = index + 1;
                 end
