@@ -401,6 +401,11 @@ do
 				b1 = 0;
 			end
 		end
+		--if there is format in the string, clean it for sort.
+		if type(a1) == "string" then
+			--clean name
+			a1, b1 = cleanString(a1), cleanString(b1);
+		end
 		if (groupby == nil) or not groupby then
 			if a1 == b1 then
 				if column.sortnext then
@@ -430,6 +435,15 @@ do
 			MRT_Debug("ST:CompareSort: calling ststorbyclass");
 			local direction = column.sort or column.defaultsort or "asc";
 			return stsortbyclass(a1, b1, a2, b2, direction)
+		end
+	end
+	function cleanString(strText)
+		--|cff9d9d9d
+		local strFound = strfind(strText, "|c")
+		if not strFound then
+			return strText;
+		else
+			return strsub(strText, 11);
 		end
 	end
 	function stsortbyclass (a1, b1, a2, b2, direction)
@@ -695,7 +709,6 @@ do
 					if groupby then
 						--do new groupby
 						--MRT_Debug("ST_doOnclick:group by class checked!");
-						-- need to do group by sort here.
 						table:SortData(groupby);
 					else
 						----do nothing, just call sortdata
