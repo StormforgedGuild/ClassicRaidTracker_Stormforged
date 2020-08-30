@@ -527,6 +527,8 @@ function MRT_GUI_RaidDeleteAccept(raidnum)
 end
 
 function MRT_GUI_BossAdd()
+
+
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -727,6 +729,29 @@ end
 end ]]
 
 function MRT_GUI_RaidAttendeeAdd()
+    
+    local ag = MRT_GUIFrame_Import_PR_Button:CreateAnimationGroup()    
+
+    local FadeOut = ag:CreateAnimation("Alpha");
+    --a4:SetScale(0.5,0.5)
+    FadeOut:SetToAlpha(.25);
+    FadeOut:SetFromAlpha(1);
+    FadeOut:SetDuration(3)
+    FadeOut:SetOrder(1);
+    FadeOut:SetSmoothing("OUT")
+
+    local FadeIn = ag:CreateAnimation("Alpha");
+    --a4:SetScale(0.5,0.5)
+    FadeIn:SetToAlpha(1);
+    FadeIn:SetFromAlpha(.25);
+    FadeIn:SetDuration(3)
+    FadeOut:SetOrder(2);
+    FadeIn:SetSmoothing("OUT")
+
+    ag:SetLooping("Repeat")
+    ag:Play()
+
+
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then

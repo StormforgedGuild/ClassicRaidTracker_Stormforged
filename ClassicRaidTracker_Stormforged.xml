@@ -307,6 +307,7 @@
             <Offset x="-80" y="32"/>
           </Anchor>
         </Anchors>
+
         <Scripts>
           <OnClick>MRT_ImportButtonClick();</OnClick>
         </Scripts>
