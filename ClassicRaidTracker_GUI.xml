@@ -522,11 +522,6 @@
           <OnEnter>MRT_GUI_SetTT(self, "Import_PR");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
-      <AnimationGroup name="Pulse">
-            <Alpha name="$parentIn" change="1" duration="0.1"/>
-          <Alpha name="$parentOut" change="-1" duration="1.5"/>
-      </AnimationGroup>
-
       </Button>
       <Button name="$parent_RaidLog_ExportNormal_Button" inherits="MRT_GUI_BIG_Button_Template">
         <Scripts>

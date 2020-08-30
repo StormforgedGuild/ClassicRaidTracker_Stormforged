@@ -97,6 +97,7 @@ function MRT_ImportButtonClick()
     MRT_LastPRImport = MRT_GetCurrentTime();
     loadstring(strData)();
     --loadstring(strData)();
+    stopEncouragingImport();
     MRT_ExportFrame:Hide();
     --UpdatePlayerPR();
 end

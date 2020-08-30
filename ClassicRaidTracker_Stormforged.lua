@@ -44,9 +44,6 @@ MRT_RaidLog = {};
 MRT_PlayerDB = {};
 MRT_LastPRImport = nil;
 MRT_SFExport = {};
-
-
-
 MRT_ArrayBossID = {};
 MRT_ArrayBosslast = nil;
 
