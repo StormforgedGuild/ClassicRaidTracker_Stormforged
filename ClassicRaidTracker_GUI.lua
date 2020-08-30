@@ -1781,6 +1781,7 @@ function parseFilter(strText)
         [":priest"] = "priest",
         [":warlock"] = "warlock",
         [":druid"] = "druid",
+        [":hunter"] = "hunter",
         [":rogue"] = "rogue",
         [":paladin"] = "paladin",
         [":mage"] = "mage",
