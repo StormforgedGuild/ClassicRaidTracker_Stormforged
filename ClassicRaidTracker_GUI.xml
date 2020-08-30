@@ -89,6 +89,11 @@
         </FontString>
       </Layer>
     </Layers>
+    <Scripts>
+      <OnLoad>self:RegisterForDrag("LeftButton");</OnLoad>
+      <OnDragStart>self:StartMoving();</OnDragStart>
+      <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
+    </Scripts>
     <Frames>
       <Button name="$parent_OKButton" inherits="MRT_GUI_Button_Template">
         <Anchors>
