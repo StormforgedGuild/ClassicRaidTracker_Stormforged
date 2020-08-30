@@ -1943,8 +1943,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 classColor = getClassColor(playerClass);     
 
                 --GetDate 
-                lootTime = date("%I:%M", v["Time"]);
-                MRT_Debug(lootTime);
+                loottime = calculateLootTimeLeft(v["Time"])
 
                 if v["Looter"] == "unassigned" then
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
@@ -1985,8 +1984,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
             classColor = getClassColor(playerClass);      
 
             --GetDate 
-            lootTime = date("%I:%M", v["Time"]);
-            MRT_Debug(lootTime);
+            loottime = calculateLootTimeLeft(v["Time"])
 
             if not filter then
                 if v["Looter"] == "unassigned" then
@@ -2025,6 +2023,30 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     end
     MRT_GUI_BossLootTable:SetData(MRT_GUI_BossLootTableData, true, skipsort);
     lastSelectedBossNum = bossnum;
+end
+
+function calculateLootTimeLeft (timeLooted)
+
+            lootTimeStamp = timeLooted;
+            local nowTimeStamp = MRT_GetCurrentTime();
+        --    MRT_Debug(date("%m/%d/%y %H:%M:%S", nowTimeStamp));
+         --   MRT_Debug(date("%m/%d/%y %H:%M:%S", lootTimeStamp));
+            local deltaTime = 7200 - difftime(nowTimeStamp, lootTimeStamp);
+            MRT_Debug(deltaTime)
+
+            if deltaTime > 0 then
+                local hours = math.floor(deltaTime /3600);
+                local minutes = math.floor( (deltaTime - (hours*3600) )/60);
+              --  MRT_Debug(hours);
+             --   MRT_Debug(minutes);
+                if hours > 0 then
+                    lootTime = hours.."h "..minutes.."m";
+                else
+                    lootTime = minutes.."m";
+                end
+            else
+                lootTime = date("%I:%M", timeLooted); --default to time stamp if the loot has expired
+            end
 end
 
 -- update bossattendee table
