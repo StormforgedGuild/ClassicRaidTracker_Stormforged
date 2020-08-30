@@ -570,6 +570,22 @@
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
+      <!--checkbox for group by class here.  -->
+      <CheckButton name="$parent_RaidAttendee_GroupByCB" inherits="OptionsCheckButtonTemplate">
+        <Scripts>
+          <OnEnter>MRT_GUI_SetTT(self, "RA_GroupBy");</OnEnter>
+          <OnLeave>MRT_GUI_HideTT();</OnLeave>
+            <OnClick>
+                local enable = self:GetChecked()
+                self:SetChecked(enable and true or false)
+                if enable then
+                  MRT_Debug("GroupbyChecked!");
+                else
+                  MRT_Debug("GroupbyUnChecked!");
+                end
+            </OnClick>
+        </Scripts>
+      </CheckButton>
       <Button name="$parent_BossLoot_Add_Button" inherits="MRT_GUI_EXTRA_SMALL_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_LootAdd();</OnClick>

@@ -278,7 +278,7 @@ do
 	-- @description Resorts the table using the rules specified in the table column info.
 	-- @usage st:SortData()
 	-- @see http://www.wowace.com/addons/lib-st/pages/create-st/#w-defaultsort
-	local function SortData (self)
+	local function SortData (self, groupby)
 		-- sanity check
 		if not(self.sorttable) or (#self.sorttable ~= #self.data)then
 			self.sorttable = {};
@@ -288,7 +288,7 @@ do
 				self.sorttable[i] = i;
 			end
 		end
-
+		
 		-- go on sorting
 		local i, sortby = 1, nil;
 		while i <= #self.cols and not sortby do
@@ -298,12 +298,21 @@ do
 			i = i + 1;
 		end
 		if sortby then
+			--MRT_Debug("ST:SortData: sortby true");
+			--MRT_Debug("ST:SortData:sortby = " ..sortby);
 			table.sort(self.sorttable, function(rowa, rowb)
 				local column = self.cols[sortby];
-				if column.comparesort then
-					return column.comparesort(self, rowa, rowb, sortby);
+				if column.CompareSort then
+					--MRT_Debug("ST:SortData:sortby:CompareSort = true");
+					return column.CompareSort(self, rowa, rowb, sortby);
 				else
-					return self:CompareSort(rowa, rowb, sortby);
+					--MRT_Debug("ST:SortData:sortby:CompareSort = false");
+					if (groupby == nil) or not groupby then
+						return self:CompareSort(rowa, rowb, sortby);
+					else
+						--MRT_Debug("ST:SortData:groupby");
+						return self:CompareSort(rowa, rowb, sortby, groupby);
+					end
 				end
 			end);
 		end
@@ -324,15 +333,30 @@ do
 	-- @description CompareSort function used to determine how to sort column values.  Can be overridden in column data or table data.
 	-- @usage used internally.
 	-- @see Core.lua
-	local function CompareSort (self, rowa, rowb, sortbycol)
+	local function CompareSort (self, rowa, rowb, sortbycol, groupby)
+		--MRT_Debug("ST:CompareSort Called!");
 		local cella, cellb = self:GetCell(rowa, sortbycol), self:GetCell(rowb, sortbycol);
 		local a1, b1 = cella, cellb;
+		local a2, b2
+		if groupby == nil or not groupby then
+			--do nothing
+		else
+			--MRT_Debug("ST:CompareSort: groupby is true");
+			local cella2, cellb2 = self:GetCell(rowa, 5), self:GetCell(rowb, 5);
+			if not cella2 then cella2="Unknown" end;
+			if not cellb2 then callb2="Unknown" end;
+			a2, b2 = cella2, cellb2
+			--MRT_Debug("ST:CompareSort: groupby a2 == " ..a2);
+			--MRT_Debug("ST:CompareSort: groupby b2 == " ..b2);
+		end
 		if type(a1) == 'table' then
 			a1 = a1.value;
 		end
 		if type(b1) == 'table' then
 			b1 = b1.value;
 		end
+		--MRT_Debug("ST:CompareSort: type of a1 is " ..type(a1));
+		--MRT_Debug("ST:CompareSort: type of b2 is " ..type(b1));
 		local column = self.cols[sortbycol];
 
 		if type(a1) == "function" then
@@ -377,27 +401,52 @@ do
 				b1 = 0;
 			end
 		end
-		if a1 == b1 then
-			if column.sortnext then
-				local nextcol = self.cols[column.sortnext];
-				if not(nextcol.sort) then
-					if nextcol.comparesort then
-						return nextcol.comparesort(self, rowa, rowb, column.sortnext);
+		if (groupby == nil) or not groupby then
+			if a1 == b1 then
+				if column.sortnext then
+					local nextcol = self.cols[column.sortnext];
+					if not(nextcol.sort) then
+						if nextcol.CompareSort then
+							return nextcol.CompareSort(self, rowa, rowb, column.sortnext);
+						else
+							return self:CompareSort(rowa, rowb, column.sortnext);
+						end
 					else
-						return self:CompareSort(rowa, rowb, column.sortnext);
+						return false;
 					end
 				else
 					return false;
 				end
 			else
-				return false;
+				local direction = column.sort or column.defaultsort or "asc";
+				if direction:lower() == "asc" then
+					return a1 > b1;
+				else
+					return a1 < b1;
+				end
 			end
 		else
+			--do group by
+			MRT_Debug("ST:CompareSort: calling ststorbyclass");
 			local direction = column.sort or column.defaultsort or "asc";
+			return stsortbyclass(a1, b1, a2, b2, direction)
+		end
+	end
+	function stsortbyclass (a1, b1, a2, b2, direction)
+		MRT_Debug("ST:stsortbyclass: a1, b1, a2, b2, " ..a1.." "..b1.." "..a2.." "..b2);
+		if a2 == b2 then
+			--MRT_Debug("ST:stsortbyclass: a2 == b2");
+			--MRT_Debug("ST:stsortbyclass: direction == " ..direction);
 			if direction:lower() == "asc" then
 				return a1 > b1;
 			else
 				return a1 < b1;
+			end
+		else
+			if direction:lower() == "asc" then
+				return a2 > b2;
+			else
+				return a2 < b2;
 			end
 		end
 	end
@@ -618,13 +667,13 @@ do
 	end
 
 	
-	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, disabledeselect, ...)
+	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, disabledeselect, groupby, ...)
 		MRT_Debug("ST_doOnclick fired!");
 		st = table;
 		if button == "LeftButton" then	-- LS: only handle on LeftButton click (right passes thru)
 			MRT_Debug("ST_doOnclick button == Leftbutton");
 			if not (row or realrow) then
-				MRT_Debug("ST_doOnclick sorting!");
+				MRT_Debug("ST_doOnclick not (row or realrow) sorting!");
 				for i, col in ipairs(st.cols) do
 					if i ~= column then -- clear out all other sort marks
 						cols[i].sort = nil;
@@ -637,7 +686,24 @@ do
 					sortorder = "dsc";
 				end
 				cols[column].sort = sortorder;
-				table:SortData();
+				--check groupby default is off
+				if groupby == nil then
+					--do nothing, just call sortdata
+					--MRT_Debug("ST_doOnclick:groupby not passed!");					
+					table:SortData();
+				else
+					if groupby then
+						--do new groupby
+						--MRT_Debug("ST_doOnclick:group by class checked!");
+						-- need to do group by sort here.
+						table:SortData(groupby);
+					else
+						----do nothing, just call sortdata
+						--MRT_Debug("ST_doOnclick group by class not checked!");
+						table:SortData();
+					end	
+				end
+				
 
 			else
 				MRT_Debug("ST_doOnclick row or realrow");
@@ -664,7 +730,7 @@ do
 		self.framecount = self.framecount + 1;
 		st.showing = true;
 		st.frame = f;
-
+		
 		st.Show = Show;
 		st.Hide = Hide;
 		st.SetDisplayRows = SetDisplayRows;
@@ -693,7 +759,7 @@ do
 
 		st.SetFilter = SetFilter;
 		st.DoFilter = DoFilter;
-
+		
 		highlight = highlight or {};
 		st:SetDefaultHighlight(highlight["r"], highlight["g"], highlight["b"], highlight["a"]); -- highlight color
 		st:SetDefaultHighlightBlank(); -- non highlight color
