@@ -1738,6 +1738,7 @@ function parseFilter(strText)
         [":druid"] = "druid",
         [":rogue"] = "rogue",
         [":paladin"] = "paladin",
+        [":mage"] = "mage",
         [":shaman"] = "shaman",
     }
     if substr(strText,":") then
