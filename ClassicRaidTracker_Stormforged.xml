@@ -253,6 +253,9 @@
               <Offset x="5" y="-50"/>
             </Anchor>
         </Anchors>
+        <scripts>
+          <OnTabPressed>MRT_ExportFrame_EB:SetFocus();</OnTabPressed>
+        </scripts>
      </EditBox>
 
       <ScrollFrame name="$parent_ScrollFrame" inherits="UIPanelScrollFrameTemplate">
