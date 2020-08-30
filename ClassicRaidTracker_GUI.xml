@@ -22,6 +22,9 @@
   <Button name="MRT_GUI_BIG_Button_Template" inherits="GameMenuButtonTemplate" virtual="true" hidden="false" text="FIXME!">
     <Size x="85" y="38"/>
   </Button>
+    <Button name="MRT_GUI_MEDIUM_Button_Template" inherits="GameMenuButtonTemplate" virtual="true" hidden="false" text="FIXME!">
+    <Size x="120" y="22"/>
+  </Button>
   <Button name="MRT_GUI_SMALL_Button_Template" inherits="GameMenuButtonTemplate" virtual="true" hidden="false" text="FIXME!">
     <Size x="70" y="22"/>
   </Button>
@@ -279,7 +282,7 @@
     </Scripts>
   </Frame>
   <Frame name="MRT_GUI_FourRowDialog" toplevel="true" hidden="true" enableMouse="true" movable="true" enableKeyboard="true" parent="UIParent">
-    <Size x="215" y="283"/>
+    <Size x="215" y="310"/>
     <Anchors>
       <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent">
         <Offset x="394" y="3"/>
@@ -329,6 +332,17 @@
           <OnClick>MRT_GUI_HideDialogs();</OnClick>
         </Scripts>
       </Button>
+      <Button name="$parent_AnnounceWinnerButton" inherits="MRT_GUI_MEDIUM_Button_Template">
+        <Anchors>
+          <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent">
+            <Offset x="-50" y="50"/>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick>MRT_GUI_LootRaidWinner();</OnClick>
+        </Scripts>
+      </Button>
+
       <EditBox name="$parent_EB1" inherits="MRT_GUI_Editbox_Template">
         <Anchors>
           <Anchor point="TOP" relativePoint="TOP" relativeTo="$parent">

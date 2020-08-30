@@ -123,6 +123,7 @@ MRT_L.Core["LDB Right-click to open the options menu"] =
 MRT_L.Core["MB_Cancel"] = "Cancel"
 MRT_L.Core["MB_No"] = "No"
 MRT_L.Core["MB_Ok"] = "Ok"
+MRT_L.Core["MB_Win"] = "Announce Winner"
 MRT_L.Core["MB_Yes"] = "Yes"
 MRT_L.Core["TakeSnapshot_CurrentRaidError"] =
     "Error: Active raid in progress. No snapshot taken."
