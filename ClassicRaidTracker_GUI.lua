@@ -513,14 +513,14 @@ end
     local FadeOut = ag:CreateAnimation("Alpha");
     FadeOut:SetToAlpha(.25);
     FadeOut:SetFromAlpha(1);
-    FadeOut:SetDuration(2);
+    FadeOut:SetDuration(1);
     FadeOut:SetOrder(1);
     FadeOut:SetSmoothing("OUT")
   
     local FadeIn = ag:CreateAnimation("Alpha");
     FadeIn:SetToAlpha(1);
     FadeIn:SetFromAlpha(.25);
-    FadeIn:SetDuration(2);
+    FadeIn:SetDuration(1);
     FadeOut:SetOrder(2);
     FadeIn:SetSmoothing("OUT")
   
@@ -2037,26 +2037,26 @@ end
 
 function calculateLootTimeLeft (timeLooted)
 
-            lootTimeStamp = timeLooted;
-            local nowTimeStamp = MRT_GetCurrentTime();
-        --    MRT_Debug(date("%m/%d/%y %H:%M:%S", nowTimeStamp));
-         --   MRT_Debug(date("%m/%d/%y %H:%M:%S", lootTimeStamp));
-            local deltaTime = 7200 - difftime(nowTimeStamp, lootTimeStamp);
-            MRT_Debug(deltaTime)
+    lootTimeStamp = timeLooted;
+    local nowTimeStamp = MRT_GetCurrentTime();
+    -- MRT_Debug(date("%m/%d/%y %H:%M:%S", nowTimeStamp));
+    -- MRT_Debug(date("%m/%d/%y %H:%M:%S", lootTimeStamp));
+    local deltaTime = 7200 - difftime(nowTimeStamp, lootTimeStamp);
+    MRT_Debug(deltaTime)
 
-            if deltaTime > 0 then
-                local hours = math.floor(deltaTime /3600);
-                local minutes = math.floor( (deltaTime - (hours*3600) )/60);
-              --  MRT_Debug(hours);
-             --   MRT_Debug(minutes);
-                if hours > 0 then
-                    lootTime = hours.."h "..minutes.."m";
-                else
-                    lootTime = minutes.."m";
-                end
-            else
-                lootTime = date("%I:%M", timeLooted); --default to time stamp if the loot has expired
-            end
+    if deltaTime > 0 then
+        local hours = math.floor(deltaTime /3600);
+        local minutes = math.floor( (deltaTime - (hours*3600) )/60);
+        -- MRT_Debug(hours);
+        -- MRT_Debug(minutes);
+        if hours > 0 then
+            lootTime = hours.."h "..minutes.."m";
+        else
+            lootTime = minutes.."m";
+        end
+    else
+        lootTime = date("%I:%M", timeLooted); --default to time stamp if the loot has expired
+    end
 end
 
 -- update bossattendee table
