@@ -40,6 +40,7 @@ local pasted;
 ------------------------------
 function MRT_ExportFrame_Show(export,import)
     if not import then
+--        MRT_ExportFrame:SetBackdropColor(1,0,0,1);
         MRT_ExportFrame_Title:SetText("Export");
         MRT_ExportFrame_ScrollFrame:Hide();
         MRT_ExportFrame_ScrollFrame2:Show();
@@ -75,7 +76,7 @@ function MRT_ExportFrame_Show(export,import)
 
         MRT_ExportFrame_ScrollFrame2:Hide();
         MRT_ExportFrame_ScrollFrame:Show();
-        MRT_ExportFrame_EB:SetText("");
+        MRT_ExportFrame_EB:SetText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         MRT_ExportFrame_EB:SetMaxBytes(1) -- limit the max length of anything entered into the box, this is what prevents the lag
 
         MRT_ExportFrame_Title:SetText("Import");
@@ -94,8 +95,8 @@ function MRT_ImportButtonClick()
     --MRT_SFExport = loadstring(strData);
     strData = "MRT_SFExport = {"..strData.."}"
     MRT_Debug("strData = ".. strData);
-    MRT_LastPRImport = MRT_GetCurrentTime();
     loadstring(strData)();
+    MRT_LastPRImport = MRT_GetCurrentTime();
     --loadstring(strData)();
     stopEncouragingImport();
     MRT_ExportFrame:Hide();

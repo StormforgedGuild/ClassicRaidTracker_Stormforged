@@ -200,8 +200,9 @@
       <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent"/>
     </Anchors>
     <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
-      <TileSize val="32"/>
+    <TileSize val="32"/>
       <EdgeSize val="32"/>
+       <Color r="1" g="0" b="0" a="1"/>
       <BackgroundInsets left="11" right="12" top="12" bottom="11"/>
     </Backdrop>
     <Layers>

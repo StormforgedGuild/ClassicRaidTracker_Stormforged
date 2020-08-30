@@ -1981,6 +1981,10 @@ function MRT_Debug(text)
     end
 end
 
+function MRT_Debug_Always(text)
+        DEFAULT_CHAT_FRAME:AddMessage(text, 1, 0.5, 0);
+end
+
 function MRT_Print(text)
     DEFAULT_CHAT_FRAME:AddMessage("MRT: "..text, 1, 1, 0);
 end

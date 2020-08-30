@@ -235,6 +235,8 @@ end
 --  parse localization and set up tables after ADDON_LOADED  --
 ---------------------------------------------------------------
 function MRT_GUI_ParseValues()
+
+
     -- Parse title strings
     MRT_GUIFrame_Title:SetText(MRT_L.GUI["Header_Title"]);
   --  MRT_GUIFrame_RaidLogTitle:SetText(MRT_L.GUI["Tables_RaidLogTitle"]);
@@ -371,55 +373,7 @@ function MRT_GUI_ParseValues()
         end
     });
 
-        --Do Last Import Check
-        if not MRT_LastPRImport then
-            encourageImport();
-        else
-            local baseline = MRT_GetCurrentTime()
-            baseline = baseline - 60*60*48;  --2 days
-            if (baseline < MRT_LastPRImport) then
-              encourageImport();
-            end
-        end
 
-
-end
-
-function encourageImport()
-
-  MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontHighlight");
-  local font = MRT_GUIFrame_Import_PR_Button:GetNormalFontObject();
-  font:SetTextColor(1, 0.5, 0.25, 1.0);
-  MRT_GUIFrame_Import_PR_Button:SetNormalFontObject(font);
-
-  local ag = MRT_GUIFrame_Import_PR_Button:CreateAnimationGroup()    
-
-  local FadeOut = ag:CreateAnimation("Alpha");
-  --a4:SetScale(0.5,0.5)
-  FadeOut:SetToAlpha(.25);
-  FadeOut:SetFromAlpha(1);
-  FadeOut:SetDuration(3)
-  FadeOut:SetOrder(1);
-  FadeOut:SetSmoothing("OUT")
-
-  local FadeIn = ag:CreateAnimation("Alpha");
-  --a4:SetScale(0.5,0.5)
-  FadeIn:SetToAlpha(1);
-  FadeIn:SetFromAlpha(.25);
-  FadeIn:SetDuration(3)
-  FadeOut:SetOrder(2);
-  FadeIn:SetSmoothing("OUT")
-
-  ag:SetLooping("Repeat")
-  ag:Play()
-
-end
-
-function stopEncouragingImport()
-    MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontHighlight");
-    local font = MRT_GUIFrame_Import_PR_Button:GetNormalFontObject();
-    font:SetTextColor(1, 1, 1, 1.0);
-    MRT_GUIFrame_Import_PR_Button:SetNormalFontObject(font);
 end
 
 function mrt:UI_CreateTwoRowDDM()
@@ -501,11 +455,72 @@ function MRT_GUI_Toggle()
                 MRT_GUI_RaidLogTable:SetSelection(1);   --if there is a row, select the most current
             end 
         end
+
+        --Import Reminder
+         if not MRT_LastPRImport then
+               MRT_Debug("No import detected");
+             encourageImport();
+          else
+             MRT_Debug_Always("Import detected");
+        
+            -- local baseline = MRT_GetCurrentTime()
+            -- baseline = baseline - 60;  --2 days
+            -- MRT_Debug(MRT_MakeEQDKP_Time(baseline));
+            -- MRT_Debug(MRT_MakeEQDKP_Time(MRT_LastPRImport));
+
+            local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+            local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+            baseline = MRT_RaidLog [raidnum]["StartTime"];
+
+            MRT_Debug(MRT_MakeEQDKP_Time(baseline));
+            MRT_Debug(MRT_MakeEQDKP_Time(MRT_LastPRImport));
+
+            if (MRT_NumOfCurrentRaid) then
+                if (MRT_LastPRImport < baseline) then
+                    encourageImport();
+                end
+            end
+          end
+
     else
         MRT_GUIFrame:Hide();
         MRT_GUIFrame:SetScript("OnUpdate", nil);
     end
 end
+
+local ag -- import button animationgroup
+
+function encourageImport()
+
+    MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontGreen");
+ --   local font = MRT_GUIFrame_Import_PR_Button:GetNormalFontObject();
+  --  font:SetTextColor(1, 0.5, 0.25, 1.0);
+  --  MRT_GUIFrame_Import_PR_Button:SetNormalFontObject(font);
+  
+    ag = MRT_GUIFrame_Import_PR_Button:CreateAnimationGroup()    
+    local FadeOut = ag:CreateAnimation("Alpha");
+    FadeOut:SetToAlpha(.25);
+    FadeOut:SetFromAlpha(1);
+    FadeOut:SetDuration(2);
+    FadeOut:SetOrder(1);
+    FadeOut:SetSmoothing("OUT")
+  
+    local FadeIn = ag:CreateAnimation("Alpha");
+    FadeIn:SetToAlpha(1);
+    FadeIn:SetFromAlpha(.25);
+    FadeIn:SetDuration(2);
+    FadeOut:SetOrder(2);
+    FadeIn:SetSmoothing("OUT")
+  
+    ag:SetLooping("Repeat")
+    ag:Play();
+  
+  end
+  
+  function stopEncouragingImport()
+      MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontWhite");
+      ag:Stop();
+  end
 
 
 ----------------------
