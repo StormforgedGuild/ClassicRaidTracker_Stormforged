@@ -52,6 +52,7 @@ local lastValue = nil;
 local lastNote = nil;
 local lastOS = nil;
 local lootFilterHack = 0;
+local attendeeFilterHack = 0;
 
 -- table definitions
 local MRT_RaidLogTableColDef = {
@@ -955,6 +956,7 @@ function MRT_GUI_LootAdd()
     local createdTrash = false;
     if (boss_select == nil) then
         if (MRT_NumOfLastBoss == nil) or (MRT_NumOfLastBoss == 0) then
+            MRT_Debug("MRT_GUI_LootAdd: adding boss kill");
             MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
             boss_select = 1;
             createdTrash = true;
@@ -970,6 +972,8 @@ function MRT_GUI_LootAdd()
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     if createdTrash then
         --no boss is available, add one and select
+        MRT_Debug("MRT_GUI_LootAdd: createdTrash == true ");
+        --MRT_Debug("MRT_GUI_LootAdd: MRT_NumOfLastBoss = " ..MRT_NumOfLastBoss);    
         bossnum = 1;
     else
         MRT_Debug("MRT_GUI_LootAdd: boss_select: " ..boss_select);
@@ -1645,7 +1649,13 @@ function MRT_GUI_RaidAttendeeFilter()
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local strText = MRT_GUIFrame_RaidAttendees_Filter:GetText();
-    MRT_GUI_RaidAttendeesTableUpdate(raidnum,strText);
+    --attendeeFilterHack
+    if attendeeFilterHack > 0 then
+        MRT_GUI_RaidAttendeesTableUpdate(raidnum,strText);
+    else
+        attendeeFilterHack = attendeeFilterHack + 1;
+    end
+    
 end
 
 function MRT_GUI_BossLootFilter()
@@ -1692,36 +1702,96 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
             classColor = "ff9d9d9d";
 
             -- add check here for filter
-            if not filter then
+            if (not filter) or filter == "" then
                 v["PR"] = getModifiedPR(raidnum, v["Name"]);
                 v["Class"] = getPlayerClass(v["Name"]);
                 
                 classColor = getClassColor(v["Class"]);         
 
            --     MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
-                MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"])};
+                MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
                 index = index + 1;
             else 
-                indexofsub = substr(v["Name"], filter);
-                if not indexofsub then
-                    --skip
-                else 
-                    v["PR"] = getModifiedPR(raidnum, v["Name"]);
-                    v["Class"] = getPlayerClass(v["Name"]);
-                    
-                    classColor = getClassColor(v["Class"]); 
+                local strFilter, classname = parseFilter(filter);
+                MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: strFilter =  ".. strFilter);
+                if classname then
+                    indexofsub = substr(v["Class"], strFilter);
+                    if not indexofsub then
+                        --skip
+                    else 
+                        v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                        v["Class"] = getPlayerClass(v["Name"]);
+                        
+                        classColor = getClassColor(v["Class"]); 
 
-            --        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
-                    MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"])};
-                    index = index + 1;
+                --        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                        MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
+                        index = index + 1;
+                    end
+                else
+                    indexofsub = substr(v["Name"], strFilter);
+                    if not indexofsub then
+                        --skip
+                    else 
+                        v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                        v["Class"] = getPlayerClass(v["Name"]);
+                        
+                        classColor = getClassColor(v["Class"]); 
+
+                --        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                        MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
+                        index = index + 1;
+                    end
                 end
             end
 
         end
     end
-    table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[2] < b[2]); end);
+    --table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[5] > b[5]); end);
+    --table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[5] > b[5]); end);
+    table.sort(MRT_GUI_RaidAttendeesTableData, sortbyclassthenPR);
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
+end
+function parseFilter(strText)
+    MRT_Debug("parseFilter called!");
+    
+    local filtertype = {
+        [":warrior"] = "warrior",
+        [":priest"] = "priest",
+        [":warlock"] = "warlock",
+        [":druid"] = "druid",
+        [":rogue"] = "rogue",
+        [":paladin"] = "paladin",
+        [":shaman"] = "shaman",
+    }
+    if substr(strText,":") then
+        MRT_Debug("parseFilter : found!");
+        local classname = filtertype[strlower(strText)]
+        if not classname then
+            MRT_Debug("parseFilter classname not found");
+            return strText;
+        else
+            return classname, true;
+        end
+    else
+        return strText;
+    end
+end
+function sortbyclassthenPR (a, b)
+    if a[5] == b[5] then
+        if a[3] > b[3] then
+            return true;
+        else
+            return false;
+        end
+    else
+        if a[5] > b [5] then
+            return true;
+        else
+            return false;
+        end
+    end
 end
 
 function getClassColor(class)
