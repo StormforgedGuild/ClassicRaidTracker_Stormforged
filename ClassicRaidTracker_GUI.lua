@@ -261,6 +261,15 @@ function MRT_GUI_ParseValues()
     MRT_GUI_RaidAttendeesTable = ScrollingTable:CreateST(MRT_RaidAttendeesTableColDef, 18, nil, nil, MRT_GUIFrame);
     MRT_GUI_RaidAttendeesTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidAttendees_Filter, "BOTTOMLEFT",-7, -18);
     MRT_GUI_RaidAttendeesTable:EnableSelection(true);
+    --uncomment when ready to try group by sorting
+    MRT_GUI_RaidAttendeesTable:RegisterEvents({
+        ["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, ...)
+            MRT_Debug("MRT_GUI_RaidAttendeesTable:MRT_Onclick fired!");
+            doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, false, MRT_GUIFrame_RaidAttendee_GroupByCB:GetChecked())  --pass group by true if checked.
+            return true;
+        end,
+        
+    });
     MRT_GUI_RaidBosskillsTable = ScrollingTable:CreateST(MRT_RaidBosskillsTableColDef, 6, nil, nil, MRT_GUIFrame);
     MRT_GUI_RaidBosskillsTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_RaidBosskillsTitle, "BOTTOMLEFT", 0, -15);
     MRT_GUI_RaidBosskillsTable:EnableSelection(true);
@@ -297,10 +306,10 @@ function MRT_GUI_ParseValues()
                 MRT_GUI_LootModify();
             end;
         end,
-        ["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
-            MRT_Debug("MRT_Onclick fired!");
+        ["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, ...)
+            MRT_Debug("MRT_BoosLootTable:Onclick fired!");
             donotdeselect = false;
-            doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ..., true)  --passing true so that we don't deselect in the loot table.
+            doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, true, false)  --passing true so that we don't deselect in the loot table.
             if MRT_GUI_FourRowDialog:IsVisible() then
                 if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked()) then
                     MRT_Debug("STOnClick: isDirty == True");
@@ -327,6 +336,7 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_RaidAttendees_Add_Button:SetPoint("TOPLEFT", MRT_GUIFrame_RaidAttendees_Filter, "RIGHT", 1, 11);
     MRT_GUIFrame_RaidAttendees_Delete_Button:SetText(MRT_L.GUI["Button_Small_Delete"]);
     MRT_GUIFrame_RaidAttendees_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_RaidAttendees_Add_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_RaidAttendee_GroupByCB:SetPoint("LEFT", MRT_GUIFrame_RaidAttendees_Delete_Button, "RIGHT", 0, 0);
 
     -- Create difficulty drop down menu
     mrt:UI_CreateTwoRowDDM()
