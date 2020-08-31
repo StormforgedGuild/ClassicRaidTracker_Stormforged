@@ -601,13 +601,12 @@
                 --self:SetChecked(enable and true or false)
                 if enable then
                   MRT_Debug("GroupbyChecked!");
-                  local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-                  local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-                MRT_GUI_RaidAttendeesTableUpdate(raidnum);
                 else
                   MRT_Debug("GroupbyUnChecked!");
                 end
-                
+                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                MRT_GUI_RaidAttendeesTableUpdate(raidnum);
             </OnClick>
         </Scripts>
       </CheckButton>
