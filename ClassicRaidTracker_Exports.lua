@@ -48,6 +48,7 @@ function MRT_ExportFrame_Show(export,import)
         MRT_ExportFrame_ExplanationText2:SetText("Copy (Ctrl+C) the Raid Export String from box below.\n Paste (Ctrl+V) into the Website.");
         MRT_Export_URL:SetText("https://www.stormforged.org/plugins/raidlogimport/admin/dkp.php?s=");
         MRT_ExportFrame_EB2:HighlightText();
+        MRT_ExportFrame_ImportButton:Hide();
         MRT_ExportFrame:Show()
     else 
           textBuffer={};
