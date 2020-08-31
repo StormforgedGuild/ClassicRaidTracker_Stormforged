@@ -1834,32 +1834,20 @@ function parseFilter(strText)
 end
 
 function parseFilter4Classes(strText)
-    MRT_Debug("parseFilter4Classes called!");
+    --MRT_Debug("parseFilter4Classes called!");
     classFilters = {}
-
-    local filtertype = {
-        [":warrior"] = "warrior",
-        [":priest"] = "priest",
-        [":warlock"] = "warlock",
-        [":druid"] = "druid",
-        [":hunter"] = "hunter",
-        [":rogue"] = "rogue",
-        [":paladin"] = "paladin",
-        [":mage"] = "mage",
-        [":shaman"] = "shaman",
-    }
     local retVal = string.gsub(strText, " ", "")
-    MRT_Debug("parseFilter4Classes retVal == "..retVal);
+    --MRT_Debug("parseFilter4Classes retVal == "..retVal);
     if string.len(retVal) > 4 then
         for i in string.gmatch(retVal, "%a+") do
             MRT_Debug("parseFilter4Classes i == "..i);
             table.insert(classFilters, i);
         end
         if table.maxn(classFilters) > 0 then
-            MRT_Debug("parseFilter4Classes:classFilters true");
+            --MRT_Debug("parseFilter4Classes:classFilters true");
             return classFilters, true;
         else
-            MRT_Debug("parseFilter4Classes:classFilters false");
+            --MRT_Debug("parseFilter4Classes:classFilters false");
             return strText, false;
         end 
     else
@@ -1869,7 +1857,7 @@ end
 function isClassinClassFilter(class, classFilter)
     MRT_Debug("isClassinClassFilter");
     for i, v in pairs(classFilter) do
-        MRT_Debug("isClassinClassFilter:v == " ..v);
+        --MRT_Debug("isClassinClassFilter:v == " ..v);
         if string.lower(v) == string.lower(class) then
             return true;
         end
