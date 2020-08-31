@@ -1545,8 +1545,14 @@ function MRT_GUI_StartNewRaidAccept()
     MRT_CreateNewRaid(zoneName, raidSize, diffId);
     MRT_GUI_CompleteTableUpdate();
     MRT_GUIFrame_StartNewRaid_Button:SetText(MRT_L.GUI["Button_EndCurrentRaid"]); -- rename raid button to end
+    MRT_GUI_RaidLogTable:SetSelection(1);
+    if (MRT_NumOfCurrentRaid) then 
+        MRT_GUI_RaidAttendeesTableUpdate(MRT_NumOfCurrentRaid);
+    end 
+    
     --MRT_GUIFrame_StartNewRaid_Button:SetEnabled(false); -- disable add raid button
     --MRT_GUIFrame_EndCurrentRaid_Button:SetEnabled(true); --enable end raid button
+    
 end
 
 function MRT_GUI_MakeAttendanceCheck()
