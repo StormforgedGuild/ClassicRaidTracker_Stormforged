@@ -34,12 +34,14 @@ local LBZ = LibStub("LibBabble-Zone-3.0")
 local LBZR = LBZ:GetReverseLookupTable()
 local textBuffer= {};
 local pasted; 
+local MRT_Import = false;
 
 ------------------------------
 --  export frame functions  --
 ------------------------------
 function MRT_ExportFrame_Show(export,import)
     if not import then
+        MRT_Import = false;
         MRT_ExportFrame_Title:SetText("Export");
         MRT_ExportFrame_ScrollFrame:Hide();
         MRT_ExportFrame_ScrollFrame2:Show();
@@ -51,6 +53,7 @@ function MRT_ExportFrame_Show(export,import)
         MRT_ExportFrame_ImportButton:Hide();
         MRT_ExportFrame:Show()
     else 
+        MRT_Import = true;
           textBuffer={};
           pasted = "";
           local i, lastPaste =  0, 0
@@ -89,7 +92,14 @@ function MRT_ExportFrame_Show(export,import)
 end
 
 function MRT_ExportFrame_Hide() MRT_ExportFrame:Hide() end
+function MRT_ExportSetTab()
 
+    if MRT_Import then
+        MRT_ExportFrame_EB:SetFocus();
+    else
+        MRT_ExportFrame_EB2:SetFocus();
+    end
+end
 function MRT_ImportButtonClick()
     local strData = prepstring(pasted);
     --MRT_SFExport = loadstring(strData);

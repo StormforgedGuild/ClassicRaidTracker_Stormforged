@@ -254,7 +254,7 @@
             </Anchor>
         </Anchors>
         <scripts>
-          <OnTabPressed>MRT_ExportFrame_EB:SetFocus();</OnTabPressed>
+          <OnTabPressed>MRT_ExportSetTab();</OnTabPressed>
         </scripts>
      </EditBox>
 
@@ -287,6 +287,7 @@
             <Size x="350" y="150"/>
             <Scripts>
               <OnEscapePressed>MRT_ExportFrame_Hide();</OnEscapePressed>
+              <OnEditFocusGained> MRT_ExportFrame_EB2:HighlightText();</OnEditFocusGained>
             </Scripts>
             <FontString inherits="ChatFontNormal"/>            
           </EditBox>
