@@ -241,7 +241,7 @@ function MRT_GUI_ParseValues()
     -- Parse title strings
     MRT_GUIFrame_Title:SetText(MRT_L.GUI["Header_Title"]);
   --  MRT_GUIFrame_RaidLogTitle:SetText(MRT_L.GUI["Tables_RaidLogTitle"]);
-    MRT_GUIFrame_RaidLogTitle:SetPoint("TOPLEFT", MRT_GUIFrame, "TOPLEFT", 25, -10);
+    MRT_GUIFrame_RaidLogTitle:SetPoint("TOPLEFT", MRT_GUIFrame, "TOPLEFT", 20, -10);
 
  --   MRT_GUIFrame_RaidBosskillsTitle:SetText(MRT_L.GUI["Tables_RaidBosskillsTitle"]);
   --  MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
@@ -274,10 +274,10 @@ function MRT_GUI_ParseValues()
     MRT_GUI_RaidBosskillsTable:EnableSelection(true);
     MRT_GUI_RaidBosskillsTable:Hide();
 
-    MRT_GUIFrame_BossLoot_Filter:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 205, -15);
+    MRT_GUIFrame_BossLoot_Filter:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 198, -15);
     MRT_GUIFrame_BossLoot_Filter:SetAutoFocus(false);
     MRT_GUIFrame_BossLoot_Add_Button:SetText(MRT_L.GUI["Button_Small_Add"]);
-    MRT_GUIFrame_BossLoot_Add_Button:SetPoint("RIGHT", MRT_GUIFrame_BossLoot_Filter, "RIGHT", 26, 0);
+    MRT_GUIFrame_BossLoot_Add_Button:SetPoint("RIGHT", MRT_GUIFrame_BossLoot_Filter, "RIGHT", 23, 0);
     MRT_GUIFrame_BossLoot_Delete_Button:SetText(MRT_L.GUI["Button_Small_Delete"]);
     MRT_GUIFrame_BossLoot_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Add_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_Modify_Button:SetText(MRT_L.GUI["Button_Modify"]);
@@ -347,24 +347,24 @@ function MRT_GUI_ParseValues()
     print(l)
     l:SetThickness(1)
     l:SetColorTexture(235,231,223,.5)
-    l:SetStartPoint("TOPLEFT",26,-48)
-    l:SetEndPoint("TOPLEFT",201,-48)
+    l:SetStartPoint("TOPLEFT",22,-48)
+    l:SetEndPoint("TOPLEFT",197,-48)
 
     --Above the player list
     local l = MRT_GUIFrame:CreateLine()
     print(l)
     l:SetThickness(1)
     l:SetColorTexture(235,231,223,.5)
-    l:SetStartPoint("TOPLEFT",26,-171)
-    l:SetEndPoint("TOPLEFT",201,-171)
+    l:SetStartPoint("TOPLEFT",22,-171)
+    l:SetEndPoint("TOPLEFT",197,-171)
 
     --Above the loot list
     local l = MRT_GUIFrame:CreateLine()
     print(l)
     l:SetThickness(1)
     l:SetColorTexture(235,231,223,.5)
-    l:SetStartPoint("TOPLEFT",227,-57)
-    l:SetEndPoint("TOPLEFT",595,-57)
+    l:SetStartPoint("TOPLEFT",217,-57)
+    l:SetEndPoint("TOPLEFT",591,-57)
 
     -- Create and anchor drop down menu table for add/modify loot dialog
     MRT_GUI_PlayerDropDownTable = ScrollingTable:CreateST(MRT_PlayerDropDownTableColDef, 9, nil, nil, MRT_GUI_FourRowDialog);
