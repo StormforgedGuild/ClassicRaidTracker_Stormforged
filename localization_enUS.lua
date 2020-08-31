@@ -343,7 +343,7 @@ MRT_L.GUI["TT_Attendee_Add_LeaveEB"] = [=[Format HH:MM
 
 If left blank, MRT will use
 the raid end time or current time.]=]
-MRT_L.GUI["TT_BA_Add"] = "Add an attendee to the boss attendee list."
+MRT_L.GUI["TT_BA_Add"] = "Add an attendee to the raid."
 MRT_L.GUI["TT_BA_Delete"] = "Delete selected boss attendee."
 MRT_L.GUI["TT_Boss_Add"] = "Add a boss encounter."
 MRT_L.GUI["TT_Boss_Add_TimeEB"] = [=[Format HH:MM

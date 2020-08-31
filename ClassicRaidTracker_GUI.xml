@@ -580,6 +580,8 @@
       <Button name="$parent_RaidAttendees_Add_Button" inherits="MRT_GUI_EXTRA_SMALL_Button_Template">
         <Scripts>
           <OnClick>MRT_GUI_RaidAttendeeAdd();</OnClick>
+          <OnEnter>MRT_GUI_SetTT(self, "BA_Add");</OnEnter>
+          <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
       </Button>
       <Button name="$parent_RaidAttendees_Delete_Button" inherits="MRT_GUI_EXTRA_SMALL_Button_Template">
