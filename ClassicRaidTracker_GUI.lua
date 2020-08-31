@@ -1838,7 +1838,7 @@ function parseFilter4Classes(strText)
     classFilters = {}
     local retVal = string.gsub(strText, " ", "")
     --MRT_Debug("parseFilter4Classes retVal == "..retVal);
-    if string.len(retVal) > 4 then
+    if string.len(retVal) > 3 then
         for i in string.gmatch(retVal, "%a+") do
             MRT_Debug("parseFilter4Classes i == "..i);
             table.insert(classFilters, i);
