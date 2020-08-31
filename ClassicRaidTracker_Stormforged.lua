@@ -477,7 +477,7 @@ function MRT_Initialize(frame)
             end
         end,
         OnTooltipShow = function(tooltip)
-            tooltip:AddLine(_TITLE);
+            tooltip:AddLine(MRT_ADDON_TITLE);
             tooltip:AddLine(" ");
             tooltip:AddLine(MRT_L.Core["LDB Left-click to toggle the raidlog browser"]);
             tooltip:AddLine(MRT_L.Core["LDB Right-click to open the options menu"]);

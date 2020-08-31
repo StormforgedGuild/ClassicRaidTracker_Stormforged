@@ -1097,7 +1097,7 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
-    MRT_GUI_FourRowDialog_EB2:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 4));
+    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
     lastLooter = MRT_GUI_FourRowDialog_EB2:GetText();
     MRT_Debug("MRT_GUI_LootModify: lastLooter: "..lastLooter);
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
@@ -1256,7 +1256,8 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
         end
     end
     -- do table update, if selected loot table was modified
-    MRT_GUI_RaidDetailsTableUpdate(raidnum);
+    MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
+    
     local item_select = MRT_GUI_BossLootTable:GetSelection();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then return; end
@@ -1292,14 +1293,18 @@ function MRT_GUI_LootRaidWinner()
         MRT_Print(MRT_L.GUI["No loot selected"]);
         return;
     end
-    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-    local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
-    local lootName = MRT_GUI_BossLootTable:GetCell(loot_select, 3);
-    local looter = string.upper(MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]);
-    local cost = MRT_GUI_BossLootTable:GetCell(loot_select, 5);
-
+    --local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    --local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    --local lootName = MRT_GUI_BossLootTable:GetCell(loot_select, 3);
+    --local looter = string.upper(MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]);
+    --local cost = MRT_GUI_BossLootTable:GetCell(loot_select, 5);
+    local looter = string.upper(MRT_GUI_FourRowDialog_EB2:GetText());
+    local cost = MRT_GUI_FourRowDialog_EB3:GetText();
+    local lootName = MRT_GUI_FourRowDialog_EB1:GetText();
+    
     --"Congratz! %s receives %s for %sGP",   
-    local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
+    --local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
+    local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
     SendChatMessage(rwMessage, "Raid");
 end
 
@@ -1665,15 +1670,15 @@ function MRT_GUI_CompleteTableUpdate()
 end
 
 -- update raid details tables
-function MRT_GUI_RaidDetailsTableUpdate(raidnum)
+function MRT_GUI_RaidDetailsTableUpdate(raidnum, skipsort)
     MRT_GUI_RaidAttendeesTableUpdate(raidnum);
     MRT_GUI_RaidBosskillsTableUpdate(raidnum);
-    MRT_GUI_BossDetailsTableUpdate(nil);
+    MRT_GUI_BossDetailsTableUpdate(nil, skipsort);
 end
 
 -- update boss details tables
-function MRT_GUI_BossDetailsTableUpdate(bossnum)
-    MRT_GUI_BossLootTableUpdate(bossnum);
+function MRT_GUI_BossDetailsTableUpdate(bossnum, skipsort)
+    MRT_GUI_BossLootTableUpdate(bossnum, skipsort);
     MRT_GUI_BossAttendeesTableUpdate(bossnum);
 end
 
@@ -1730,6 +1735,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
     local MRT_GUI_RaidAttendeesTableData = {};
     local indexofsub
     if (raidnum) then
+        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == true");
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
             --always show PR
@@ -1792,14 +1798,17 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
                     end
                 end
             end
-
         end
+    else
+        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == false");
     end
     --table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[5] > b[5]); end);
     --table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[5] > b[5]); end);
+    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
     table.sort(MRT_GUI_RaidAttendeesTableData, sortbyclassthenPR);
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
+    MRT_GUI_RaidAttendeesTable:SortData(MRT_GUIFrame_RaidAttendee_GroupByCB:GetChecked());
 end
 function parseFilter(strText)
     MRT_Debug("parseFilter called!");
