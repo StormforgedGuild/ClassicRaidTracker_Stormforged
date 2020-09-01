@@ -41,7 +41,8 @@ do
 	-- @see http://www.wowace.com/addons/lib-st/pages/colors/
 	local function SetHighLightColor (self, frame, color)
 		if not frame.highlight then
-			frame.highlight = frame:CreateTexture(nil, "OVERLAY");
+			--old code: frame.highlight = frame:CreateTexture(nil, "OVERLAY");
+			frame.highlight = frame:CreateTexture(nil, "BORDER");
 			frame.highlight:SetAllPoints(frame);
 		end
 		frame.highlight:SetColorTexture(color.r, color.g, color.b, color.a);
@@ -116,6 +117,8 @@ do
 			local row = self.rows[i];
 			if not row then
 				row = CreateFrame("Button", self.frame:GetName().."Row"..i, self.frame);
+				row:SetFrameStrata("MEDIUM");
+				row:SetFrameLevel(2);
 				self.rows[i] = row;
 				if i > 1 then
 					row:SetPoint("TOPLEFT", self.rows[i-1], "BOTTOMLEFT", 0, 0);
@@ -134,7 +137,9 @@ do
 				local col = row.cols[j];
 				if not col then
 					col = CreateFrame("Button", row:GetName().."col"..j, row);
-					col.text = row:CreateFontString(col:GetName().."text", "OVERLAY", "GameFontHighlightSmall");
+					-- old code col.text = row:CreateFontString(col:GetName().."text", "OVERLAY", "GameFontHighlightSmall");
+					col.text = row:CreateFontString(col:GetName().."text", "BORDER", "GameFontHighlightSmall");
+					--col:SetFrameStrata("MEDIUM");
 					row.cols[j] = col;
 					local align = self.cols[j].align or "LEFT";
 					col.text:SetJustifyH(align);
@@ -192,6 +197,8 @@ do
 		local row = self.head
 		if not row then
 			row = CreateFrame("Frame", self.frame:GetName().."Head", self.frame);
+			row:SetFrameStrata("MEDIUM");
+			row:SetFrameLevel(1);
 			row:SetPoint("BOTTOMLEFT", self.frame, "TOPLEFT", 4, 0);
 			row:SetPoint("BOTTOMRIGHT", self.frame, "TOPRIGHT", -4, 0);
 			row:SetHeight(self.rowHeight);
@@ -203,6 +210,7 @@ do
 			local col = getglobal(colFrameName);
 			if not col then
 				col = CreateFrame("Button", colFrameName, row);
+				--col:SetFrameStrata("MEDIUM");
 				col:RegisterForClicks("AnyUp");	 -- LS: right clicking on header
 
 				if self.events then
@@ -213,9 +221,11 @@ do
 					end
 				end
 			end
+			--col:SetFrameStrata("MEDIUM");
 			row.cols[i] = col;
 
-			local fs = col:GetFontString() or col:CreateFontString(col:GetName().."fs", "OVERLAY", "GameFontHighlightSmall");
+			--old code local fs = col:GetFontString() or col:CreateFontString(col:GetName().."fs", "OVERLAY", "GameFontHighlightSmall");
+			local fs = col:GetFontString() or col:CreateFontString(col:GetName().."fs", "BORDER", "GameFontHighlightSmall");
 			fs:SetAllPoints(col);
 			fs:SetPoint("LEFT", col, "LEFT", lrpadding, 0);
 			fs:SetPoint("RIGHT", col, "RIGHT", -lrpadding, 0);
@@ -240,7 +250,8 @@ do
 				local colibg = "col"..i.."bg";
 				local bg = self.frame[colibg];
 				if not bg then
-					bg = self.frame:CreateTexture(nil, "OVERLAY");
+					--old code: bg = self.frame:CreateTexture(nil, "OVERLAY");
+					bg = self.frame:CreateTexture(nil, "BORDER");
 					self.frame[colibg] = bg;
 				end
 				bg:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, 4);
@@ -737,6 +748,7 @@ do
 		local st = {};
 		self.framecount = self.framecount or 1;
 		local f = CreateFrame("Frame", "ScrollTable" .. self.framecount, parent or UIParent);
+		--f:SetFrameStrata("MEDIUM");
 		self.framecount = self.framecount + 1;
 		st.showing = true;
 		st.frame = f;
@@ -839,6 +851,7 @@ do
 
 		-- build scroll frame
 		local scrollframe = CreateFrame("ScrollFrame", f:GetName().."ScrollFrame", f, "FauxScrollFrameTemplate");
+		--scrollframe:SetFrameStrata("MEDIUM");
 		st.scrollframe = scrollframe;
 		scrollframe:Show();
 		scrollframe:SetScript("OnHide", function(self, ...)
@@ -849,6 +862,7 @@ do
 		scrollframe:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -26, 3);
 
 		local scrolltrough = CreateFrame("Frame", f:GetName().."ScrollTrough", scrollframe);
+		--scrolltrough:SetFrameStrata("MEDIUM");
 		scrolltrough:SetWidth(17);
 		scrolltrough:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -3);
 		scrolltrough:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -4, 4);
@@ -856,6 +870,7 @@ do
 		scrolltrough.background:SetAllPoints(scrolltrough);
 		scrolltrough.background:SetColorTexture(0.05, 0.05, 0.05, 1.0);
 		local scrolltroughborder = CreateFrame("Frame", f:GetName().."ScrollTroughBorder", scrollframe);
+		--scrolltroughborder:SetFrameStrata("MEDIUM")
 		scrolltroughborder:SetWidth(1);
 		scrolltroughborder:SetPoint("TOPRIGHT", scrolltrough, "TOPLEFT");
 		scrolltroughborder:SetPoint("BOTTOMRIGHT", scrolltrough, "BOTTOMLEFT");

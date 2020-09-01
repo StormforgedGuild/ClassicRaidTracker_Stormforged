@@ -79,6 +79,7 @@ local function GetAutoCompleteButton(index)
 	local buttonName = "EditBoxAutoCompleteButton"..index;
 	if not _G[buttonName] then
 		local btn = CreateFrame("Button",buttonName,EditBoxAutoCompleteBox,"EditBoxAutoCompleteButtonTemplate")
+		--btn:SetFrameStrata("HIGH")
 		btn:SetPoint("TOPLEFT",GetAutoCompleteButton(index-1),"BOTTOMLEFT",0,0)
 		_G[buttonName] = btn		
 		EditBoxAutoCompleteBox.existingButtonCount = max(index, EditBoxAutoCompleteBox.existingButtonCount or 1)
@@ -110,6 +111,8 @@ function EditBoxAutoComplete_OnLoad(self)
 	self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
 	self:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);	
 	AutoCompleteInstructions:SetText("|cffbbbbbb"..PRESS_TAB.."|r");
+	--self:SetFrameStrata("HIGH")
+	
 end
 
 function EditBoxAutoComplete_Update(parent, text, cursorPosition)

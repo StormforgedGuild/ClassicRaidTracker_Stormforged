@@ -214,6 +214,10 @@ Constructor
 local function Constructor()
 	local num  = AceGUI:GetNextWidgetNum(Type)
 	local frame = CreateFrame("Frame", nil, UIParent)
+	--[[ frame:SetFrameStrata("HIGH")
+	frame:setFrameLevel(5)
+	frame:setTopLevel(true)
+ ]]
 	frame:Hide()
 
 	local editbox = CreateFrame("EditBox", "AceGUI-3.0EditBox"..num, frame, "InputBoxTemplate")
@@ -232,12 +236,19 @@ local function Constructor()
 	editbox:SetPoint("BOTTOMLEFT", 6, 0)
 	editbox:SetPoint("BOTTOMRIGHT")
 	editbox:SetHeight(19)
-
+	--[[ editbox:SetFrameStrata("HIGH")
+	editbox:setFrameLevel(5)
+	editbox:setTopLevel(true)
+ ]]
 	local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	label:SetPoint("TOPLEFT", 0, -2)
 	label:SetPoint("TOPRIGHT", 0, -2)
 	label:SetJustifyH("LEFT")
 	label:SetHeight(18)
+--[[ 	label:SetFrameStrata("HIGH")
+	label:setFrameLevel(5)
+	label:setTopLevel(true)
+ ]]
 
 	local button = CreateFrame("Button", nil, editbox, "UIPanelButtonTemplate")
 	button:SetWidth(40)
@@ -245,6 +256,10 @@ local function Constructor()
 	button:SetPoint("RIGHT", -2, 0)
 	button:SetText(OKAY)
 	button:SetScript("OnClick", Button_OnClick)
+--[[ 	button:SetFrameStrata("HIGH")
+	button:setFrameLevel(5)
+	button:setTopLevel(true)
+ ]]
 	button:Hide()
 
 	local widget = {

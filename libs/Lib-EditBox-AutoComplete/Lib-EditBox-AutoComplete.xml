@@ -28,6 +28,7 @@
 		<DisabledFont style="GameFontDisable"/>
 		<HighlightTexture inherits="UIPanelButtonHighlightTexture"/>
 	</Button>
+	<!-- <Frame name="EditBoxAutoCompleteBox" parent="UIParent" hidden="true" frameStrata="HIGH" frameLevel="5" toplevel="true"> -->
 	<Frame name="EditBoxAutoCompleteBox" parent="UIParent" hidden="true">
 		<Size>
 			<AbsDimension x="5" y="5"/>
@@ -35,7 +36,8 @@
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
-		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+		<!-- <Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true"> -->
+		<Backdrop bgFile="Interface\framegeneral\ui-background-rock" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true" alphaMode="DISABLE">
 			<EdgeSize>
 				<AbsValue val="16"/>
 			</EdgeSize>
@@ -47,7 +49,7 @@
 			</BackgroundInsets>
 		</Backdrop>
 		<Layers>
-			<Layer level="ARTWORK">
+			<Layer level="OVERLAY">
 				<FontString name="EditBoxAutoCompleteInstructions" inherits="GameFontDisableSmall" text="PRESS_TAB">
 					<Anchors>
 						<Anchor point="BOTTOMLEFT">
@@ -57,6 +59,7 @@
 				</FontString>
 			</Layer>
 		</Layers>
+		<!-- <Frames frameStrata="HIGH" frameLevel="5" toplevel="true"> -->
 		<Frames>
 			<Button name="EditBoxAutoCompleteButton1" inherits="EditBoxAutoCompleteButtonTemplate">
 				<Anchors>
