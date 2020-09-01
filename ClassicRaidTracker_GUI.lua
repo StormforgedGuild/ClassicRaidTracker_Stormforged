@@ -1740,13 +1740,17 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
   --  MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate Called!");
     local MRT_GUI_RaidAttendeesTableData = {};
     local indexofsub
+    local checkFilter = filter;
+    if not checkFilter then
+        checkFilter = MRT_GUIFrame_RaidAttendees_Filter:GetText();
+    end
     if (raidnum) then
         MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == true");
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
             classColor = "ff9d9d9d";
             -- add check here for filter
-            if (not filter) or filter == "" then
+            if (not checkFilter) or checkFilter == "" then
                 v["PR"] = getModifiedPR(raidnum, v["Name"]);
                 v["Class"] = getPlayerClass(v["Name"]);
                 classColor = getClassColor(v["Class"]);         
@@ -1755,7 +1759,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
             else 
                 -- need function here to return true if there are classes to filter
                 --old code: local strFilter, classname = parseFilter(filter);
-                local strFilter, isClassFilter = parseFilter4Classes(filter);
+                local strFilter, isClassFilter = parseFilter4Classes(checkFilter);
                 --old code: MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: strFilter =  ".. strFilter);
 
                 --old code if classname then  -- if there are class filters then do something
@@ -1857,8 +1861,9 @@ end
 function isClassinClassFilter(class, classFilter)
     MRT_Debug("isClassinClassFilter");
     for i, v in pairs(classFilter) do
-        --MRT_Debug("isClassinClassFilter:v == " ..v);
-        if string.lower(v) == string.lower(class) then
+        MRT_Debug("isClassinClassFilter:class == " ..class);
+        MRT_Debug("isClassinClassFilter:v == " ..v);
+        if string.lower(v) == string.lower(strClass) then
             return true;
         end
     end
@@ -2097,7 +2102,7 @@ function calculateLootTimeLeft (timeLooted)
     -- MRT_Debug(date("%m/%d/%y %H:%M:%S", nowTimeStamp));
     -- MRT_Debug(date("%m/%d/%y %H:%M:%S", lootTimeStamp));
     local deltaTime = 7200 - difftime(nowTimeStamp, lootTimeStamp);
-    MRT_Debug(deltaTime)
+    --MRT_Debug(deltaTime)
 
     if deltaTime > 0 then
         local hours = math.floor(deltaTime /3600);

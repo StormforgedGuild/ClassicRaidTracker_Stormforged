@@ -1230,19 +1230,12 @@ function MRT_RaidRosterUpdate(frame)
 end
 
 function getPlayerClass(PlayerName)
-    --MRT_Debug("getSFEPGP: Called!");        
-    --MRT_Debug("getSFEPGP: PlayerName: "..PlayerName);
     if not MRT_SFExport["info"] then
         return "Unknown";
     else
       --  MRT_Debug("getPlayerClass: about to start loop");        
         local playerCount = MRT_SFExport["info"]["total_players"];
         for key, value in pairs(MRT_SFExport["players"]) do
-            --MRT_Debug("getSFEPGP: in for loop");
-            --MRT_Debug("getSFEPGP: key = "..key);
-            --MRT_Debug("getSFEPGP: PlayerName = "..PlayerName);
-            --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
-            --MRT_Debug("getSFEPGP: value[main_name]: "..value["main_name"]);  
             if strcomp(value["name"], PlayerName) then
            --    MRT_Debug("getPlayerClass: Found player"); 
                 local retval = value["class_name"];
@@ -1251,10 +1244,6 @@ function getPlayerClass(PlayerName)
                 else
                     return retval;
                 end
-                --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
-           --     for k, v in pairs(value["points"]) do
-           --         return (v["class_name"]); --don't forget actual points spent is points_spent + 2000
-           --     end
             end
         end
         return "Unknown";
@@ -1295,27 +1284,6 @@ function getSFEPGP(PlayerName)
     --MRT_Debug("getSFEPGP: Called!");        
     --MRT_Debug("getSFEPGP: PlayerName: "..PlayerName);
     return getSFData(PlayerName);
-    --[[ if not MRT_SFExport["info"] then
-        return "";
-    else
-        --MRT_Debug("getSFEPGP: about to start loop");        
-        local playerCount = MRT_SFExport["info"]["total_players"];
-        for key, value in pairs(MRT_SFExport["players"]) do
-            --MRT_Debug("getSFEPGP: in for loop");
-            --MRT_Debug("getSFEPGP: key = "..key);
-            --MRT_Debug("getSFEPGP: PlayerName = "..PlayerName);
-            --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
-            --MRT_Debug("getSFEPGP: value[main_name]: "..value["main_name"]);  
-            if strcomp(value["name"],PlayerName) then
-                --MRT_Debug("getSFEPGP: Found player"); 
-                --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
-                for k, v in pairs(value["points"]) do
-                    return (v["points_current"]), (v["points_earned"]), (v["points_spent"]); --don't forget actual points spent is points_spent + 2000
-                end
-            end
-        end
-        return "", "0", "0";
-    end ]]
 end
 function getSFData(PlayerName)
     if not MRT_SFExport["info"] then
