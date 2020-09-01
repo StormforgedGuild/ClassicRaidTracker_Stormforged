@@ -494,6 +494,12 @@ function ImportReminder()
         return;
     end
 
+    --if they have never imported
+    if (not MRT_LastPRImport) then
+         encourageImport();
+        return;
+    end
+
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     baseline = MRT_RaidLog [raidnum]["StartTime"];
     MRT_Debug(MRT_MakeEQDKP_Time(baseline));
