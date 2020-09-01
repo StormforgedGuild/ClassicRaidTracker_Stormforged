@@ -111,6 +111,9 @@ function MRT_ImportButtonClick()
     ImportReminder();
     MRT_ExportFrame:Hide();
     --UpdatePlayerPR();
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    MRT_GUI_RaidAttendeesTableUpdate(raidnum);
 end
 ------------------------
 --  helper functions  --
