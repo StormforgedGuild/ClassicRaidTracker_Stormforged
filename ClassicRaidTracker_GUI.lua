@@ -1859,9 +1859,13 @@ function parseFilter4Classes(strText)
     end
 end
 function isClassinClassFilter(class, classFilter)
+    local strClass = class;
+    if (not strClass) or (strClass == "") then
+        strClass = "Unknown";
+    end
     MRT_Debug("isClassinClassFilter");
     for i, v in pairs(classFilter) do
-        MRT_Debug("isClassinClassFilter:class == " ..class);
+        MRT_Debug("isClassinClassFilter:class == " ..strClass);
         MRT_Debug("isClassinClassFilter:v == " ..v);
         if string.lower(v) == string.lower(strClass) then
             return true;
