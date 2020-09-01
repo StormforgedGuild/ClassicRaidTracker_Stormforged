@@ -253,7 +253,12 @@ function MRT_GUI_ParseValues()
 
  --   MRT_GUIFrame_RaidAttendees_Filter:SetText(MRT_L.GUI["Header_Title"]);
     MRT_GUIFrame_RaidAttendees_Filter:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 7, -5);
-    MRT_GUIFrame_RaidAttendees_Filter:SetAutoFocus(false);
+    local valueList = {":casters", ":druid", ":healers", ":hunter", ":mage", ":melee", ":ranged", ":paladin", ":rogue", ":shaman", ":warlock", ":warrior"}
+    local maxButtonCount = 20;
+    SetupAutoComplete(MRT_GUIFrame_RaidAttendees_Filter, valueList, maxButtonCount);
+    --MRT_GUIFrame_RaidAttendees_Filter:SetAutoFocus(false);
+    
+    
 
  --   MRT_GUIFrame_RaidAttendeesTitle:SetText(MRT_L.GUI["Tables_RaidAttendeesTitle"]);
  --   MRT_GUIFrame_RaidAttendeesTitle:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 0, -15);
