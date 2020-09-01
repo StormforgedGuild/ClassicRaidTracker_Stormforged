@@ -1880,14 +1880,16 @@ function check4GroupFilters(classFilter)
     MRT_Debug("check4GroupFilters: called!");
 
     local sgroupFilters = {
-        ["healer"] = {"druid", "paladin", "priest", "warrior"},
+        ["healer"] = {"druid", "paladin", "priest"},
+        ["healers"] = {"druid", "paladin", "priest"},
         ["caster"] = {"mage", "warlock", "priest"},
+        ["casters"] = {"mage", "warlock", "priest"},
         ["melee"] = {"warrior", "rogue"},
     }
     local oclassFilter = classFilter;
     for i, v in pairs(oclassFilter) do
         --look for special filter
-        local tblGroupFilter = sgroupFilters[v];
+        local tblGroupFilter = sgroupFilters[string.lower(v)];
         if (tblGroupFilter) then
             --add the list into the classFilter
             for i1, v1 in pairs(tblGroupFilter) do
