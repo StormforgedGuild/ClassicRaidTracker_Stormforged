@@ -1097,7 +1097,8 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
-    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
+    --MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
+    MRT_GUI_FourRowDialog_EB2:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 4));
     lastLooter = MRT_GUI_FourRowDialog_EB2:GetText();
     MRT_Debug("MRT_GUI_LootModify: lastLooter: "..lastLooter);
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
@@ -1298,7 +1299,8 @@ function MRT_GUI_LootRaidWinner()
     --local lootName = MRT_GUI_BossLootTable:GetCell(loot_select, 3);
     --local looter = string.upper(MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]);
     --local cost = MRT_GUI_BossLootTable:GetCell(loot_select, 5);
-    local looter = string.upper(MRT_GUI_FourRowDialog_EB2:GetText());
+    -- old code local looter = string.upper(MRT_GUI_FourRowDialog_EB2:GetText());
+    local looter = string.upper(cleanString(MRT_GUI_FourRowDialog_EB2:GetText()));
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
     local lootName = MRT_GUI_FourRowDialog_EB1:GetText();
     
@@ -1882,8 +1884,9 @@ function check4GroupFilters(classFilter)
     local sgroupFilters = {
         ["healer"] = {"druid", "paladin", "priest"},
         ["healers"] = {"druid", "paladin", "priest"},
-        ["caster"] = {"mage", "warlock", "priest"},
-        ["casters"] = {"mage", "warlock", "priest"},
+        ["caster"] = {"mage", "warlock"},
+        ["casters"] = {"mage", "warlock"},
+        ["ranged"] = {"mage", "warlock", "hunter"},
         ["melee"] = {"warrior", "rogue"},
     }
     local oclassFilter = classFilter;
