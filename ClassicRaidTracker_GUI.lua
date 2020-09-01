@@ -1769,7 +1769,10 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
                     -- new function to return true if class is in classfilter table.
                     -- old code: indexofsub = substr(v["Class"], strFilter);
                     -- old code: if not indexofsub then
-                    if not (isClassinClassFilter(v["Class"], strFilter)) then
+                    local tblClassFilter = check4GroupFilters(strFilter);
+
+                    --old code if not (isClassinClassFilter(v["Class"], strFilter)) then
+                    if not (isClassinClassFilter(v["Class"], tblClassFilter)) then
                         --skip no class matches so don't do anything.
                     else 
                         --class match found so include in table
@@ -1873,6 +1876,28 @@ function isClassinClassFilter(class, classFilter)
     end
     return false;
 end 
+function check4GroupFilters(classFilter)
+    MRT_Debug("check4GroupFilters: called!");
+
+    local sgroupFilters = {
+        ["healer"] = {"druid", "paladin", "priest", "warrior"},
+        ["caster"] = {"mage", "warlock", "priest"},
+        ["melee"] = {"warrior", "rogue"},
+    }
+    local oclassFilter = classFilter;
+    for i, v in pairs(oclassFilter) do
+        --look for special filter
+        local tblGroupFilter = sgroupFilters[v];
+        if (tblGroupFilter) then
+            --add the list into the classFilter
+            for i1, v1 in pairs(tblGroupFilter) do
+                MRT_Debug("check4GroupFilters: called!");
+                table.insert(oclassFilter,v1)
+            end
+        end
+    end
+    return oclassFilter
+end
 
 function sortbyclassthenPR (a, b)
     if a[5] == b[5] then
