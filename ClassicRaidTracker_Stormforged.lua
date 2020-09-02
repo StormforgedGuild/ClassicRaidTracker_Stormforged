@@ -1248,6 +1248,12 @@ function getPlayerClass(PlayerName)
         end
         return "Unknown";
     end ]]
+    --take care of special assignments
+    
+    if (PlayerName == "bank") or (PlayerName == "disenchanted") then
+        MRT_Debug("getPlayerClass: bank or disenchanted player = " ..PlayerName);
+        return PlayerName;
+    end
     local realm = GetRealmName();
     local nilcheckname = MRT_PlayerDB[realm][PlayerName]
     local cName;

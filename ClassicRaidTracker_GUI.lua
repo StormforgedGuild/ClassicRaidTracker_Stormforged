@@ -1950,7 +1950,11 @@ function getClassColor(class)
     elseif class == "Shaman"
     then classColor = "ff0070DE";   
     elseif class == "Priest"
-    then classColor = "ffffffff";  
+    then classColor = "ffffffff";
+    elseif class == "bank"
+    then classColor = "ff00ff73";
+    elseif class == "disenchanted"
+    then classColor = "ffff00aa";
     end 
     return classColor;
 end
@@ -2071,7 +2075,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                     classColor = "ff9d9d9d";
                     local class = getPlayerClass(v["Looter"]);   
                     classColor = getClassColor(class);      
-                    MRT_Debug(classColor);
+                    --MRT_Debug(classColor);
 
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
                     if v["Offspec"] then
@@ -2097,7 +2101,8 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
             classColor = "ff9d9d9d";
             local playerClass = getPlayerClass(v["Looter"]);   
             classColor = getClassColor(playerClass);      
-
+            MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition: looter: " ..v["Looter"] .."playerClass: "..playerClass..", classColor: " ..classColor);
+            
             --GetDate 
             loottime = calculateLootTimeLeft(v["Time"])
 

@@ -450,11 +450,12 @@ do
 	end
 	function cleanString(strText)
 		--|cff9d9d9d
-		local strFound = strfind(strText, "|c")
+		local sText = string.lower(strText);
+		local strFound = strfind(sText, "|c")
 		if not strFound then
-			return strText;
+			return sText;
 		else
-			return strsub(strText, 11);
+			return strsub(sText, 11);
 		end
 	end
 	function stsortbyclass (a1, b1, a2, b2, direction)
