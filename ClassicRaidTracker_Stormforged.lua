@@ -1230,7 +1230,7 @@ function MRT_RaidRosterUpdate(frame)
 end
 
 function getPlayerClass(PlayerName)
-    if not MRT_SFExport["info"] then
+    --[[ if not MRT_SFExport["info"] then
         return "Unknown";
     else
       --  MRT_Debug("getPlayerClass: about to start loop");        
@@ -1247,8 +1247,37 @@ function getPlayerClass(PlayerName)
             end
         end
         return "Unknown";
+    end ]]
+    local realm = GetRealmName();
+    local nilcheckname = MRT_PlayerDB[realm][PlayerName]
+    local cName;
+    MRT_Debug("getPlayerClass, player = " ..PlayerName);
+    --check if player is in our playerdb
+    if not nilcheckname then 
+        MRT_Debug("getPlayerClass, not in playerDB");
+        return getPlayerClassFromGuildRoster(PlayerName);
+    else
+        --seen this person before, pull this from the PlayerDB
+        cName = MRT_PlayerDB[realm][PlayerName]["ClassL"];
+    end 
+    if not cName then
+        return "Uknown";
+    else 
+        return cName;
     end
 end
+
+function getPlayerClassFromGuildRoster(PlayerName)
+    local retClassName;
+    local gPlayerName;
+    for i = 1, GetNumGuildMembers() do
+        gPlayerName, _, _, _, retClassName = GetGuildRosterInfo(i);
+        if getPlayerPR == PlayerName then
+            return retClassName;
+        end
+    end
+    return "Unknown"
+end 
 
 -- GetPlayerPR  There are potentially 3 ways to get a PR.  PlayerDB, MRT_SFExport (imported from website), or adjusted PR based on selected Raid.
 -- Current implementation is only from MRT_SFExport (PlayerDB is updated on new raid, but that data is not currently being used.)
