@@ -1136,7 +1136,7 @@ function MRT_GUI_LootModify()
         MRT_GUI_FourRowDialog_EB4:SetText(lootnote);
         lastNote = lootnote;
     end
-    MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Modify"]);
+    MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["MB_Ok"]);
     MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum); end);
     MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
     MRT_GUI_FourRowDialog_EB1:SetAutoFocus(false);
@@ -1952,7 +1952,7 @@ function getClassColor(class)
     elseif class == "Priest"
     then classColor = "ffffffff";
     elseif class == "bank"
-    then classColor = "ff00ff73";
+    then classColor = "ff9d8e8d";
     elseif class == "disenchanted"
     then classColor = "ffff00aa";
     end 
