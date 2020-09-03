@@ -291,6 +291,8 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLoot_RaidLink_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Modify_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetText("Bid");
     MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidLink_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_BossLoot_Trade_Button:SetText("Trade");
+    MRT_GUIFrame_BossLoot_Trade_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidAnnounce_Button, "RIGHT", 0, 0);
 
     MRT_GUI_BossLootTable = ScrollingTable:CreateST(MRT_BossLootTableColDef, 12, 32, nil, MRT_GUIFrame);           -- ItemId should be squared - so use 30x30 -> 30 pixels high
     MRT_GUI_BossLootTable.head:SetHeight(15);                                                                     -- Manually correct the height of the header (standard is rowHight - 30 pix would be different from others tables around and looks ugly)
@@ -369,7 +371,7 @@ function MRT_GUI_ParseValues()
     l:SetThickness(1)
     l:SetColorTexture(235,231,223,.5)
     l:SetStartPoint("TOPLEFT",217,-57)
-    l:SetEndPoint("TOPLEFT",591,-57)
+    l:SetEndPoint("TOPLEFT",600,-57)
 
     -- Create and anchor drop down menu table for add/modify loot dialog
     MRT_GUI_PlayerDropDownTable = ScrollingTable:CreateST(MRT_PlayerDropDownTableColDef, 9, nil, nil, MRT_GUI_FourRowDialog);
@@ -1319,6 +1321,16 @@ function MRT_GUI_LootRaidWinner()
     --local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
     local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
     SendChatMessage(rwMessage, "Raid");
+end
+
+function MRT_GUI_TradeLink()
+
+    --Get name of player with an open trade window
+    --Get list of items that person is the looter for in the loot list
+    --Find those items in my bag
+    --Validate that the item is tradeable by looking at the loot timer
+    --Place those items in the trade window
+
 end
 
 function MRT_GUI_LootRaidLink()

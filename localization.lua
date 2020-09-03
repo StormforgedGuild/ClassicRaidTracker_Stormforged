@@ -311,6 +311,7 @@ MRT_L.GUI = {
     TT_Loot_Add = "Add an item to the loot list.",
     TT_Loot_Delete = "Delete selected item.",
     TT_Loot_RaidAnnounce = "Announce/yell item & value to the raid for bidding",
+    TT_Loot_TradeLink = "Place items won by the person currently trading in the trade window.",
     TT_Loot_RaidLink = "Link item & value to the raid",
     TT_Loot_Modify = "Modify data of selected item.",
     TT_RA_Add = "Add an attendee to the raid attendee list.",
