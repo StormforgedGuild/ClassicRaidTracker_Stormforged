@@ -1954,7 +1954,7 @@ function getClassColor(class)
     elseif class == "bank"
     then classColor = "ff9d8e8d";
     elseif class == "disenchanted"
-    then classColor = "ffff00aa";
+    then classColor = "ff9d8e8d";
     end 
     return classColor;
 end
