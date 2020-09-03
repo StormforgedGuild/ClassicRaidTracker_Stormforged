@@ -1138,7 +1138,7 @@ function MRT_GUI_LootModify()
         MRT_GUI_FourRowDialog_EB4:SetText(lootnote);
         lastNote = lootnote;
     end
-    MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["MB_Ok"]);
+    MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.Core["MB_Ok"]);
     MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum); end);
     MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
     MRT_GUI_FourRowDialog_EB1:SetAutoFocus(false);
