@@ -2160,7 +2160,7 @@ function calculateLootTimeLeft (timeLooted)
         -- MRT_Debug(hours);
         -- MRT_Debug(minutes);
         if hours > 0 then
-            lootTime = hours.."h "..minutes.."m";
+            lootTime = (hours*60)+minutes.."m";
         else
             lootTime = minutes.."m";
         end
