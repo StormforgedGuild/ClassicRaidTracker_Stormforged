@@ -1301,6 +1301,7 @@ function MRT_GUI_LootModify()
 end
 
 function MRT_GUI_PlayerDropDownList_Toggle()
+    EditBoxAutoComplete_HideIfAttachedTo(MRT_GUI_FourRowDialog_EB2);
     if (MRT_GUI_PlayerDropDownTable.frame:IsShown()) then
         MRT_GUI_PlayerDropDownTable.frame:Hide();
     else
