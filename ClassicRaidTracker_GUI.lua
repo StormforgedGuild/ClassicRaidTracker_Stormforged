@@ -33,6 +33,7 @@ local mrt = ClassicRaidTracker
 --------------
 local deformat = LibStub("LibDeformat-3.0");
 local ScrollingTable = LibStub("ScrollingTable");
+local LibSFGP = LibStub("LibSFGearPoints-1.0");
 local ag -- import reminder animationgroup
 local agTrade -- trade reminder animationgroup
 
@@ -315,8 +316,8 @@ function MRT_GUI_ParseValues()
                     local error = false;
                     error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                     if error then
-                        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-                        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+                        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                        StaticPopup_Show("MRT_GUI_ok");
                         MRT_GUI_BossLootTable:SetSelection(lastloot_select);
                     end
                 end
@@ -337,8 +338,8 @@ function MRT_GUI_ParseValues()
                     error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                     if error then
                         MRT_Debug("STOnClick:error occured");
-                        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-                        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+                        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                        StaticPopup_Show("MRT_GUI_ok");
                         MRT_GUI_BossLootTable:SetSelection(lastloot_select);
                         return true
                     end
@@ -1172,6 +1173,7 @@ function RemoveAutoComplete(editbox)
 	editbox.buttonCount = nil;
 end
 function MRT_GUI_LootModify()
+
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1229,6 +1231,12 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_Title:SetText(MRT_L.GUI["Modify loot data"]);
     MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
+    MRT_GUI_FourRowDialog_EB1:SetScript("OnEnter", function(self) 
+        local ttText = "Prio to: " ..LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText());
+        MRT_Debug("EB:OnEnter ttText: " ..ttText);
+        MRT_GUI_SetPrioTT(self,ttText);
+    end);
+    MRT_GUI_FourRowDialog_EB1:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
     --MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
     --autocomplete here.
@@ -1301,6 +1309,7 @@ function MRT_GUI_LootModify()
 end
 
 function MRT_GUI_PlayerDropDownList_Toggle()
+    EditBoxAutoComplete_HideIfAttachedTo(MRT_GUI_FourRowDialog_EB2);
     if (MRT_GUI_PlayerDropDownTable.frame:IsShown()) then
         MRT_GUI_PlayerDropDownTable.frame:Hide();
     else
@@ -1339,8 +1348,8 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     MRT_Debug("MRT_GUI_LootModifyAccept: clooter: " ..clooter);
     local validPlayerName = verifyPlayer(clooter);
     if not validPlayerName then
-        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = looter.." is not in this raid.  Please choose a valid character."
-        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+        StaticPopup_Show("MRT_GUI_ok");
         return true;
     end
     MRT_GUI_HideDialogs();
@@ -2011,10 +2020,17 @@ function MRT_GUI_SetTT(frame, button)
             MRT_GUI_TT:SetText("Last Imported PR - " ..strDate);  
         end
     else
+        
         MRT_GUI_TT:SetText(MRT_L.GUI["TT_"..button]);
     end 
     MRT_GUI_TT:Show();
 end
+function MRT_GUI_SetPrioTT(frame, button)
+    MRT_GUI_TT:SetOwner(frame, "ANCHOR_BOTTOMRIGHT");
+    MRT_GUI_TT:SetText(button);  
+    MRT_GUI_TT:Show();
+end
+
 
 function MRT_GUI_HideTT()
     MRT_GUI_TT:Hide();
@@ -2683,4 +2699,12 @@ StaticPopupDialogs["MRT_GUI_ZeroRowDialog"] = {
     whileDead = true,
     hideOnEscape = true,
 }
-
+StaticPopupDialogs["MRT_GUI_ok"] = {
+    preferredIndex = 3,
+    text = "FIXME!",
+    button1 = MRT_L.Core["MB_Ok"],
+    OnAccept = nil,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+}

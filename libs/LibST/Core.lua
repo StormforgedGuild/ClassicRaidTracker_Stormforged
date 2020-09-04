@@ -330,7 +330,7 @@ do
 		self.filtered = self:DoFilter();
 		self:Refresh();
 	end
-
+	
 	local StringToNumber = function(str)
 		if str == "" then
 			return 0;
@@ -454,20 +454,20 @@ do
 		if not keepCase then 
 			sText = string.lower(strText);
 		else
-			MRT_Debug("ST:CleanString keepCase");
+			--MRT_Debug("ST:CleanString keepCase");
 			sText = strText;
 		end 
 		local strFound = strfind(sText, "|c")
 		if not strFound then
 			return sText;
 		else
-			MRT_Debug("ST:CleanString:format found, stripping")
-			MRT_Debug("ST:CleanString:string.sub(sText,11)" ..string.sub(sText,11));
+			--MRT_Debug("ST:CleanString:format found, stripping")
+			--MRT_Debug("ST:CleanString:string.sub(sText,11)" ..string.sub(sText,11));
 			return string.sub(sText, 11);
 		end
 	end
 	function stsortbyclass (a1, b1, a2, b2, direction)
-		MRT_Debug("ST:stsortbyclass: a1, b1, a2, b2, " ..a1.." "..b1.." "..a2.." "..b2);
+		--MRT_Debug("ST:stsortbyclass: a1, b1, a2, b2, " ..a1.." "..b1.." "..a2.." "..b2);
 		if a2 == b2 then
 			--MRT_Debug("ST:stsortbyclass: a2 == b2");
 			--MRT_Debug("ST:stsortbyclass: direction == " ..direction);
