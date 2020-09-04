@@ -2455,11 +2455,13 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 local doneState = false;
                 if (v["Looter"] == "disenchanted") or (v["Looter"] == "bank") then
                     doneState=true;
+                elseif (v["Looter"] == "unassigned") then
+                    doneState=false;
                 else
                     --if item is assigned to a player & not in your bag (or in your bag, but loot timer expired) set to done
                     local foundInBag, containerID, slotID = findItemInBag(v["ItemName"]);
                     if not foundInBag then
-                        --not in your bag & assigned, your done.
+                        --not in your bag .
                         doneState = true;
                     else
                         local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
@@ -2516,11 +2518,13 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
             local doneState = false;
             if (v["Looter"] == "disenchanted") or (v["Looter"] == "bank") then
                 doneState=true;
+            elseif (v["Looter"] == "unassigned") then
+                doneState=false;
             else
                    --if item is assigned to a player & not in your bag (or in your bag, but loot timer expired) set to done
                 local foundInBag, containerID, slotID = findItemInBag(v["ItemName"]);
                 if not foundInBag then
-                    --not in your bag & assigned, your done.
+                    --not in your bag .
                     doneState = true;
                 else
                     local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
