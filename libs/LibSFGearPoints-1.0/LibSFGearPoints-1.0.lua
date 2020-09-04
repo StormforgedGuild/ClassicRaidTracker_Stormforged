@@ -27,6 +27,11 @@ if not lib then return end
 -- **@Item Cost section
 -- **Warning, this area will be generated.  Modifications will be lost!!!
 local SF_FULL_ITEM_DATA = 
+--download item spreadsheet info as excel spreadsheet
+--hide columns C-J (A, B, K) should be the only once you copy
+--go to https://thdoan.github.io/mr-data-converter/ and paste the excel sheet into the top
+--choose the lua - array table
+--copy and paste below and override what is there.
 {
   [1]={["Item"]="Arcanist Boots",["GP"]=500,["Bid_Priority"]="Mages"},
   [2]={["Item"]="Cenarion Boots",["GP"]=500,["Bid_Priority"]="Druids"},
@@ -402,13 +407,14 @@ local SF_FULL_ITEM_DATA =
   [372]={["Item"]="Imperial Qiraji Armaments",["GP"]=8750,["Bid_Priority"]="Tank / Rogue /Human Warrior w/ Weapon Skill"},
   [373]={["Item"]="Imperial Qiraji Regalia",["GP"]=8750,["Bid_Priority"]="Healers / Caster DPS / Feral"},
   [374]={["Item"]="Husk of the Old God",["GP"]=4688,["Bid_Priority"]="Spriest / Mage"},
-  [375]={["Item"]="Carapace of the Old God ",["GP"]=4688,["Bid_Priority"]="Fury Tank > Warrior / Rogue"}
+  [375]={["Item"]="Carapace of the Old God",["GP"]=4688,["Bid_Priority"]="Fury Tank > Warrior / Rogue"}
 }
 
 
 
 local SF_ITEM_DATA = {
 -- SF: Need to figure out the format  
+-- delete this when we're comfortable with the above import.
   ["Forest Spider Webbing"] = 3000,
   ["Malachite"] = 200,
   ["Tigerseye"] = 400,
