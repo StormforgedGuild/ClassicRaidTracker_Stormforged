@@ -157,7 +157,7 @@ local MRT_BossLootTableColDef = {
         end,
     }, ]]
     {                                                          -- col for OffSpec
-    ["name"] = MRT_L.GUI["Col_OffSpec"], 
+    ["name"] = "Done", 
     ["width"] = 30,
     ["DoCellUpdate"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, fShow, self, ...)
         -- Show Checkbox
@@ -1598,7 +1598,8 @@ function MRT_GUI_TradeLink()
         
                 if itemAlreadyTraded == false then
                     --Place those items in the trade window
-                    UseContainerItem(container,slot);
+                    MRT_Debug("about to use item: "..containerID..slotID)
+                    UseContainerItem(containerID,slotID);
                 end
             end
          end
@@ -1615,11 +1616,9 @@ function findItemInBag(name)
                 local itemLink = GetContainerItemLink(container, slot);
                 if itemLink then
                     local sName, sLink, iRarity, iLevel, iMinLevel, sType, sSubType, iStackCount = GetItemInfo(itemLink);
-                    for i in pairs(itemsToTrade) do
-                        if itemsToTrade[i] == sName then
-      --                    MRT_Debug("Found item "..sName.." at"..container.. slot)  
-                            return true, container, slot
-                        end
+                    if name == sName then
+    --                    MRT_Debug("Found item "..sName.." at"..container.. slot)  
+                        return true, container, slot
                     end
                 end
             end
@@ -2436,8 +2435,27 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 --GetDate 
                 loottime = calculateLootTimeLeft(v["Time"])
 
+                --SetDoneState
+                local doneState = false;
+                if (v["Looter"] == "disenchanted") or (v["Looter"] == "bank") then
+                    doneState=true;
+                else
+                    --if item is assigned to a player & not in your bag (or in your bag, but loot timer expired) set to done
+                    local foundInBag, containerID, slotID = findItemInBag(v["ItemName"]);
+                    if not foundInBag then
+                        --not in your bag & assigned, your done.
+                        doneState = true;
+                    else
+                        local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
+                        if timeRemaining==0 then
+                            --in your bag but not tradeable (loot timer expired), your done
+                            doneState=true;
+                        end
+                    end
+                end
+
                 if v["Looter"] == "unassigned" then
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, doneState};
                     if v["Offspec"] then
                     --    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
                     else
@@ -2446,10 +2464,10 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 else
                     classColor = "ff9d9d9d";
                     local class = getPlayerClass(v["Looter"]);   
-                    classColor = getClassColor(class);      
+                    classColor = getClass8Color(class);      
                     --MRT_Debug(classColor);
 
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                     if v["Offspec"] then
                       --  MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData1;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
                     else
@@ -2478,11 +2496,30 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
             --GetDate 
             loottime = calculateLootTimeLeft(v["Time"])
 
+            --SetDoneState
+            local doneState = false;
+            if (v["Looter"] == "disenchanted") or (v["Looter"] == "bank") then
+                doneState=true;
+            else
+                   --if item is assigned to a player & not in your bag (or in your bag, but loot timer expired) set to done
+                local foundInBag, containerID, slotID = findItemInBag(v["ItemName"]);
+                if not foundInBag then
+                    --not in your bag & assigned, your done.
+                    doneState = true;
+                else
+                    local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
+                    if timeRemaining==0 then
+                        --in your bag but not tradeable (loot timer expired), your done
+                        doneState=true;
+                    end
+                end
+            end
+
             if not filter then
                 if v["Looter"] == "unassigned" then
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, doneState};
                 else 
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                 end 
                 index = index + 1;
             else 
@@ -2493,9 +2530,9 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 else
                     ---
                     if v["Looter"] == "unassigned" then
-                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, doneState};
                     else 
-                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, v["Offspec"]};
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                     end 
                     index = index + 1;
                 end

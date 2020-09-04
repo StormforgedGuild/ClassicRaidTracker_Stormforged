@@ -182,6 +182,7 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
     frame:RegisterEvent("TRADE_SHOW");
     frame:RegisterEvent("TRADE_CLOSED");
+    frame:RegisterEvent("BAG_UPDATE");
 
 end
 
@@ -287,6 +288,9 @@ function MRT_OnEvent(frame, event, ...)
         MRT_Debug("Trade initiated");
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
         stopEncouragingTrade();
+
+    elseif (event == "BAG_UPDATE") then
+        MRT_GUI_BossLootTableUpdate(nil, false);
 
     elseif (event == "RAID_ROSTER_UPDATE") then
         MRT_Debug("RAID_ROSTER_UPDATE fired!");
