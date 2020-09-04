@@ -1232,7 +1232,7 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     MRT_GUI_FourRowDialog_EB1:SetScript("OnEnter", function(self) 
-        local ttText = LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText());
+        local ttText = "Prio to: " ..LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText());
         MRT_Debug("EB:OnEnter ttText: " ..ttText);
         MRT_GUI_SetPrioTT(self,ttText);
     end);
