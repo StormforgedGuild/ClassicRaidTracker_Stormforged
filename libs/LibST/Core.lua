@@ -448,14 +448,22 @@ do
 			return stsortbyclass(a1, b1, a2, b2, direction)
 		end
 	end
-	function cleanString(strText)
+	function cleanString(strText, keepCase)
 		--|cff9d9d9d
-		local sText = string.lower(strText);
+		local sText;
+		if not keepCase then 
+			sText = string.lower(strText);
+		else
+			MRT_Debug("ST:CleanString keepCase");
+			sText = strText;
+		end 
 		local strFound = strfind(sText, "|c")
 		if not strFound then
 			return sText;
 		else
-			return strsub(sText, 11);
+			MRT_Debug("ST:CleanString:format found, stripping")
+			MRT_Debug("ST:CleanString:string.sub(sText,11)" ..string.sub(sText,11));
+			return string.sub(sText, 11);
 		end
 	end
 	function stsortbyclass (a1, b1, a2, b2, direction)

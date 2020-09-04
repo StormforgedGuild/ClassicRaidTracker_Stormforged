@@ -43,7 +43,9 @@ function SetupAutoComplete(editbox, valueList, maxButtonCount)
 	end)
 	editbox:SetScript("OnTextChanged", function(editbox, changedByUser)
 		EditBoxAutoComplete_OnTextChanged(editbox,changedByUser)
-		return editbox.old_OnTextChanged(editbox)
+		if (editbox.old_OnTextChanged) then
+			return editbox.old_OnTextChanged(editbox, changedByUser)
+		end
 	end)
 	editbox:SetScript("OnChar", EditBoxAutoComplete_OnChar)
 	editbox:SetScript("OnEditFocusLost", function(editbox)

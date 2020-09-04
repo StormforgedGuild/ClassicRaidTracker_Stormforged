@@ -46,9 +46,11 @@ local lastShownNumOfRaids = nil;
 local lastSelectedRaidNum = nil;
 local lastShownNumOfBosses = nil;
 local lastSelectedBossNum = nil;
+local lastloot_select = nil;
 local lastLootNum = nil;
 local lastBossNum = nil;
 local lastRaidNum = nil;
+local MRT_RaidPlayerList= {};
 --state of dialog
 local lastLooter = nil;
 local lastValue = nil;
@@ -56,6 +58,7 @@ local lastNote = nil;
 local lastOS = nil;
 local lootFilterHack = 0;
 local attendeeFilterHack = 0;
+local bAutoCompleteCreated = false;
 
 --tooltip for parsing loot time remaining
 local tooltipForParsing = CreateFrame("GameTooltip", "RCLootCouncil_Tooltip_Parse", nil, "GameTooltipTemplate")
@@ -309,7 +312,13 @@ function MRT_GUI_ParseValues()
             if MRT_GUI_FourRowDialog:IsVisible() then
                 if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked()) then
                     MRT_Debug("STOnDoubleClick: isDirty == True");
-                    MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                    local error = false;
+                    error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                    if error then
+                        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+                        MRT_GUI_BossLootTable:SetSelection(lastloot_select);
+                    end
                 end
                 MRT_GUI_LootModify();
             else
@@ -324,7 +333,15 @@ function MRT_GUI_ParseValues()
             if MRT_GUI_FourRowDialog:IsVisible() then
                 if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked()) then
                     MRT_Debug("STOnClick: isDirty == True");
-                    MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                    local error = false;
+                    error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                    if error then
+                        MRT_Debug("STOnClick:error occured");
+                        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+                        MRT_GUI_BossLootTable:SetSelection(lastloot_select);
+                        return true
+                    end
                 end
                 MRT_GUI_LootModify();
             end;
@@ -1098,6 +1115,41 @@ function MRT_GUI_LootAdd()
     MRT_GUI_FourRowDialog:Show();
 end
 
+function verifyPlayer(PlayerName)
+    --iterate the dropdown table
+    local cPlayerName = cleanString(PlayerName,true)
+    MRT_Debug("verifyPlayer");
+    for i, v in ipairs(MRT_RaidPlayerList) do
+        MRT_Debug("verifyPlayer: i: " ..i.." v: " ..v[1]);
+        if cPlayerName == v[1] then
+            return true
+        end
+    end
+    MRT_Debug("verifyPlayer: did not match!!!! cPlayerName: "..cPlayerName);
+    return false;
+end
+
+function cleanFormatString(strText, keepCase)
+    --|cff9d9d9d
+    local sText;
+    local cleanText;
+    if not keepCase then 
+        sText = string.lower(strText);
+    else
+        MRT_Debug("CleanFormatString keepCase");
+        sText = strText;
+    end 
+    local strFound = strfind(sText, "|c")
+    if not strFound then
+        return sText;
+    else
+        MRT_Debug("CleanFormatString:format found, stripping")
+        cleanText = string.sub(sText, 11);
+        MRT_Debug("CleanFormatString:cleanText: " ..cleanText)
+        return cleanText;
+    end
+end
+
 function MRT_GUI_LootModify()
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
@@ -1111,8 +1163,11 @@ function MRT_GUI_LootModify()
         return;
     end
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-    lastRaidNum = raidnum;
+    if lastRaidNum ~= raidnum then
+        lastRaidNum = raidnum;
+    end 
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    lastloot_select = loot_select;
     lastLootNum = lootnum;
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
     lastBossNum = bossnum;
@@ -1135,8 +1190,9 @@ function MRT_GUI_LootModify()
     table.sort(playerData, function(a, b) return (a[1] < b[1]); end );
     tinsert(playerData, 1, { "disenchanted" } );
     tinsert(playerData, 1, { "bank" } );
-    tinsert(playerData,1, {"unassigned"});
+    tinsert(playerData, 1, {"unassigned"});
     tinsert(playerData, 1, {"pug"} );
+    MRT_RaidPlayerList = playerData;
     MRT_GUI_PlayerDropDownTable:SetData(playerData, true);
     if (#playerData < 9) then
         MRT_GUI_PlayerDropDownTable:SetDisplayRows(#playerData, 15);
@@ -1150,9 +1206,33 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
     --MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
-    MRT_GUI_FourRowDialog_EB2:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 4));
+    --autocomplete here.
+    if not bAutoCompleteCreated then
+        MRT_Debug("MRT_GUI_LootModify: Creating autocomplete table");
+        local valueList = {}
+        local realm = GetRealmName();
+        MRT_Debug("MRT_GUI_LootModify: realm: "..realm);
+        for i, v in pairs(MRT_PlayerDB[realm]) do
+            MRT_Debug("MRT_GUI_LootModify: first for loop");
+            tinsert(valueList,1,i)
+        end
+        local maxButtonCount = 20;
+        for i1, v1 in ipairs(valueList) do
+            MRT_Debug("MRT_GUI_LootModify: v: " ..v1);
+        end
+        MRT_Debug("MRT_GUI_LootModify: for loops over ");
+        tinsert(valueList, 1, "disenchanted");
+        tinsert(valueList, 1, "bank" );
+        tinsert(valueList, 1, "unassigned");
+        tinsert(valueList, 1, "pug" );
+        SetupAutoComplete(MRT_GUI_FourRowDialog_EB2, valueList, maxButtonCount);
+        bAutoCompleteCreated = true;
+    end
+    --MRT_GUI_FourRowDialog_EB2:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 4));
+    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4),true));
     lastLooter = MRT_GUI_FourRowDialog_EB2:GetText();
     MRT_Debug("MRT_GUI_LootModify: lastLooter: "..lastLooter);
+    
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
     MRT_GUI_FourRowDialog_EB3:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 5));
     -- figure out how to get check box info
@@ -1189,7 +1269,6 @@ function MRT_GUI_LootModify()
     --MRT_GUI_FourRowDialog_EB1:SetEnabled(false);
     
 end
-
 function MRT_GUI_PlayerDropDownList_Toggle()
     if (MRT_GUI_PlayerDropDownTable.frame:IsShown()) then
         MRT_GUI_PlayerDropDownTable.frame:Hide();
@@ -1217,11 +1296,21 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     end
     if (not itemName) then
         MRT_Print(MRT_L.GUI["No itemLink found"]);
-        return;
+        return true;
     end
     if (not cost) then
         MRT_Print(MRT_L.GUI["Item cost invalid"]);
-        return;
+        return true;
+    end
+    --uncomment when ready to verify
+    MRT_Debug("MRT_GUI_LootModifyAccept: looter: " ..looter);
+    local clooter = cleanFormatString(looter,true);
+    MRT_Debug("MRT_GUI_LootModifyAccept: clooter: " ..clooter);
+    local validPlayerName = verifyPlayer(clooter);
+    if not validPlayerName then
+        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = looter.." is not in this raid.  Please choose a valid character."
+        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+        return true;
     end
     MRT_GUI_HideDialogs();
     -- insert new values here / if (lootnum == nil) then treat as a newly added item
