@@ -555,7 +555,7 @@ end
   function encourageTrade()
 
     --don't encourage if there are no tradeable items for the player trying to trade
-    if next(MRT_GetTradeableItems()) == nil then
+    if not MRT_GetTradeableItems() then
         return;
     end
 
