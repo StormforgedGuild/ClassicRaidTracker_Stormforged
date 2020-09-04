@@ -315,8 +315,8 @@ function MRT_GUI_ParseValues()
                     local error = false;
                     error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                     if error then
-                        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-                        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+                        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                        StaticPopup_Show("MRT_GUI_ok");
                         MRT_GUI_BossLootTable:SetSelection(lastloot_select);
                     end
                 end
@@ -337,8 +337,8 @@ function MRT_GUI_ParseValues()
                     error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                     if error then
                         MRT_Debug("STOnClick:error occured");
-                        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-                        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+                        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                        StaticPopup_Show("MRT_GUI_ok");
                         MRT_GUI_BossLootTable:SetSelection(lastloot_select);
                         return true
                     end
@@ -1340,8 +1340,8 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     MRT_Debug("MRT_GUI_LootModifyAccept: clooter: " ..clooter);
     local validPlayerName = verifyPlayer(clooter);
     if not validPlayerName then
-        StaticPopupDialogs.MRT_GUI_ZeroRowDialog.text = looter.." is not in this raid.  Please choose a valid character."
-        StaticPopup_Show("MRT_GUI_ZeroRowDialog");
+        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+        StaticPopup_Show("MRT_GUI_ok");
         return true;
     end
     MRT_GUI_HideDialogs();
@@ -2647,4 +2647,12 @@ StaticPopupDialogs["MRT_GUI_ZeroRowDialog"] = {
     whileDead = true,
     hideOnEscape = true,
 }
-
+StaticPopupDialogs["MRT_GUI_ok"] = {
+    preferredIndex = 3,
+    text = "FIXME!",
+    button1 = MRT_L.Core["MB_Ok"],
+    OnAccept = nil,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+}
