@@ -797,6 +797,9 @@ local SF_ITEM_DATA = {
 }
 
 
+
+
+
 -- The default quality threshold:
 -- 0 - Poor
 -- 1 - Uncommon
@@ -915,4 +918,44 @@ function lib:GetPrio(item)
     end
   end
   return "not found"
+end
+
+local SF_TOKEN_DATA = {
+  --Token list
+  ["Vek'lor's Diadem"] = {21387, 21360, 21353, 21366},
+  ["Vek'nilash's Circlet"] = {21329, 21337, 21347, 21348},
+  ["Imperial Qiraji Armaments"] = {21242, 21244, 21272, 21269},
+  ["Imperial Qiraji Regalia"] = {21268, 21273, 21273},
+  ["Qiraji Bindings of Command"] = {21333, 21330, 21359, 21361, 21349, 21350, 21365, 21365},
+  ["Qiraji Bindings of Dominance"] = {21388, 21391, 21338, 21335, 21344, 21345, 21355, 21354},
+  ["Ouro's Intact Hide"] = {21332, 21362, 21346, 21352},
+  ["Skin of the Great Sandworm"] = {21390, 21336, 21356, 21368},
+  ["Carapace of the Old God"] = {21389, 21331, 21364, 21370},
+  ["Husk of the Old God"] = {21334, 21343, 21357, 21351},
+  ["Eye of C'Thun"] = {21712, 21710, 21709},
+  ["Head of Nefarian"] = {19383, 19384, 19366},
+}
+
+
+function lib:GetTokenLoot(item)
+  local itemName, itemLink, rarity, level, _, _, _, _, equipLoc = GetItemInfo(item);
+  local itemID = GetItemInfoInstant(item);
+  --[[ MRT_Debug("LibSFGearPoitns: GetTokenLoot"); 
+  MRT_Debug("LibSFGearPoitns: item: " ..item); 
+  MRT_Debug("LibSFGearPoitns: itemName: " ..itemName); 
+  MRT_Debug("LibSFGearPoitns: itemID: " ..itemID);  ]]
+  local retVal = "";
+  if (SF_TOKEN_DATA[itemName]) then
+    for i = 1, table.maxn(SF_TOKEN_DATA[itemName]) do
+      local tItemName = SF_TOKEN_DATA[itemName][i];
+      MRT_Debug("LibSFGearPoitns: GetTokenLoot: tItemName: " ..tItemName); 
+      if (tItemName) then
+        local intID = tonumber(tItemName);
+        local itemName1, itemLink1, rarity1, level1, _, _, _, _, equipLoc1 = GetItemInfo(intID);
+        MRT_Debug("LibSFGearPoitns: GetTokenLoot: itemName1: " ..itemName1); 
+        retVal = retVal .." "..itemLink1;
+      end 
+    end
+  end
+  return retVal
 end

@@ -1090,6 +1090,7 @@ function MRT_GUI_LootAdd()
     tinsert(playerData, 1, { "bank" } );
     tinsert(playerData,1, {"unassigned"});
     tinsert(playerData, 1, {"pug"} );
+    MRT_RaidPlayerList = playerData;
     MRT_GUI_PlayerDropDownTable:SetData(playerData, true);
     if (#playerData < 9) then
         MRT_GUI_PlayerDropDownTable:SetDisplayRows(#playerData, 15);
@@ -1715,8 +1716,16 @@ function MRT_GUI_LootRaidLink()
     end
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
-
-    local rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    local loot = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"];
+    local strTokens = LibSFGP:GetTokenLoot(loot);
+    local rwMessage;
+    if strTokens~="" then
+        MRT_Debug("strTokens: " ..strTokens)
+        rwMessage = string.format(MRT_L.GUI["RaidLinkMessageToken"], loot, MRT_GUI_BossLootTable:GetCell(loot_select, 5), strTokens);
+    else
+        MRT_Debug("MRT_GUI_LootRaidLink: no strText")
+        rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], loot, MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    end
     SendChatMessage(rwMessage, "Raid");
 end
 
@@ -1735,8 +1744,17 @@ function MRT_GUI_LootRaidAnnounce()
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
-
-    local rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    local loot = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"];
+    local strTokens = LibSFGP:GetTokenLoot(loot);
+    local rwMessage;
+    if strTokens~="" then
+        MRT_Debug("strTokens: " ..strTokens)
+        rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessageToken"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5), strTokens);
+    else
+        MRT_Debug("MRT_GUI_LootRaidLink: no strText")
+        rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    end
+    --local rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
     SendChatMessage(rwMessage, "RAID_WARNING");
 end
 
