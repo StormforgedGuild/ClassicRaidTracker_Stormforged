@@ -553,6 +553,12 @@ end
   end
 
   function encourageTrade()
+
+    --don't encourage if there are no tradeable items for the player trying to trade
+    if next(MRT_GetTradeableItems()) == nil then
+        return;
+    end
+
     MRT_GUIFrame_BossLoot_Trade_Button:SetNormalFontObject("GameFontGreen");
   
     local FadeOut = agTrade:CreateAnimation("Alpha");
@@ -1356,10 +1362,7 @@ function MRT_GUI_LootRaidWinner()
     SendChatMessage(rwMessage, "Raid");
 end
 
-function MRT_GUI_TradeLink()
-
-    --disable animation once clicked
-    stopEncouragingTrade();
+function MRT_GetTradeableItems()
 
     --Get name of player with an open trade window
     local tradePartnerName = UnitName("NPC");
@@ -1376,6 +1379,11 @@ function MRT_GUI_TradeLink()
         raidnum = MRT_GUI_RaidLogTable:GetCell(MRT_GUI_RaidLogTableSelection, 1);
     end
 
+    -- if there is no raid selected (ex. on launch, then return)
+    if not raidnum then
+        return; 
+    end
+
     --MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
     local index = 1;
     for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
@@ -1386,6 +1394,17 @@ function MRT_GUI_TradeLink()
         end
         index = index + 1;
     end
+
+    return itemsToTrade;
+
+end
+
+function MRT_GUI_TradeLink()
+
+    --disable animation once clicked
+    stopEncouragingTrade();
+
+    local itemsToTrade = MRT_GetTradeableItems();
 
     -----------------------------------------------------------------
     --Find those items in my bag & trade them
