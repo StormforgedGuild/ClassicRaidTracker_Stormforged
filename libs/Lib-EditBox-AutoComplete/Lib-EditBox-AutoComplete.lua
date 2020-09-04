@@ -33,8 +33,23 @@ function SetupAutoComplete(editbox, valueList, maxButtonCount)
 	editbox.old_OnEnterPressed = editbox.old_OnEnterPressed or editbox:GetScript("OnEnterPressed")
 	editbox.old_OnTextChanged = editbox.old_OnTextChanged or editbox:GetScript("OnTextChanged")
 	editbox.old_OnEscapePressed = editbox.old_OnEscapePressed or editbox:GetScript("OnEscapePressed")
+	editbox.old_OnTabPressed = editbox.old_OnTabPressed or editbox:GetScript("OnTabPressed")
 
-	editbox:SetScript("OnTabPressed", EditBoxAutoComplete_OnTabPressed)
+	--editbox:SetScript("OnTabPressed", EditBoxAutoComplete_OnTabPressed)
+	editbox:SetScript("OnTabPressed", function(editbox)
+		local autoComplete = EditBoxAutoCompleteBox;
+		if ( autoComplete:IsShown() and (autoComplete.parent == editbox) ) then
+			MRT_Debug("LEB:EB:OnTabPressed: isShown");
+			EditBoxAutoComplete_OnTabPressed(editbox)
+			return true;
+		end
+		--EditBoxAutoComplete_OnTabPressed(editbox)
+		if (editbox.old_OnTabPressed) then
+			MRT_Debug("LEB:EB:OnTabPressed: ol_tab fired!");
+			return editbox.old_OnTabPressed(editbox)
+		end
+	end)
+
 	editbox:SetScript("OnEnterPressed", function(editbox)
 		EditBoxAutoComplete_OnEnterPressed(editbox)
 		if (editbox.old_OnEnterPressed) then
