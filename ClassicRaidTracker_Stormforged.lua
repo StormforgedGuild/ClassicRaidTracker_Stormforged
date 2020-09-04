@@ -136,6 +136,7 @@ local MRT_AskCostQueue = {};
 local MRT_AskCostQueueRunning = nil;
 
 local MRT_UnknownRelogStatus = true;
+local MRT_TradePartner = "";
 
 local _, _, _, uiVersion = GetBuildInfo();
 
@@ -179,6 +180,9 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("RAID_INSTANCE_WELCOME");
     frame:RegisterEvent("RAID_ROSTER_UPDATE");
     frame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+    frame:RegisterEvent("TRADE_SHOW");
+    frame:RegisterEvent("TRADE_CLOSED");
+
 end
 
 
@@ -273,6 +277,16 @@ function MRT_OnEvent(frame, event, ...)
             return;
         end;
         MRT_CheckZoneAndSizeStatus();
+
+    elseif (event == "TRADE_SHOW") then
+        MRT_Debug("Trade initiated");
+        MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true);
+        encourageTrade();
+
+    elseif (event == "TRADE_CLOSED") then
+        MRT_Debug("Trade initiated");
+        MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
+        stopEncouragingTrade();
 
     elseif (event == "RAID_ROSTER_UPDATE") then
         MRT_Debug("RAID_ROSTER_UPDATE fired!");

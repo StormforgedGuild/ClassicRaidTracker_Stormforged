@@ -34,6 +34,8 @@ local mrt = ClassicRaidTracker
 local deformat = LibStub("LibDeformat-3.0");
 local ScrollingTable = LibStub("ScrollingTable");
 local ag -- import reminder animationgroup
+local agTrade -- trade reminder animationgroup
+
 
 local MRT_GUI_RaidLogTableSelection = nil;
 local MRT_GUI_RaidBosskillsTableSelection = nil;
@@ -54,6 +56,10 @@ local lastNote = nil;
 local lastOS = nil;
 local lootFilterHack = 0;
 local attendeeFilterHack = 0;
+
+--tooltip for parsing loot time remaining
+local tooltipForParsing = CreateFrame("GameTooltip", "RCLootCouncil_Tooltip_Parse", nil, "GameTooltipTemplate")
+tooltipForParsing:UnregisterAllEvents() -- Don't use GameTooltip for parsing, because GameTooltip can be hooked by other addons.
 
 -- table definitions
 local MRT_RaidLogTableColDef = {
@@ -257,8 +263,6 @@ function MRT_GUI_ParseValues()
     local maxButtonCount = 20;
     SetupAutoComplete(MRT_GUIFrame_RaidAttendees_Filter, valueList, maxButtonCount);
     --MRT_GUIFrame_RaidAttendees_Filter:SetAutoFocus(false);
-    
-    
 
  --   MRT_GUIFrame_RaidAttendeesTitle:SetText(MRT_L.GUI["Tables_RaidAttendeesTitle"]);
  --   MRT_GUIFrame_RaidAttendeesTitle:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 0, -15);
@@ -293,6 +297,7 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidLink_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_Trade_Button:SetText("Trade");
     MRT_GUIFrame_BossLoot_Trade_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidAnnounce_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
 
     MRT_GUI_BossLootTable = ScrollingTable:CreateST(MRT_BossLootTableColDef, 12, 32, nil, MRT_GUIFrame);           -- ItemId should be squared - so use 30x30 -> 30 pixels high
     MRT_GUI_BossLootTable.head:SetHeight(15);                                                                     -- Manually correct the height of the header (standard is rowHight - 30 pix would be different from others tables around and looks ugly)
@@ -392,6 +397,8 @@ function MRT_GUI_ParseValues()
     });
 
     ag = MRT_GUIFrame_Import_PR_Button:CreateAnimationGroup(); -- import button animationgroup
+    agTrade =  MRT_GUIFrame_BossLoot_Trade_Button:CreateAnimationGroup(); -- trade button animationgroup
+
 end
 
 function mrt:UI_CreateTwoRowDDM()
@@ -543,6 +550,32 @@ end
   function stopEncouragingImport()
       MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontWhite");
       ag:Stop();
+  end
+
+  function encourageTrade()
+    MRT_GUIFrame_BossLoot_Trade_Button:SetNormalFontObject("GameFontGreen");
+  
+    local FadeOut = agTrade:CreateAnimation("Alpha");
+    FadeOut:SetToAlpha(.25);
+    FadeOut:SetFromAlpha(1);
+    FadeOut:SetDuration(1);
+    FadeOut:SetOrder(1);
+    FadeOut:SetSmoothing("OUT")
+  
+    local FadeIn = agTrade:CreateAnimation("Alpha");
+    FadeIn:SetToAlpha(1);
+    FadeIn:SetFromAlpha(.25);
+    FadeIn:SetDuration(1);
+    FadeOut:SetOrder(2);
+    FadeIn:SetSmoothing("OUT")
+  
+    agTrade:SetLooping("Repeat")
+    agTrade:Play();
+  end
+  
+  function stopEncouragingTrade()
+    MRT_GUIFrame_BossLoot_Trade_Button:SetNormalFontObject("GameFontWhite");
+    agTrade:Stop();
   end
 
 ----------------------
@@ -1325,12 +1358,141 @@ end
 
 function MRT_GUI_TradeLink()
 
-    --Get name of player with an open trade window
-    --Get list of items that person is the looter for in the loot list
-    --Find those items in my bag
-    --Validate that the item is tradeable by looking at the loot timer
-    --Place those items in the trade window
+    --disable animation once clicked
+    stopEncouragingTrade();
 
+    --Get name of player with an open trade window
+    local tradePartnerName = UnitName("NPC");
+    local itemsToTrade = {};
+
+    -----------------------------------------------------------------
+    --Get list of items that person is the looter for in the loot list
+    -----------------------------------------------------------------
+
+    local raidnum;
+
+    -- check if a raid is selected
+    if (MRT_GUI_RaidLogTable:GetSelection()) then
+        raidnum = MRT_GUI_RaidLogTable:GetCell(MRT_GUI_RaidLogTableSelection, 1);
+    end
+
+    --MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
+    local index = 1;
+    for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
+
+        if v["Looter"] == tradePartnerName then
+            itemsToTrade[index] = v["ItemName"];
+            MRT_Debug(tradePartnerName.. " should receive "..itemsToTrade[index]);
+        end
+        index = index + 1;
+    end
+
+    -----------------------------------------------------------------
+    --Find those items in my bag & trade them
+    -----------------------------------------------------------------
+    local c,s,t
+    for container=0, 5 do
+        if GetContainerNumSlots(container) > 0 then
+            for slot=1, GetContainerNumSlots(container) or 0 do
+      --          MRT_Debug("Iterating through bag #"..container.." at slot #"..slot)
+                local itemLink = GetContainerItemLink(container, slot);
+                if itemLink then
+                    local sName, sLink, iRarity, iLevel, iMinLevel, sType, sSubType, iStackCount = GetItemInfo(itemLink);
+                    for i in pairs(itemsToTrade) do
+                        if itemsToTrade[i] == sName then
+      --                      MRT_Debug("Found item "..sName.." at"..container.. slot)
+                             --Validate that the item is tradeable by looking at the loot timer
+                            local timeRemaining = GetContainerItemTradeTimeRemaining(container, slot);
+                            if timeRemaining>0 then
+                                local itemAlreadyTraded = false;
+
+                                --make sure the same item hasn't already been put in the loot window - ex. two aq40 weapon tokens are in your bag
+                                for j=1, 7 do
+                                    local name, texture, quantity, quality, isUsable, enchant =  GetTradePlayerItemInfo(j);
+                                    if name == itemsToTrade[i] then
+                                        itemAlreadyTraded = true;
+                                    end
+                                end
+                          
+                                if itemAlreadyTraded == false then
+                                    --Place those items in the trade window
+                                    UseContainerItem(container,slot);
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    --need a check to end if there are none found
+
+end
+
+-- Return the remaining trade time in second for an item in the container.
+-- Return math.huge(infinite) for an item not bounded.
+-- Return the remaining trade time in second if the item is within 2h trade window.
+-- Return 0 if the item is not tradable (bounded and the trade time has expired.)
+function GetContainerItemTradeTimeRemaining(container, slot)
+	tooltipForParsing:SetOwner(UIParent, "ANCHOR_NONE") -- This lines clear the current content of tooltip and set its position off-screen
+	tooltipForParsing:SetBagItem(container, slot) -- Set the tooltip content and show it, should hide the tooltip before function ends
+	if not tooltipForParsing:NumLines() or tooltipForParsing:NumLines() == 0 then
+		return 0
+	end
+
+	local bindTradeTimeRemainingPattern = escapePatternSymbols(BIND_TRADE_TIME_REMAINING):gsub("%%%%s", "%(%.%+%)") -- PT locale contains "-", must escape that.
+	local bounded = false
+
+	for i = 1, tooltipForParsing:NumLines() or 0 do
+		local line = getglobal(tooltipForParsing:GetName()..'TextLeft' .. i)
+		if line and line.GetText then
+			local text = line:GetText() or ""
+			if text == ITEM_SOULBOUND or text == ITEM_ACCOUNTBOUND or text == ITEM_BNETACCOUNTBOUND then
+				bounded = true
+			end
+
+			local timeText = text:match(bindTradeTimeRemainingPattern)
+			if timeText then -- Within 2h trade window, parse the time text
+				tooltipForParsing:Hide()
+
+				for hour=1, 0, -1 do -- time>=60s, format: "1 hour", "1 hour 59 min", "59 min", "1 min"
+					local hourText = ""
+					if hour > 0 then
+						hourText = self:CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_HOURS, hour)
+					end
+					for min=59,0,-1 do
+						local time = hourText
+						if min > 0 then
+							if time ~= "" then
+								time = time..TIME_UNIT_DELIMITER
+							end
+							time = time..self:CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_MIN, min)
+						end
+
+						if time == timeText then
+							return hour*3600 + min*60
+						end
+					end
+				end
+				for sec=59, 1, -1 do -- time<60s, format: "59 s", "1 s"
+					local time = self:CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_SEC, sec)
+					if time == timeText then
+						return sec
+					end
+				end
+				-- As of Patch 7.3.2(Build 25497), the parser have been tested for all 11 in-game languages when time < 1h and time > 1h. Shouldn't reach here.
+				-- If it reaches here, there are some parsing issues. Let's return 2h.
+				return 7200
+			end
+		end
+	end
+	tooltipForParsing:Hide()
+	if bounded then
+		return 0
+	else
+		return math.huge
+	end
 end
 
 function MRT_GUI_LootRaidLink()
