@@ -1520,7 +1520,7 @@ function MRT_GetTradeableItems()
 
 end
 
-function MRT_GUI_TradeLink()
+function MRT_GUI_TradeLink2()
 
     --disable animation once clicked
     stopEncouragingTrade();
@@ -1566,8 +1566,67 @@ function MRT_GUI_TradeLink()
         end
     end
 
-    --need a check to end if there are none found
+end
 
+--puts all items the person with the trade window is supposed to receive in their trade window.
+function MRT_GUI_TradeLink()
+
+    --disable animation once clicked
+    stopEncouragingTrade();
+
+    --get the items the person is supposed to get
+    local itemsToTrade = MRT_GetTradeableItems();
+
+    -----------------------------------------------------------------
+    --Find those items in my bag & trade them
+    -----------------------------------------------------------------
+    for i in pairs(itemsToTrade) do
+         local foundInBag, containerID, slotID = findItemInBag(itemsToTrade[i]);
+         if foundInBag then
+            --MRT_Debug("Found item "..sName.." at"..container.. slot)
+            --Validate that the item is tradeable by looking at the loot timer
+            local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
+            if timeRemaining>0 then
+                local itemAlreadyTraded = false;
+
+                --make sure the same item hasn't already been put in the loot window - ex. two aq40 weapon tokens are in your bag
+                for j=1, 7 do
+                    local name, texture, quantity, quality, isUsable, enchant =  GetTradePlayerItemInfo(j);
+                    if name == itemsToTrade[i] then
+                        itemAlreadyTraded = true;
+                    end
+                end
+        
+                if itemAlreadyTraded == false then
+                    --Place those items in the trade window
+                    UseContainerItem(container,slot);
+                end
+            end
+         end
+    end
+end
+
+--returns true/false, container, and slot numbers of the item found. 
+function findItemInBag(name)
+    local c,s,t
+    for container=0, 5 do
+        if GetContainerNumSlots(container) > 0 then
+            for slot=1, GetContainerNumSlots(container) or 0 do
+      --        MRT_Debug("Iterating through bag #"..container.." at slot #"..slot)
+                local itemLink = GetContainerItemLink(container, slot);
+                if itemLink then
+                    local sName, sLink, iRarity, iLevel, iMinLevel, sType, sSubType, iStackCount = GetItemInfo(itemLink);
+                    for i in pairs(itemsToTrade) do
+                        if itemsToTrade[i] == sName then
+      --                    MRT_Debug("Found item "..sName.." at"..container.. slot)  
+                            return true, container, slot
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return false, -1, -1
 end
 
 -- Return the remaining trade time in second for an item in the container.
