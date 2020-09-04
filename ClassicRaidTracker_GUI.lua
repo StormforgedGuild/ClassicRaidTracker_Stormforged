@@ -33,6 +33,7 @@ local mrt = ClassicRaidTracker
 --------------
 local deformat = LibStub("LibDeformat-3.0");
 local ScrollingTable = LibStub("ScrollingTable");
+local LibSFGP = LibStub("LibSFGearPoints-1.0");
 local ag -- import reminder animationgroup
 local agTrade -- trade reminder animationgroup
 
@@ -1172,6 +1173,7 @@ function RemoveAutoComplete(editbox)
 	editbox.buttonCount = nil;
 end
 function MRT_GUI_LootModify()
+
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1229,6 +1231,12 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_Title:SetText(MRT_L.GUI["Modify loot data"]);
     MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
+    MRT_GUI_FourRowDialog_EB1:SetScript("OnEnter", function(self) 
+        local ttText = LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText());
+        MRT_Debug("EB:OnEnter ttText: " ..ttText);
+        MRT_GUI_SetPrioTT(self,ttText);
+    end);
+    MRT_GUI_FourRowDialog_EB1:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
     --MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
     --autocomplete here.
@@ -2013,10 +2021,17 @@ function MRT_GUI_SetTT(frame, button)
             MRT_GUI_TT:SetText("Last Imported PR - " ..strDate);  
         end
     else
+        
         MRT_GUI_TT:SetText(MRT_L.GUI["TT_"..button]);
     end 
     MRT_GUI_TT:Show();
 end
+function MRT_GUI_SetPrioTT(frame, button)
+    MRT_GUI_TT:SetOwner(frame, "ANCHOR_BOTTOMRIGHT");
+    MRT_GUI_TT:SetText(button);  
+    MRT_GUI_TT:Show();
+end
+
 
 function MRT_GUI_HideTT()
     MRT_GUI_TT:Hide();
