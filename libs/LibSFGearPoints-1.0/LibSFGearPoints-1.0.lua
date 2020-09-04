@@ -952,7 +952,7 @@ function lib:GetTokenLoot(item)
       if (tItemName) then
         local intID = tonumber(tItemName);
         local itemName1, itemLink1, rarity1, level1, _, _, _, _, equipLoc1 = GetItemInfo(intID);
-        MRT_Debug("LibSFGearPoitns: GetTokenLoot: itemName1: " ..itemName1); 
+        --MRT_Debug("LibSFGearPoitns: GetTokenLoot: itemName1: " ..itemName1); 
         retVal = retVal .." "..itemLink1;
       end 
     end
