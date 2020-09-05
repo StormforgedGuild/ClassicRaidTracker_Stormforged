@@ -34,6 +34,7 @@ local mrt = ClassicRaidTracker
 local deformat = LibStub("LibDeformat-3.0");
 local ScrollingTable = LibStub("ScrollingTable");
 local LibSFGP = LibStub("LibSFGearPoints-1.0");
+LibSFGP:CacheTokenItemInfo();
 local ag -- import reminder animationgroup
 local agTrade -- trade reminder animationgroup
 
@@ -1709,10 +1710,10 @@ function LootAnnounce(messageType, loot, gp)
         for i = 1, iCount do
             if (tTokens[i]) then
                 tokenLootList = tokenLootList ..tTokens[i];
-                MRT_Debug("LootAnnouce: tTokens[i]:  " ..tTokens[i]);
+                --MRT_Debug("LootAnnouce: tTokens[i]:  " ..tTokens[i]);
             else
                 tokenLootList = tokenLootList .."";
-                MRT_Debug("LootAnnouce: tTokens[i]:NIL");
+                --MRT_Debug("LootAnnouce: tTokens[i]:NIL");
             end
             
             if (i % 4) == 0 then

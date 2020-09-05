@@ -926,7 +926,7 @@ local SF_TOKEN_DATA = {
   ["Vek'nilash's Circlet"] = {21329, 21337, 21347, 21348},
   ["Imperial Qiraji Armaments"] = {21242, 21244, 21272, 21269},
   ["Imperial Qiraji Regalia"] = {21268, 21273, 21273},
-  ["Qiraji Bindings of Command"] = {21333, 21330, 21359, 21361, 21349, 21350, 21365, 21365},
+  ["Qiraji Bindings of Command"] = {21333, 21330, 21359, 21361, 21349, 21350, 21365, 21367},
   ["Qiraji Bindings of Dominance"] = {21388, 21391, 21338, 21335, 21344, 21345, 21355, 21354},
   ["Ouro's Intact Hide"] = {21332, 21362, 21346, 21352},
   ["Skin of the Great Sandworm"] = {21390, 21336, 21356, 21368},
@@ -936,30 +936,45 @@ local SF_TOKEN_DATA = {
   ["Head of Nefarian"] = {19383, 19384, 19366},
 }
 
+-- this function is used to cache 
+function lib:CacheTokenItemInfo()
+  MRT_Debug("CacheTokenItemInfo: called!"); 
+  for i1,v in pairs(SF_TOKEN_DATA) do
+    for i = 1, table.maxn(v) do
+      local tItemName = SF_TOKEN_DATA[i1][i];
+      MRT_Debug("GetTokenLoot: tItemName: " ..tItemName); 
+      if (tItemName) then
+        local intID = tonumber(tItemName);
+        local itemName1, itemLink1, rarity1, level1, _, _, _, _, equipLoc1 = GetItemInfo(intID);
+        MRT_Debug("GetTokenLoot: tItemName: " ..tItemName); 
+      end 
+    end
+  end
+end
 
 function lib:GetTokenLoot(item)
   local itemName, itemLink, rarity, level, _, _, _, _, equipLoc = GetItemInfo(item);
-  local itemID = GetItemInfoInstant(item);
+  --local itemID = GetItemInfoInstant(item);
   MRT_Debug("GetTokenLoot: GetTokenLoot"); 
   MRT_Debug("GetTokenLoot: item: " ..item); 
   MRT_Debug("GetTokenLoot: itemName: " ..itemName); 
-  MRT_Debug("GetTokenLoot: itemID: " ..itemID); 
+  --MRT_Debug("GetTokenLoot: itemID: " ..itemID); 
   local retVal = {};
   if (SF_TOKEN_DATA[itemName]) then
     for i = 1, table.maxn(SF_TOKEN_DATA[itemName]) do
       local tItemName = SF_TOKEN_DATA[itemName][i];
-      MRT_Debug("GetTokenLoot: GetTokenLoot: tItemName: " ..tItemName); 
+      MRT_Debug("GetTokenLoot: tItemName: " ..tItemName); 
       if (tItemName) then
         local intID = tonumber(tItemName);
         local itemName1, itemLink1, rarity1, level1, _, _, _, _, equipLoc1 = GetItemInfo(intID);
         if (itemLink1) then 
-          MRT_Debug("LibSFGearPoitns: GetTokenLoot: itemLink1: " ..itemLink1); 
+          MRT_Debug("GetTokenLoot:: GetTokenLoot: itemLink1: " ..itemLink1); 
+          tinsert(retVal, 1, itemLink1);
         else
-          MRT_Debug("LibSFGearPoitns: GetTokenLoot: itemLink1: NIL "); 
+          MRT_Debug("GetTokenLoot:: GetTokenLoot: itemLink1: NIL"); 
         end 
-        tinsert(retVal, 1, itemLink1);
       end 
     end
   end
-  return retVal
+  return retVal;
 end
