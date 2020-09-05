@@ -1347,10 +1347,15 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     MRT_Debug("MRT_GUI_LootModifyAccept: looter: " ..looter);
     local clooter = cleanFormatString(looter,true);
     MRT_Debug("MRT_GUI_LootModifyAccept: clooter: " ..clooter);
-    local validPlayerName = verifyPlayer(clooter);
-    if not validPlayerName then
-        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-        StaticPopup_Show("MRT_GUI_ok");
+    if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked()) then
+        local validPlayerName = verifyPlayer(clooter);
+        if not validPlayerName then
+            StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+            StaticPopup_Show("MRT_GUI_ok");
+            return true;
+        end
+    else
+        MRT_GUI_HideDialogs();
         return true;
     end
     MRT_GUI_HideDialogs();
@@ -1669,16 +1674,66 @@ function MRT_GUI_LootRaidLink()
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     local loot = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"];
-    local strTokens = LibSFGP:GetTokenLoot(loot);
+    -- GetToken now returns a string table... need to write a function to parse and build smaller messages.
+    --[[ local strTokens = LibSFGP:GetTokenLoot(loot);
     local rwMessage;
+    rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], loot, MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    SendChatMessage(rwMessage, "Raid");
     if strTokens~="" then
         MRT_Debug("strTokens: " ..strTokens)
-        rwMessage = string.format(MRT_L.GUI["RaidLinkMessageToken"], loot, MRT_GUI_BossLootTable:GetCell(loot_select, 5), strTokens);
+        rwMessage = string.format(MRT_L.GUI["RaidLinkMessageToken"], loot, strTokens);
+        SendChatMessage(rwMessage, "Raid");
+    end ]]
+    LootAnnounce("Raid", loot, MRT_GUI_BossLootTable:GetCell(loot_select, 5))
+end
+
+--messageType = "Raid", "RAID_WARNING"
+function LootAnnounce(messageType, loot, gp)
+    MRT_Debug("LootAnnouce:called!");
+    local tTokens = LibSFGP:GetTokenLoot(loot);
+    local rwMessage;
+    
+    if messageType == "Raid" then
+        rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], loot, gp);
+        SendChatMessage(rwMessage, messageType);
+    elseif messageType == "RAID_WARNING" then
+        rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], loot, gp);
+        SendChatMessage(rwMessage, messageType);
     else
-        MRT_Debug("MRT_GUI_LootRaidLink: no strText")
-        rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], loot, MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+        return;
+    end 
+    local iCount = table.maxn(tTokens);
+    if iCount > 0 then
+        MRT_Debug("LootAnnouce: processing tokenloot list");
+        local tokenLootList = "";
+        for i = 1, iCount do
+            if (tTokens[i]) then
+                tokenLootList = tokenLootList ..tTokens[i];
+                MRT_Debug("LootAnnouce: tTokens[i]:  " ..tTokens[i]);
+            else
+                tokenLootList = tokenLootList .."";
+                MRT_Debug("LootAnnouce: tTokens[i]:NIL");
+            end
+            
+            if (i % 4) == 0 then
+                if i == 4 then 
+                    rwMessage = string.format(MRT_L.GUI["RaidTokenMessage"], loot, tokenLootList);
+                else
+                    rwMessage = string.format(MRT_L.GUI["RaidTokenMessageCont"], tokenLootList);
+                end
+                tokenLootList = "";
+                SendChatMessage(rwMessage, messageType);
+            end
+        end
+        if tokenLootList ~= "" then
+            if iCount < 4 then
+                rwMessage = string.format(MRT_L.GUI["RaidTokenMessage"], loot, tokenLootList);
+            else
+                rwMessage = string.format(MRT_L.GUI["RaidTokenMessageCont"], tokenLootList);
+            end
+            SendChatMessage(rwMessage, messageType);
+        end
     end
-    SendChatMessage(rwMessage, "Raid");
 end
 
 function MRT_GUI_LootRaidAnnounce()
@@ -1696,18 +1751,20 @@ function MRT_GUI_LootRaidAnnounce()
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
-    local loot = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"];
+    --[[ local loot = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"];
+    -- GetToken now returns a string table... need to write a function to parse and build smaller messages.
     local strTokens = LibSFGP:GetTokenLoot(loot);
     local rwMessage;
-    if strTokens~="" then
-        MRT_Debug("strTokens: " ..strTokens)
-        rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessageToken"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5), strTokens);
-    else
-        MRT_Debug("MRT_GUI_LootRaidLink: no strText")
-        rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
-    end
     --local rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
+    rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
     SendChatMessage(rwMessage, "RAID_WARNING");
+    if strTokens~="" then
+    
+        MRT_Debug("strTokens: " ..strTokens)
+        rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessageToken"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], strTokens);
+        SendChatMessage(rwMessage, "RAID_WARNING");
+    end ]]
+    LootAnnounce("RAID_WARNING", MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5))
 end
 
 

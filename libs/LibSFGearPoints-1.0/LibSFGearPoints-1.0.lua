@@ -396,8 +396,8 @@ local SF_FULL_ITEM_DATA =
   [361]={["Item"]="Scarab Brooch",["GP"]=1875,["Bid_Priority"]="Healers"},
   [362]={["Item"]="Sharpened Silithid Femur",["GP"]=6250,["Bid_Priority"]="Caster DPS / Holy Paladin "},
   [363]={["Item"]="Slime-coated Leggings",["GP"]=391,["Bid_Priority"]="Soakers"},
-  [364]={["Item"]="Qiraji Bindings of Command ",["GP"]=2500,["Bid_Priority"]="Tank / Rogue / Warrior"},
-  [365]={["Item"]="Qiraji Bindings of Dominance ",["GP"]=2500,["Bid_Priority"]="Warlock / Mage  "},
+  [364]={["Item"]="Qiraji Bindings of Command",["GP"]=2500,["Bid_Priority"]="Tank / Rogue / Warrior"},
+  [365]={["Item"]="Qiraji Bindings of Dominance",["GP"]=2500,["Bid_Priority"]="Warlock / Mage  "},
   [366]={["Item"]="Vek'lor's Diadem",["GP"]=3125,["Bid_Priority"]="Rogue "},
   [367]={["Item"]="Vek'nilash's Circlet",["GP"]=3125,["Bid_Priority"]="Warlock / Mage / SPriest / Warriors"},
   [368]={["Item"]="Ouro's Intact Hide",["GP"]=4688,["Bid_Priority"]="Tank > Rogue / Warrior"},
@@ -940,20 +940,24 @@ local SF_TOKEN_DATA = {
 function lib:GetTokenLoot(item)
   local itemName, itemLink, rarity, level, _, _, _, _, equipLoc = GetItemInfo(item);
   local itemID = GetItemInfoInstant(item);
-  --[[ MRT_Debug("LibSFGearPoitns: GetTokenLoot"); 
-  MRT_Debug("LibSFGearPoitns: item: " ..item); 
-  MRT_Debug("LibSFGearPoitns: itemName: " ..itemName); 
-  MRT_Debug("LibSFGearPoitns: itemID: " ..itemID);  ]]
-  local retVal = "";
+  MRT_Debug("GetTokenLoot: GetTokenLoot"); 
+  MRT_Debug("GetTokenLoot: item: " ..item); 
+  MRT_Debug("GetTokenLoot: itemName: " ..itemName); 
+  MRT_Debug("GetTokenLoot: itemID: " ..itemID); 
+  local retVal = {};
   if (SF_TOKEN_DATA[itemName]) then
     for i = 1, table.maxn(SF_TOKEN_DATA[itemName]) do
       local tItemName = SF_TOKEN_DATA[itemName][i];
-      MRT_Debug("LibSFGearPoitns: GetTokenLoot: tItemName: " ..tItemName); 
+      MRT_Debug("GetTokenLoot: GetTokenLoot: tItemName: " ..tItemName); 
       if (tItemName) then
         local intID = tonumber(tItemName);
         local itemName1, itemLink1, rarity1, level1, _, _, _, _, equipLoc1 = GetItemInfo(intID);
-        --MRT_Debug("LibSFGearPoitns: GetTokenLoot: itemName1: " ..itemName1); 
-        retVal = retVal .." "..itemLink1;
+        if (itemLink1) then 
+          MRT_Debug("LibSFGearPoitns: GetTokenLoot: itemLink1: " ..itemLink1); 
+        else
+          MRT_Debug("LibSFGearPoitns: GetTokenLoot: itemLink1: NIL "); 
+        end 
+        tinsert(retVal, 1, itemLink1);
       end 
     end
   end
