@@ -909,10 +909,10 @@ function getGP(itemName, new)
 end
 function lib:GetPrio(item)
   local itemName, itemLink, rarity, level, _, _, _, _, equipLoc = GetItemInfo(item)
-  MRT_Debug("LibSFGearPoitns: GetPrio"); 
+  --MRT_Debug("LibSFGearPoitns: GetPrio"); 
   for i = 1, table.maxn(SF_FULL_ITEM_DATA) do
     local sitemName = SF_FULL_ITEM_DATA[i]["Item"]
-    MRT_Debug("getPrio: sitemName: " ..sitemName.. "itemName: " ..itemName); 
+    --MRT_Debug("getPrio: sitemName: " ..sitemName.. "itemName: " ..itemName); 
     if sitemName == itemName then
       return SF_FULL_ITEM_DATA[i]["Bid_Priority"]
     end

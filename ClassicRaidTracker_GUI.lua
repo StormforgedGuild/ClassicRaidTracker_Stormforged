@@ -1120,10 +1120,15 @@ end
 
 function verifyPlayer(PlayerName)
     --iterate the dropdown table
+    --MRT_Debug("verifyPlayer:PlayerName: ".. PlayerName);
+    --MRT_Debug("verifyPlayer:PlayerName:strlen: ".. strlen(PlayerName));
     local cPlayerName = cleanString(PlayerName,true)
+    --MRT_Debug("verifyPlayer:cPlayerName: ".. cPlayerName);
+    --MRT_Debug("verifyPlayer:cPlayerName:strlen ".. strlen(cPlayerName));
     MRT_Debug("verifyPlayer");
     for i, v in ipairs(MRT_RaidPlayerList) do
         MRT_Debug("verifyPlayer: i: " ..i.." v: " ..v[1]);
+        --MRT_Debug("verifyPlayer: strlen v[1]: " ..strlen(v[1]));
         if cPlayerName == v[1] then
             return true
         end
@@ -1270,9 +1275,18 @@ function MRT_GUI_LootModify()
     end
 
     --MRT_GUI_FourRowDialog_EB2:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 4));
-    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4),true));
+    local cleanlooter = MRT_GUI_BossLootTable:GetCell(loot_select, 4)
+    MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean "..cleanlooter);
+    MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean strlen "..strlen(cleanlooter));
+    local debuggingprestr = string.sub(cleanlooter,1,2);
+    local debuggingpoststr = string.sub(cleanlooter,strlen(cleanlooter)-2, 2);
+    MRT_Debug("MRT_GUI_LootModify: cleanLooter:debuggingprestr "..debuggingprestr);
+    MRT_Debug("MRT_GUI_LootModify: cleanLooter:debuggingpoststr "..debuggingpoststr);
+    MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean strlen "..strlen(cleanlooter));
+    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(cleanlooter,true));
     lastLooter = MRT_GUI_FourRowDialog_EB2:GetText();
-    MRT_Debug("MRT_GUI_LootModify: lastLooter: "..lastLooter);
+    MRT_Debug("MRT_GUI_LootModify: lastLooter: afterclean "..lastLooter);
+    MRT_Debug("MRT_GUI_LootModify: lastLooter: afterclean strlen "..strlen(lastLooter));
     
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
     MRT_GUI_FourRowDialog_EB3:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 5));
@@ -1345,9 +1359,11 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
         return true;
     end
     --uncomment when ready to verify
-    MRT_Debug("MRT_GUI_LootModifyAccept: looter: " ..looter);
+    --MRT_Debug("MRT_GUI_LootModifyAccept: looter: " ..looter);
+    --MRT_Debug("MRT_GUI_LootModifyAccept: looter:strlen " ..strlen(looter));
     local clooter = cleanFormatString(looter,true);
-    MRT_Debug("MRT_GUI_LootModifyAccept: clooter: " ..clooter);
+    --MRT_Debug("MRT_GUI_LootModifyAccept: clooter: " ..clooter);
+    --MRT_Debug("MRT_GUI_LootModifyAccept: clooter:strLen " ..strlen(clooter));
     if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked()) then
         local validPlayerName = verifyPlayer(clooter);
         if not validPlayerName then
@@ -2501,7 +2517,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 end
 
                 if v["Looter"] == "unassigned" then
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, doneState};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                     if v["Offspec"] then
                     --    MRT_Debug("MRT_GUI_BossLootTableUpdate: MRT_GUI_BossTableData2;dkpvalue: ".. v["DKPValue"].. "Offspec: True");
                     else
@@ -2565,7 +2581,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
 
             if not filter then
                 if v["Looter"] == "unassigned" then
-                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, doneState};
+                    MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                 else 
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                 end 
@@ -2578,7 +2594,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 else
                     ---
                     if v["Looter"] == "unassigned" then
-                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"].."|r", v["DKPValue"], v["ItemLink"], lootTime, doneState};
+                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                     else 
                         MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                     end 
@@ -2617,9 +2633,9 @@ function calculateLootTimeLeft (timeLooted)
         -- MRT_Debug(hours);
         -- MRT_Debug(minutes);
         if hours > 0 then
-            lootTime = (hours*60)+minutes.."m";
+            lootTime = hours ..":" ..minutes;
         else
-            lootTime = minutes.."m";
+            lootTime = ":" ..minutes;
         end
     else
         lootTime = date("%I:%M", timeLooted); --default to time stamp if the loot has expired
