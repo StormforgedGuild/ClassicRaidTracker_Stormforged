@@ -938,15 +938,15 @@ local SF_TOKEN_DATA = {
 
 -- this function is used to cache 
 function lib:CacheTokenItemInfo()
-  MRT_Debug("CacheTokenItemInfo: called!"); 
+  --MRT_Debug("CacheTokenItemInfo: called!"); 
   for i1,v in pairs(SF_TOKEN_DATA) do
     for i = 1, table.maxn(v) do
       local tItemName = SF_TOKEN_DATA[i1][i];
-      MRT_Debug("GetTokenLoot: tItemName: " ..tItemName); 
+      --MRT_Debug("GetTokenLoot: tItemName: " ..tItemName); 
       if (tItemName) then
         local intID = tonumber(tItemName);
         local itemName1, itemLink1, rarity1, level1, _, _, _, _, equipLoc1 = GetItemInfo(intID);
-        MRT_Debug("GetTokenLoot: tItemName: " ..tItemName); 
+        --MRT_Debug("GetTokenLoot: tItemName: " ..tItemName); 
       end 
     end
   end

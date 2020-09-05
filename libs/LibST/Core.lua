@@ -413,9 +413,13 @@ do
 			end
 		end
 		--if there is format in the string, clean it for sort.
-		if type(a1) == "string" then
+		if type(a1) == "string" and type(b1) == "string" then
 			--clean name
 			a1, b1 = cleanString(a1), cleanString(b1);
+			--check for time sort
+			--call it some function
+			MRT_Debug("ST:CompareSort: a1: " ..a1.." b1: " ..b1);
+			a1, b1 = stringTimetonumberTime(a1), stringTimetonumberTime(b1);
 		end
 		if (groupby == nil) or not groupby then
 			if a1 == b1 then
@@ -448,6 +452,27 @@ do
 			return stsortbyclass(a1, b1, a2, b2, direction)
 		end
 	end
+	function stringTimetonumberTime(sText1)
+		local retVal1
+		local cIndex = strfind(sText1, ":")
+		MRT_Debug("ST:stringTimetonumberTime: Called!");
+		MRT_Debug("ST:stringTimetonumberTime: sText" ..sText1);
+		if (cIndex) then MRT_Debug("ST:stringTimetonumberTime: cIndex" ..cIndex);end
+		if not cIndex then
+			return sText1;
+		end
+		retVal1 = cStrTimetoInt(sText1,cIndex)
+		return retVal1;
+	end
+	function cStrTimetoInt(sText, cIndex)
+		local sH, sM;
+		sH = string.sub(sText,1,cIndex-1)
+		MRT_Debug("ST:stringTimetonumberTime: sH: " ..sH);
+		sM = string.sub(sText,cIndex+1)
+		MRT_Debug("ST:stringTimetonumberTime: sM: " ..sM);
+		return (tonumber(sH)*60) + tonumber(sM);
+	end
+
 	function cleanString(strText, keepCase)
 		--|cff9d9d9d
 		local sText;
