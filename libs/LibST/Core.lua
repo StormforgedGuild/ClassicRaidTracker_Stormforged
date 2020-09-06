@@ -418,7 +418,7 @@ do
 			a1, b1 = cleanString(a1), cleanString(b1);
 			--check for time sort
 			--call it some function
-			MRT_Debug("ST:CompareSort: a1: " ..a1.." b1: " ..b1);
+			--MRT_Debug("ST:CompareSort: a1: " ..a1.." b1: " ..b1);
 			a1, b1 = stringTimetonumberTime(a1), stringTimetonumberTime(b1);
 		end
 		if (groupby == nil) or not groupby then
@@ -447,7 +447,7 @@ do
 			end
 		else
 			--do group by
-			MRT_Debug("ST:CompareSort: calling ststorbyclass");
+			--MRT_Debug("ST:CompareSort: calling ststorbyclass");
 			local direction = column.sort or column.defaultsort or "asc";
 			return stsortbyclass(a1, b1, a2, b2, direction)
 		end
@@ -455,8 +455,8 @@ do
 	function stringTimetonumberTime(sText1)
 		local retVal1
 		local cIndex = strfind(sText1, ":")
-		MRT_Debug("ST:stringTimetonumberTime: Called!");
-		MRT_Debug("ST:stringTimetonumberTime: sText" ..sText1);
+		--MRT_Debug("ST:stringTimetonumberTime: Called!");
+		--MRT_Debug("ST:stringTimetonumberTime: sText" ..sText1);
 		if (cIndex) then MRT_Debug("ST:stringTimetonumberTime: cIndex" ..cIndex);end
 		if not cIndex then
 			return sText1;
@@ -467,9 +467,9 @@ do
 	function cStrTimetoInt(sText, cIndex)
 		local sH, sM;
 		sH = string.sub(sText,1,cIndex-1)
-		MRT_Debug("ST:stringTimetonumberTime: sH: " ..sH);
+		--MRT_Debug("ST:stringTimetonumberTime: sH: " ..sH);
 		sM = string.sub(sText,cIndex+1)
-		MRT_Debug("ST:stringTimetonumberTime: sM: " ..sM);
+		--MRT_Debug("ST:stringTimetonumberTime: sM: " ..sM);
 		return (tonumber(sH)*60) + tonumber(sM);
 	end
 

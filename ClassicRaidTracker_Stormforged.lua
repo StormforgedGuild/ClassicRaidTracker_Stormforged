@@ -105,7 +105,6 @@ local MRT_Defaults = {
     },
 };
 
-
 --------------
 --  Locals  --
 --------------
@@ -183,9 +182,8 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("TRADE_SHOW");
     frame:RegisterEvent("TRADE_CLOSED");
     frame:RegisterEvent("BAG_UPDATE");
-
+    frame:RegisterEvent("CHAT_MSG_ADDON");
 end
-
 
 -------------------------
 --  Handler functions  --
@@ -252,6 +250,13 @@ function MRT_OnEvent(frame, event, ...)
         if (MRT_UnknownRelogStatus) then
             MRT_UnknownRelogStatus = false;
             MRT_EndActiveRaid();
+        end
+
+    elseif (event == "CHAT_MSG_ADDON") then
+        local prefix, messageFromAddon = ...;
+  --      MRT_Debug(prefix);
+        if prefix == "SFRT" then
+           MRT_Debug("SFRT: "..messageFromAddon);
         end
 
     elseif (event == "PLAYER_ENTERING_WORLD") then
@@ -585,8 +590,14 @@ function MRT_Initialize(frame)
     -- update version number in saved vars
     MRT_Options["General_Version"] = MRT_ADDON_VERSION;
     MRT_Options["General_ClientLocale"] = GetLocale();
+
+
+    C_ChatInfo.RegisterAddonMessagePrefix("SFRT")
+
+
     -- Finish
     MRT_Debug("Addon loaded.");
+
 end
 
 
@@ -1327,7 +1338,7 @@ function getPlayerClass(PlayerName)
     --take care of special assignments
     
     if (PlayerName == "bank") or (PlayerName == "disenchanted") then
-        MRT_Debug("getPlayerClass: bank or disenchanted player = " ..PlayerName);
+   --     MRT_Debug("getPlayerClass: bank or disenchanted player = " ..PlayerName);
         return PlayerName;
     end
     local realm = GetRealmName();
@@ -1336,7 +1347,7 @@ function getPlayerClass(PlayerName)
     MRT_Debug("getPlayerClass, player = " ..PlayerName);
     --check if player is in our playerdb
     if not nilcheckname then 
-        MRT_Debug("getPlayerClass, not in playerDB");
+     --   MRT_Debug("getPlayerClass, not in playerDB");
         return getPlayerClassFromGuildRoster(PlayerName);
     else
         --seen this person before, pull this from the PlayerDB
@@ -2132,6 +2143,12 @@ end
 function MRT_MakeEQDKP_Time(timestamp)
     return date("%m/%d/%y %H:%M:%S", timestamp)
 end
+
+function MRT_MakeEQDKP_TimeShort(timestamp)
+    return date("%H:%M:%S", timestamp)
+end
+
+
 
 function MRT_DeleteRaidLog()
     if (MRT_NumOfCurrentRaid) then

@@ -27,7 +27,6 @@
 if (not ClassicRaidTracker) then ClassicRaidTracker = {}; end
 local mrt = ClassicRaidTracker
 
-
 --------------
 --  Locals  --
 --------------
@@ -1181,6 +1180,8 @@ function RemoveAutoComplete(editbox)
 	editbox.buttonCount = nil;
 end
 function MRT_GUI_LootModify()
+
+    MRT_Debug("modifying loot");
 
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
@@ -2490,6 +2491,9 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     local raidnum;
     local indexofsub1;
     local indexofsub2;
+
+    C_ChatInfo.SendAddonMessage("SFRT", MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime())..": Updating the loot table!", "RAID");
+
     -- check if a raid is selected
     if (MRT_GUI_RaidLogTable:GetSelection()) then
         raidnum = MRT_GUI_RaidLogTable:GetCell(MRT_GUI_RaidLogTableSelection, 1);
@@ -2556,7 +2560,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
         MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_BossLootTitle"]);
     -- there is only a raidnum and no bossnum, list raid loot
     elseif (raidnum) then
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
+--        MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
         local index = 1;
 
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
@@ -2567,7 +2571,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
             classColor = "ff9d9d9d";
             local playerClass = getPlayerClass(v["Looter"]);   
             classColor = getClassColor(playerClass);      
-            MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition: looter: " ..v["Looter"] .."playerClass: "..playerClass..", classColor: " ..classColor);
+     --       MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition: looter: " ..v["Looter"] .."playerClass: "..playerClass..", classColor: " ..classColor);
             
             --GetDate 
             loottime = calculateLootTimeLeft(v["Time"])
@@ -2592,6 +2596,8 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                     end
                 end
             end
+
+            C_ChatInfo.SendAddonMessage("SFRT", MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime())..": "..v["ItemId"]..", "..v["ItemName"]..", "..v["Looter"], "RAID");
 
             if not filter then
                 if v["Looter"] == "unassigned" then
@@ -2624,9 +2630,9 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     table.sort(MRT_GUI_BossLootTableData, function(a, b) return (a[3] < b[3]); end);
     --MRT_GUI_BossLootTable:ClearSelection();
     if skipsort then 
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True about to call SetData");
+     --   MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True about to call SetData");
     else
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil about to call SetData");
+     --   MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil about to call SetData");
     end
     MRT_GUI_BossLootTable:SetData(MRT_GUI_BossLootTableData, true, skipsort);
     lastSelectedBossNum = bossnum;
