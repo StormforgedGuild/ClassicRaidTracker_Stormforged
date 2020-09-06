@@ -1504,13 +1504,21 @@ function MRT_GUI_LootRaidWinner()
     --local looter = string.upper(MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]);
     --local cost = MRT_GUI_BossLootTable:GetCell(loot_select, 5);
     -- old code local looter = string.upper(MRT_GUI_FourRowDialog_EB2:GetText());
-    local looter = string.upper(cleanString(MRT_GUI_FourRowDialog_EB2:GetText()));
+
+    local looter= MRT_GUI_FourRowDialog_EB2:GetText();
+    looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
+
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
     local lootName = MRT_GUI_FourRowDialog_EB1:GetText();
-    
+    local rwMessage;
+
     --"Congratz! %s receives %s for %sGP",   
     --local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
-    local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
+    if MRT_GUI_FourRowDialog_EB2:GetText()=="disenchanted" then 
+        rwMessage = string.format("%s is being turned into {diamond}{diamond}{diamond}", lootName);
+    else
+        rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
+    end
     SendChatMessage(rwMessage, "Raid");
 end
 
