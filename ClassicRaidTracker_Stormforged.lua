@@ -206,7 +206,8 @@ function MRT_OnEvent(frame, event, ...)
         end
 
     elseif (event == "CHAT_MSG_WHISPER") then
-        if (not MRT_TimerFrame.GARunning) then return false; end
+        --use this to handle latest PR request
+        --[[ if (not MRT_TimerFrame.GARunning) then return false; end
         local msg, from = ...;
         if ( MRT_Options["Attendance_GuildAttendanceCheckUseTrigger"] and (MRT_Options["Attendance_GuildAttendanceCheckTrigger"] == msg) ) then
             MRT_GuildAttendanceWhisper(from, from);
@@ -214,7 +215,9 @@ function MRT_OnEvent(frame, event, ...)
             local player = MRT_GuildRoster[string.lower(msg)];
             if (not player) then return; end
             MRT_GuildAttendanceWhisper(player, from);
-        end
+        end ]]
+        --Check to see if there is an active raid.  if not, do nothing.
+        ProcessWhisper(...);
 
     elseif (event == "CHAT_MSG_MONSTER_YELL") then
         if (not MRT_Options["General_MasterEnable"]) then return end;
@@ -324,7 +327,60 @@ function MRT_OnEvent(frame, event, ...)
 
     end
 end
-
+function ProcessWhisper(text, playerName)
+    --if text:gsub("^%s*(.-)%s*$", "%1") == AutoInviteSettings.AutoInviteKeyword then
+    local stext = text:gsub("^%s*(.-)%s*$", "%1")
+    local sCom = strsub(stext,1,3);
+    local sParams = strsub(stext,4)
+    MRT_Debug("Process Whisper: sCom: " ..sCom);
+    MRT_Debug("Process Whisper: sParams: " ..sParams);
+    if string.lower(sCom) == string.lower ("!PR") then
+        --SendChatMessage("What!?", "WHISPER",_ ,playerName);
+        if sParams == "?" then
+            SendChatMessage("usage: !PR? - Get help msg", "WHISPER",_ ,playerName);
+            SendChatMessage("usage: !PR:classname - filter by class (!PR:Warrior - returns warriors)", "WHISPER",_ ,playerName);
+            SendChatMessage("usage: !PR<character name> - filter by character (!PR moncholy - returns Moncholy's PR", "WHISPER",_ ,playerName);
+        else 
+            doPRReply(playerName, sParams);
+        end
+	end
+end
+function doPRReply(playerName)
+    local RaidAttendees = nil;
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    MRT_Debug("doPRReply: raid_select: " ..raid_select);
+    MRT_Debug("doPRReply: raidnum: " ..raidnum);
+    if (raid_select) and (raidnum) then 
+        RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, true)
+    end
+    local strMessage = "";
+    if (RaidAttendees) then 
+        SendChatMessage("Player Name ____PR", "WHISPER", _, playerName);
+        for i, v in ipairs(RaidAttendees) do
+            --MRT_Debug("doPRReply: i: " ..i);
+            strMessage = strMessage ..cleanString(v[2], true).." "..v[3];
+            --MRT_Debug("doPRReply:strMessage: "..strMessage);
+            strMessage = format2Table(strMessage);
+            SendChatMessage(strMessage, "WHISPER", _, playerName);
+            strMessage = "";
+        end
+    else
+        SendChatMessage("PR info not available", "WHISPER", _, playerName);
+    end
+end
+function format2Table(message)
+    local indexOfSpace = strfind(message," ");
+    local newString
+    local endString = strsub(message,indexOfSpace+1);
+    --start PR at 19.
+    newString = strsub(message,1,indexOfSpace);
+    for i = 1, (16 - indexOfSpace) do
+        newString = newString.."_"
+    end
+    newString = newString..endString;
+    return newString
+end 
 function MRT_PrintGR()
     local concatTable = "";
     for key, val in pairs(MRT_GuildRoster) do
@@ -548,7 +604,7 @@ function MRT_UpdateSavedOptions()
         end
     end
     if MRT_Options["General_OptionsVersion"] == 1 then
-        MRT_Options["Tracking_CreateNewRaidOnNewZone"] = true;
+        MRT_Options["Tracking_CreateNewRaidOnNewZone"] = false;
         MRT_Options["General_OptionsVersion"] = 2;
     end
     if MRT_Options["General_OptionsVersion"] == 2 then
@@ -1007,7 +1063,9 @@ function MRT_CheckZoneAndSizeStatus()
             return;
         end
         -- diffID not changed. If instance changed, check if auto create on new instance is on.
-        if ((MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= localInstanceInfoName) and MRT_Options["Tracking_CreateNewRaidOnNewZone"]) then
+        -- need to no do this 
+        --if ((MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= localInstanceInfoName) and MRT_Options["Tracking_CreateNewRaidOnNewZone"]) then
+        if ((MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= localInstanceInfoName) and false) then
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
             --SF: Use Short Name if it's Classic
             if not MRT_LegacyRaidZonesClassic[areaID] then

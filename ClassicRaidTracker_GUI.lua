@@ -62,6 +62,7 @@ local lootFilterHack = 0;
 local attendeeFilterHack = 0;
 local bAutoCompleteCreated = false;
 
+
 --tooltip for parsing loot time remaining
 local tooltipForParsing = CreateFrame("GameTooltip", "RCLootCouncil_Tooltip_Parse", nil, "GameTooltipTemplate")
 tooltipForParsing:UnregisterAllEvents() -- Don't use GameTooltip for parsing, because GameTooltip can be hooked by other addons.
@@ -1739,7 +1740,6 @@ function LootAnnounce(messageType, loot, gp)
                 tokenLootList = tokenLootList .."";
                 --MRT_Debug("LootAnnouce: tTokens[i]:NIL");
             end
-            
             if (i % 4) == 0 then
                 if i == 4 then 
                     rwMessage = string.format(MRT_L.GUI["RaidTokenMessage"], tokenLootList);
@@ -2188,7 +2188,7 @@ function MRT_GUI_RaidAttendeeResetFilter()
 end
 
 -- update raid attendees table
-function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
+function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
   --  MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate Called!");
     local MRT_GUI_RaidAttendeesTableData = {};
     local indexofsub
@@ -2260,6 +2260,12 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum,filter)
     --table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[5] > b[5]); end);
     --table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[5] > b[5]); end);
     MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
+    
+    if (dataonly) then
+        --return table
+        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
+        return MRT_GUI_RaidAttendeesTableData;
+    end
     table.sort(MRT_GUI_RaidAttendeesTableData, sortbyclassthenPR);
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
