@@ -1734,21 +1734,21 @@ function LootAnnounce(messageType, loot, gp)
             
             if (i % 4) == 0 then
                 if i == 4 then 
-                    rwMessage = string.format(MRT_L.GUI["RaidTokenMessage"], loot, tokenLootList);
+                    rwMessage = string.format(MRT_L.GUI["RaidTokenMessage"], tokenLootList);
                 else
                     rwMessage = string.format(MRT_L.GUI["RaidTokenMessageCont"], tokenLootList);
                 end
                 tokenLootList = "";
-                SendChatMessage(rwMessage, messageType);
+                SendChatMessage(rwMessage, "Raid");
             end
         end
         if tokenLootList ~= "" then
             if iCount < 4 then
-                rwMessage = string.format(MRT_L.GUI["RaidTokenMessage"], loot, tokenLootList);
+                rwMessage = string.format(MRT_L.GUI["RaidTokenMessage"], tokenLootList);
             else
                 rwMessage = string.format(MRT_L.GUI["RaidTokenMessageCont"], tokenLootList);
             end
-            SendChatMessage(rwMessage, messageType);
+            SendChatMessage(rwMessage, "Raid");
         end
     end
 end
