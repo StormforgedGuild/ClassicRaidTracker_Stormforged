@@ -342,8 +342,9 @@ function ProcessWhisper(text, playerName)
     if string.lower(sCom) == string.lower ("!PR") then
         --SendChatMessage("What!?", "WHISPER",_ ,playerName);
         if sParams == "?" then
-            SendChatMessage("usage: !PR ? - Get help msg", "WHISPER",_ ,playerName);
-            SendChatMessage("usage: !PR :classname - filter by class (!PR :Warrior - returns warriors)", "WHISPER",_ ,playerName);
+            SendChatMessage("usage: !PR - return your PR", "WHISPER",_ ,playerName);
+            SendChatMessage("usage: !PR :classname - filter by class (!PR :casters - returns casters :warrios - returns warriors)", "WHISPER",_ ,playerName);
+            SendChatMessage("usage: !PR :all - returns all in the raid, this call will be throttled", "WHISPER",_ ,playerName);
             SendChatMessage("usage: !PR <character name> - filter by character (!PR Moncholy - returns Moncholy's PR", "WHISPER",_ ,playerName);
         else
             doPRReply(playerName, sParams);
@@ -353,14 +354,41 @@ end
 function doPRReply(playerName, sParams)
     local RaidAttendees = nil;
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local filter = nil;
+    local raidnum;
     if (raid_select) then 
-        local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+        --MRT_Debug("doPRReply: raid_select: " .. raid_select);
+        raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+        --MRT_Debug("doPRReply: raidnum " ..raidnum);
     end 
-    local filter = sParams
+    local allIndex = substr(sParams, ":all")
+    if (allIndex) then
+        --strip out all, it's special for whisper
+        --MRT_Debug("doPRReply: stripping :all sParams: " ..sParams);
+        filter = strsub(sParams,1,allIndex-1)..strsub(sParams,allIndex+4);
+        --[[ if not filter then
+            MRT_Debug("doPRReply: stripping :filter: nil");
+        else     
+            MRT_Debug("doPRReply: stripping :filter: " ..filter);
+            MRT_Debug("doPRReply: stripping :len (filter): " ..strlen(filter));
+        end ]]
+    else
+        --MRT_Debug("doPRReply: default path");
+        filter = sParams    
+    end
+    if not(sParams) or sParams == "" then
+        --MRT_Debug("doPRReply: no sParam");
+        filter = playerName;
+    end
     --MRT_Debug("doPRReply: raid_select: " ..raid_select);
     --MRT_Debug("doPRReply: raidnum: " ..raidnum);
-    if (raid_select) and (raidnum) then 
+    
+    if (raidnum) then 
         RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, true)
+        --MRT_Debug("doPRReply: raidnum valid");
+        --[[ if (RaidAttendees) then
+            MRT_Debug("doPRReply: RaidAttendees returned");
+        end ]]
         table.sort(RaidAttendees, function (a, b)
             if a[3] > b[3] then
                     return true;
@@ -371,6 +399,7 @@ function doPRReply(playerName, sParams)
     end
     
     if (RaidAttendees) and table.maxn(RaidAttendees) > 0 then 
+        --MRT_Debug("doPRReply: RaidAttendee returned and count > 0");
         --SendChatMessage("Player Name PR", "WHISPER", _, playerName);
         local msgTable = {};
         --build table
@@ -388,14 +417,12 @@ function doPRReply(playerName, sParams)
             SendChatMessage(strMessage, "WHISPER", _, playerName);
             strMessage = "";
         end
-        
-
     else
-        SendChatMessage("PR info not available", "WHISPER", _, playerName);
+        SendChatMessage("PR info not available or player(s) not found.  !pr ? for help", "WHISPER", _, playerName);
     end
 end
 function getLargestStrLen(msgTable)
-    MRT_Debug("getLargestStrLen: Called!");
+    --MRT_Debug("getLargestStrLen: Called!");
     --return the largetst string length
     local largestLength = 0
     for i, v in ipairs(msgTable) do

@@ -2155,7 +2155,7 @@ function MRT_GUI_RaidLogTableUpdate()
 end
 
 function MRT_GUI_RaidAttendeeFilter()
-    MRT_Debug("MRT_GUI_RaidAttendeeFilter Called!");
+    --MRT_Debug("MRT_GUI_RaidAttendeeFilter Called!");
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local strText = MRT_GUIFrame_RaidAttendees_Filter:GetText();
@@ -2169,11 +2169,11 @@ function MRT_GUI_RaidAttendeeFilter()
 end
 
 function MRT_GUI_BossLootFilter()
-    MRT_Debug("MRT_GUI_BossLootFilter Called!");
+    --MRT_Debug("MRT_GUI_BossLootFilter Called!");
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local strText = MRT_GUIFrame_BossLoot_Filter:GetText();
-    MRT_Debug("MRT_GUI_BossLootFilter: strText = " ..strText);
+    --MRT_Debug("MRT_GUI_BossLootFilter: strText = " ..strText);
     if lootFilterHack > 0 then
         MRT_GUI_BossLootTableUpdate(nil, false, strText);
     else
