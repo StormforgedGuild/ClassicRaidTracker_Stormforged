@@ -353,7 +353,9 @@ end
 function doPRReply(playerName, sParams)
     local RaidAttendees = nil;
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    if (raid_select) then 
+        local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    end 
     local filter = sParams
     --MRT_Debug("doPRReply: raid_select: " ..raid_select);
     --MRT_Debug("doPRReply: raidnum: " ..raidnum);
@@ -372,7 +374,7 @@ function doPRReply(playerName, sParams)
         --SendChatMessage("Player Name PR", "WHISPER", _, playerName);
         local msgTable = {};
         --build table
-        tinsert(msgTable, "PlayerName PR");
+        tinsert(msgTable, "Player PR");
         for i, v in ipairs(RaidAttendees) do
             tinsert(msgTable, cleanString(v[2], true).." "..v[3]);
         end
@@ -412,14 +414,26 @@ function format2Table(message, largeLength)
     local endString = strsub(message,indexOfSpace+1);
     --start PR at largestLength
     newString = strsub(message,1,indexOfSpace);
-    local newlength = ((largeLength* 3.14) - (strlen(message)*.85)) *.75
-    --MRT_Debug("format2Table: newlength : " ..newlength);
-    for i = 1, (newlength - indexOfSpace) do
+    --local newlength = ((largeLength* 3.14) - (strlen(message)*.85)) *.75
+    local dotlen = largeLength - strlen(endString) - strlen(newString)
+
+    
+    --[[ for i = 1, (newlength - indexOfSpace) do
         newString = newString.."."
+    end ]]
+    dotlen = dotlen + (countLetters(newString, "i")*4) + (countLetters(newString, "l") *5) + countLetters(newString, "t") + countLetters(newString, "r") - (countLetters(newString, "W")*2) - countLetters(newString, "w") - (countLetters(newString, "M")*2) - (countLetters(newString, "m")*2)
+    for i = 1, dotlen do
+        newString = newString..".";
     end
     newString = newString..endString;
+    --MRT_Debug("format2Table: newString: " ..newString .. " len(newString) : " ..strlen(newString));
+    --MRT_Debug("format2Table: dotlen : " ..dotlen);
     return newString
 end 
+
+function countLetters(base, pattern)
+    return select(2, string.gsub(base, pattern, ""))
+end
 function MRT_PrintGR()
     local concatTable = "";
     for key, val in pairs(MRT_GuildRoster) do

@@ -2246,7 +2246,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
                         
                         classColor = getClassColor(v["Class"]); 
 
-                --        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                --      MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
                         MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
                         index = index + 1;
                     end
@@ -2254,11 +2254,11 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
             end
         end
     else
-        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == false");
+        --MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == false");
     end
     --table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[5] > b[5]); end);
     --table.sort(MRT_GUI_RaidAttendeesTableData, function(a, b) return (a[5] > b[5]); end);
-    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
+    --MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
     
     if (dataonly) then
         --return table
@@ -2298,7 +2298,7 @@ function parseFilter(strText)
 end
 
 function parseFilter4Classes(strText)
-    MRT_Debug("parseFilter4Classes called!");
+    --MRT_Debug("parseFilter4Classes called!");
     classFilters = {}
     local retVal = string.gsub(strText, " ", "")
     --MRT_Debug("parseFilter4Classes retVal == "..retVal);
@@ -2323,7 +2323,7 @@ function isClassinClassFilter(class, classFilter)
     if (not strClass) or (strClass == "") then
         strClass = "Unknown";
     end
-    MRT_Debug("isClassinClassFilter");
+    --MRT_Debug("isClassinClassFilter");
     for i, v in pairs(classFilter) do
         --MRT_Debug("isClassinClassFilter:class == " ..strClass);
         --MRT_Debug("isClassinClassFilter:v == " ..v);
@@ -2481,9 +2481,9 @@ end
 -- update bossloot table
 function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     if skipsort then 
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True");
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True");
     else
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil ");
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil ");
     end
     local MRT_GUI_BossLootTableData = {};
     local raidnum;
