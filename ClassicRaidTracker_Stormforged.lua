@@ -337,8 +337,8 @@ function ProcessWhisper(text, playerName)
     local stext = text:gsub("^%s*(.-)%s*$", "%1")
     local sCom = strsub(stext,1,4);
     local sParams = strsub(stext,6)
-    MRT_Debug("Process Whisper: sCom: " ..sCom);
-    MRT_Debug("Process Whisper: sParams: " ..sParams);
+    --MRT_Debug("Process Whisper: sCom: " ..sCom);
+    --MRT_Debug("Process Whisper: sParams: " ..sParams);
     if string.lower(sCom) == string.lower ("epgp") then
         --SendChatMessage("What!?", "WHISPER",_ ,playerName);
         if sParams == "?" then
@@ -350,23 +350,22 @@ function ProcessWhisper(text, playerName)
         else
             doPRReply(playerName, sParams);
         end
-
-        --epgp healers (or melee/casters)
-        --epgp druids (or warriors/hunters, etc...)
-        --epgp scrapper (or hokie/moncholyg, etc...)
-        --epgp all
 	end
 end
 function doPRReply(playerName, sParams)
     local RaidAttendees = nil;
-    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local raid_select = nil;
     local filter = nil;
     local raidnum;
-    if (raid_select) then 
+    --MRT_Debug("Process Whisper: MRT_NumOFCurrentRaid: " ..MRT_NumOfCurrentRaid);
+    if not(MRT_NumOfCurrentRaid) then
+        raid_select = MRT_GUI_RaidLogTable:GetSelection();
         --MRT_Debug("doPRReply: raid_select: " .. raid_select);
         raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-        --MRT_Debug("doPRReply: raidnum " ..raidnum);
-    end 
+    else
+        raidnum = MRT_NumOfCurrentRaid
+    end
+    MRT_Debug("doPRReply: raidnum " ..raidnum);
     local allIndex = substr(sParams, "all")
     
     if (allIndex) then
@@ -388,7 +387,10 @@ function doPRReply(playerName, sParams)
     end
     if not(sParams) or sParams == "" then
         --MRT_Debug("doPRReply: no sParam");
-        filter = playerName;
+        --strip off realmname from player
+
+        filter = strsub(playerName, 1, substr(playerName, "-")-1);
+        --MRT_Debug("doPRReply: filter: "  ..filter.. " strlen(filter): " ..strlen(filter));
     end
     --MRT_Debug("doPRReply: raid_select: " ..raid_select);
     --MRT_Debug("doPRReply: raidnum: " ..raidnum);
@@ -421,8 +423,8 @@ function doPRReply(playerName, sParams)
         --send tell
         for i, v in ipairs(msgTable) do
             local strMessage
-            --MRT_Debug("doPRReply: i: " ..i);
-            --MRT_Debug("doPRReply: v: "..v);
+            MRT_Debug("doPRReply: i: " ..i);
+            MRT_Debug("doPRReply: v: "..v);
             strMessage = format2Table(v, largestLen);
             SendChatMessage(strMessage, "WHISPER", _, playerName);
             strMessage = "";
@@ -468,7 +470,6 @@ function applyFilterSyntax(sText)
     }
     local retVal;
     retVal = filtertype[string.lower(sText)];
-
     if retVal then
         return retVal;
     else
