@@ -2490,7 +2490,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     local indexofsub1;
     local indexofsub2;
 
-    C_ChatInfo.SendAddonMessage("SFRT", MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime())..": Updating the loot table!", "RAID");
+  --  C_ChatInfo.SendAddonMessage("SFRT", MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime())..": Updating the loot table!", "RAID");
 
     -- check if a raid is selected
     if (MRT_GUI_RaidLogTable:GetSelection()) then
@@ -2595,7 +2595,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 end
             end
 
-            C_ChatInfo.SendAddonMessage("SFRT", MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime())..": "..v["ItemId"]..", "..v["ItemName"]..", "..v["Looter"], "RAID");
+          --  C_ChatInfo.SendAddonMessage("SFRT", MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime())..": "..v["ItemId"]..", "..v["ItemName"]..", "..v["Looter"], "RAID");
 
             if not filter then
                 if v["Looter"] == "unassigned" then

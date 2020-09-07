@@ -667,7 +667,7 @@ function MRT_Initialize(frame)
     MRT_Options["General_ClientLocale"] = GetLocale();
 
 
-    C_ChatInfo.RegisterAddonMessagePrefix("SFRT")
+   -- C_ChatInfo.RegisterAddonMessagePrefix("SFRT")
 
 
     -- Finish
