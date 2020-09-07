@@ -1344,7 +1344,7 @@ function getPlayerClass(PlayerName)
     local realm = GetRealmName();
     local nilcheckname = MRT_PlayerDB[realm][PlayerName]
     local cName;
-    MRT_Debug("getPlayerClass, player = " ..PlayerName);
+    --MRT_Debug("getPlayerClass, player = " ..PlayerName);
     --check if player is in our playerdb
     if not nilcheckname then 
      --   MRT_Debug("getPlayerClass, not in playerDB");

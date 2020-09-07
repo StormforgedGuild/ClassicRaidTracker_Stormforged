@@ -680,10 +680,10 @@ do
 		self.data = data;
 		--SF: skipsort so that we don't do goofy sort
 		if (skipsort == nil) or (not skipsort) then
-			MRT_Debug("STSetData: skipsort == false ");
+			--MRT_Debug("STSetData: skipsort == false ");
 			self:SortData();
 		else 
-			MRT_Debug("STSetData: skipsort ==True ");
+			--MRT_Debug("STSetData: skipsort ==True ");
 			self:Refresh();
 		end
 	end

@@ -233,12 +233,12 @@ end
 ---------------------------------------------------------------
 
 function isDirty (strLooter, strValue, strNote, strOS)
-    MRT_Debug("isDirty fired!");
+    --MRT_Debug("isDirty fired!");
     if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) and (strOS == lastOS) then
-        MRT_Debug("isDirty = false");
+        --MRT_Debug("isDirty = false");
         return false;
     else
-        MRT_Debug("isDirty = true");
+        --MRT_Debug("isDirty = true");
         return true;
     end
 end
@@ -1181,8 +1181,6 @@ function RemoveAutoComplete(editbox)
 end
 function MRT_GUI_LootModify()
 
-    MRT_Debug("modifying loot");
-
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1278,17 +1276,17 @@ function MRT_GUI_LootModify()
 
     --MRT_GUI_FourRowDialog_EB2:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 4));
     local cleanlooter = MRT_GUI_BossLootTable:GetCell(loot_select, 4)
-    MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean "..cleanlooter);
-    MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean strlen "..strlen(cleanlooter));
+    --MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean "..cleanlooter);
+    --MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean strlen "..strlen(cleanlooter));
     local debuggingprestr = string.sub(cleanlooter,1,2);
     local debuggingpoststr = string.sub(cleanlooter,strlen(cleanlooter)-2, 2);
-    MRT_Debug("MRT_GUI_LootModify: cleanLooter:debuggingprestr "..debuggingprestr);
-    MRT_Debug("MRT_GUI_LootModify: cleanLooter:debuggingpoststr "..debuggingpoststr);
-    MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean strlen "..strlen(cleanlooter));
-    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(cleanlooter,true));
+    --MRT_Debug("MRT_GUI_LootModify: cleanLooter:debuggingprestr "..debuggingprestr);
+    --MRT_Debug("MRT_GUI_LootModify: cleanLooter:debuggingpoststr "..debuggingpoststr);
+    --MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean strlen "..strlen(cleanlooter));
+    --MRT_GUI_FourRowDialog_EB2:SetText(cleanString(cleanlooter,true));
     lastLooter = MRT_GUI_FourRowDialog_EB2:GetText();
-    MRT_Debug("MRT_GUI_LootModify: lastLooter: afterclean "..lastLooter);
-    MRT_Debug("MRT_GUI_LootModify: lastLooter: afterclean strlen "..strlen(lastLooter));
+    --MRT_Debug("MRT_GUI_LootModify: lastLooter: afterclean "..lastLooter);
+    --MRT_Debug("MRT_GUI_LootModify: lastLooter: afterclean strlen "..strlen(lastLooter));
     
     MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
     MRT_GUI_FourRowDialog_EB3:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 5));
@@ -1305,7 +1303,7 @@ function MRT_GUI_LootModify()
         MRT_Debug("MRT_GUI_LootModify: lastOS = False");
     end
     lastValue = MRT_GUI_FourRowDialog_EB3:GetText();
-    MRT_Debug("MRT_GUI_LootModify: lastValue: "..lastValue);
+    --MRT_Debug("MRT_GUI_LootModify: lastValue: "..lastValue);
     MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
     if (lootnote == nil or lootnote == "" or lootnote == " ") then
         MRT_GUI_FourRowDialog_EB4:SetText("");
