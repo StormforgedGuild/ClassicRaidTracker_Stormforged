@@ -313,7 +313,7 @@ function MRT_GUI_ParseValues()
             MRT_Debug("Doubleclick fired!");
             if MRT_GUI_FourRowDialog:IsVisible() then
                 if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked()) then
-                    MRT_Debug("STOnDoubleClick: isDirty == True");
+                    --MRT_Debug("STOnDoubleClick: isDirty == True");
                     local error = false;
                     error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                     if error then
@@ -324,17 +324,17 @@ function MRT_GUI_ParseValues()
                 end
                 MRT_GUI_LootModify();
             else
-                MRT_Debug("in false condition");
+                --MRT_Debug("in false condition");
                 MRT_GUI_LootModify();
             end;
         end,
         ["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, ...)
-            MRT_Debug("MRT_BoosLootTable:Onclick fired!");
+            --MRT_Debug("MRT_BoosLootTable:Onclick fired!");
             donotdeselect = false;
             doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, true, false)  --passing true so that we don't deselect in the loot table.
             if MRT_GUI_FourRowDialog:IsVisible() then
                 if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked()) then
-                    MRT_Debug("STOnClick: isDirty == True");
+                    --MRT_Debug("STOnClick: isDirty == True");
                     local error = false;
                     error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
                     if error then
@@ -2196,7 +2196,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
         checkFilter = MRT_GUIFrame_RaidAttendees_Filter:GetText();
     end
     if (raidnum) then
-        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == true");
+        --MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == true");
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
             classColor = "ff9d9d9d";
@@ -2264,7 +2264,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
         --return table
         return MRT_GUI_RaidAttendeesTableData;
     end
-    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
+    --MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
     table.sort(MRT_GUI_RaidAttendeesTableData, sortbyclassthenPR);
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
@@ -2301,17 +2301,17 @@ function parseFilter4Classes(strText)
     MRT_Debug("parseFilter4Classes called!");
     classFilters = {}
     local retVal = string.gsub(strText, " ", "")
-    MRT_Debug("parseFilter4Classes retVal == "..retVal);
+    --MRT_Debug("parseFilter4Classes retVal == "..retVal);
     if string.len(retVal) > 3 and substr(strText,":") then
         for i in string.gmatch(retVal, "%a+") do
-            MRT_Debug("parseFilter4Classes i == "..i);
+            --MRT_Debug("parseFilter4Classes i == "..i);
             table.insert(classFilters, i);
         end
         if table.maxn(classFilters) > 0 then
-            MRT_Debug("parseFilter4Classes:classFilters true");
+            --MRT_Debug("parseFilter4Classes:classFilters true");
             return classFilters, true;
         else
-            MRT_Debug("parseFilter4Classes:classFilters false");
+            --MRT_Debug("parseFilter4Classes:classFilters false");
             return strText, false;
         end 
     else
@@ -2325,8 +2325,8 @@ function isClassinClassFilter(class, classFilter)
     end
     MRT_Debug("isClassinClassFilter");
     for i, v in pairs(classFilter) do
-        MRT_Debug("isClassinClassFilter:class == " ..strClass);
-        MRT_Debug("isClassinClassFilter:v == " ..v);
+        --MRT_Debug("isClassinClassFilter:class == " ..strClass);
+        --MRT_Debug("isClassinClassFilter:v == " ..v);
         if string.lower(v) == string.lower(strClass) then
             return true;
         end
@@ -2334,7 +2334,7 @@ function isClassinClassFilter(class, classFilter)
     return false;
 end 
 function check4GroupFilters(classFilter)
-    MRT_Debug("check4GroupFilters: called!");
+    --MRT_Debug("check4GroupFilters: called!");
 
     local sgroupFilters = {
         ["healer"] = {"druid", "paladin", "priest"},
@@ -2351,7 +2351,7 @@ function check4GroupFilters(classFilter)
         if (tblGroupFilter) then
             --add the list into the classFilter
             for i1, v1 in pairs(tblGroupFilter) do
-                MRT_Debug("check4GroupFilters: called!");
+                --MRT_Debug("check4GroupFilters: called!");
                 table.insert(oclassFilter,v1)
             end
         end

@@ -337,8 +337,8 @@ function ProcessWhisper(text, playerName)
     local stext = text:gsub("^%s*(.-)%s*$", "%1")
     local sCom = strsub(stext,1,3);
     local sParams = strsub(stext,5)
-    MRT_Debug("Process Whisper: sCom: " ..sCom);
-    MRT_Debug("Process Whisper: sParams: " ..sParams);
+    --MRT_Debug("Process Whisper: sCom: " ..sCom);
+    --MRT_Debug("Process Whisper: sParams: " ..sParams);
     if string.lower(sCom) == string.lower ("!PR") then
         --SendChatMessage("What!?", "WHISPER",_ ,playerName);
         if sParams == "?" then
@@ -355,8 +355,8 @@ function doPRReply(playerName, sParams)
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local filter = sParams
-    MRT_Debug("doPRReply: raid_select: " ..raid_select);
-    MRT_Debug("doPRReply: raidnum: " ..raidnum);
+    --MRT_Debug("doPRReply: raid_select: " ..raid_select);
+    --MRT_Debug("doPRReply: raidnum: " ..raidnum);
     if (raid_select) and (raidnum) then 
         RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, true)
         table.sort(RaidAttendees, function (a, b)
@@ -380,8 +380,8 @@ function doPRReply(playerName, sParams)
         --send tell
         for i, v in ipairs(msgTable) do
             local strMessage
-            MRT_Debug("doPRReply: i: " ..i);
-            MRT_Debug("doPRReply: v: "..v);
+            --MRT_Debug("doPRReply: i: " ..i);
+            --MRT_Debug("doPRReply: v: "..v);
             strMessage = format2Table(v, largestLen);
             SendChatMessage(strMessage, "WHISPER", _, playerName);
             strMessage = "";
@@ -403,7 +403,7 @@ function getLargestStrLen(msgTable)
             largestLength = strlen(v);
         end
     end
-    MRT_Debug("getLargestStrLen: largestLength: " ..largestLength);
+    --MRT_Debug("getLargestStrLen: largestLength: " ..largestLength);
     return largestLength;
 end
 function format2Table(message, largeLength)
@@ -413,7 +413,7 @@ function format2Table(message, largeLength)
     --start PR at largestLength
     newString = strsub(message,1,indexOfSpace);
     local newlength = ((largeLength* 3.14) - (strlen(message)*.85)) *.75
-    MRT_Debug("format2Table: newlength : " ..newlength);
+    --MRT_Debug("format2Table: newlength : " ..newlength);
     for i = 1, (newlength - indexOfSpace) do
         newString = newString.."."
     end
@@ -425,7 +425,7 @@ function MRT_PrintGR()
     for key, val in pairs(MRT_GuildRoster) do
         concatTable = concatTable..val..", ";
     end
-    MRT_Debug(concatTable);
+    --MRT_Debug(concatTable);
 end
 
 -- Combatlog handler
