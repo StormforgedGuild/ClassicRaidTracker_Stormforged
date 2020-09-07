@@ -335,20 +335,26 @@ end
 function ProcessWhisper(text, playerName)
     --if text:gsub("^%s*(.-)%s*$", "%1") == AutoInviteSettings.AutoInviteKeyword then
     local stext = text:gsub("^%s*(.-)%s*$", "%1")
-    local sCom = strsub(stext,1,3);
-    local sParams = strsub(stext,5)
-    --MRT_Debug("Process Whisper: sCom: " ..sCom);
-    --MRT_Debug("Process Whisper: sParams: " ..sParams);
-    if string.lower(sCom) == string.lower ("!PR") then
+    local sCom = strsub(stext,1,4);
+    local sParams = strsub(stext,6)
+    MRT_Debug("Process Whisper: sCom: " ..sCom);
+    MRT_Debug("Process Whisper: sParams: " ..sParams);
+    if string.lower(sCom) == string.lower ("epgp") then
         --SendChatMessage("What!?", "WHISPER",_ ,playerName);
         if sParams == "?" then
-            SendChatMessage("usage: !PR - return your PR", "WHISPER",_ ,playerName);
-            SendChatMessage("usage: !PR :classname - filter by class (!PR :casters - returns casters :warrios - returns warriors)", "WHISPER",_ ,playerName);
-            SendChatMessage("usage: !PR :all - returns all in the raid, this call will be throttled", "WHISPER",_ ,playerName);
-            SendChatMessage("usage: !PR <character name> - filter by character (!PR Moncholy - returns Moncholy's PR", "WHISPER",_ ,playerName);
+            SendChatMessage("usage: epgp (return your PR)", "WHISPER",_ ,playerName);
+            SendChatMessage("epgp healers (or melee/casters)", "WHISPER",_ ,playerName);
+            SendChatMessage("epgp druids (or warriors/hunters, etc...)", "WHISPER",_ ,playerName);
+            SendChatMessage("epgp scrapper (or hokie/moncholyg, etc...)", "WHISPER",_ ,playerName);
+            SendChatMessage("epgp all (this might be throttled)", "WHISPER",_ ,playerName);
         else
             doPRReply(playerName, sParams);
         end
+
+        --epgp healers (or melee/casters)
+        --epgp druids (or warriors/hunters, etc...)
+        --epgp scrapper (or hokie/moncholyg, etc...)
+        --epgp all
 	end
 end
 function doPRReply(playerName, sParams)
@@ -361,11 +367,13 @@ function doPRReply(playerName, sParams)
         raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
         --MRT_Debug("doPRReply: raidnum " ..raidnum);
     end 
-    local allIndex = substr(sParams, ":all")
+    local allIndex = substr(sParams, "all")
+    
     if (allIndex) then
         --strip out all, it's special for whisper
         --MRT_Debug("doPRReply: stripping :all sParams: " ..sParams);
-        filter = strsub(sParams,1,allIndex-1)..strsub(sParams,allIndex+4);
+        local allGone = strsub(sParams,1,allIndex-1)..strsub(sParams,allIndex+4);
+        filter = applyFilterSyntax(allGone)
         --[[ if not filter then
             MRT_Debug("doPRReply: stripping :filter: nil");
         else     
@@ -374,7 +382,9 @@ function doPRReply(playerName, sParams)
         end ]]
     else
         --MRT_Debug("doPRReply: default path");
-        filter = sParams    
+        --TODOif we see a class name or class group, add a ":"
+
+        filter = applyFilterSyntax(sParams)
     end
     if not(sParams) or sParams == "" then
         --MRT_Debug("doPRReply: no sParam");
@@ -405,7 +415,7 @@ function doPRReply(playerName, sParams)
         --build table
         tinsert(msgTable, "Player PR");
         for i, v in ipairs(RaidAttendees) do
-            tinsert(msgTable, cleanString(v[2], true).." "..v[3]);
+            tinsert(msgTable, cleanString(v[2], true).." "..cleanPR(v[3]));
         end
         local largestLen = getLargestStrLen(msgTable);
         --send tell
@@ -418,9 +428,54 @@ function doPRReply(playerName, sParams)
             strMessage = "";
         end
     else
-        SendChatMessage("PR info not available or player(s) not found.  !pr ? for help", "WHISPER", _, playerName);
+        SendChatMessage("PR info not available or player(s) not found.  epgp ? for help", "WHISPER", _, playerName);
     end
 end
+function cleanPR (PR)
+    if PR == "0.00" then
+        return "0"
+    else 
+        return PR
+    end 
+
+end 
+function applyFilterSyntax(sText)
+    local filtertype = {
+        ["warrior"] = ":warrior",
+        ["warriors"] = ":warrior",
+        ["priest"] = ":priest",
+        ["priests"] = ":priest",
+        ["warlock"] = ":warlock",
+        ["warlocks"] = ":warlock",
+        ["druid"] = ":druid",
+        ["druids"] = ":druid",
+        ["hunter"] = ":hunter",
+        ["hunters"] = ":hunter",
+        ["rogue"] = ":rogue",
+        ["rogues"] = ":rogue",
+        ["paladin"] = ":paladin",
+        ["paladins"] = ":paladin",
+        ["mage"] = ":mage",
+        ["mages"] = ":mage",
+        ["shaman"] = ":shaman",
+        ["shamans"] = ":shaman",
+        ["healer"] = ":healer",
+        ["healers"] = ":healers",
+        ["caster"] = ":caster",
+        ["casters"] = ":casters",
+        ["ranged"] = ":ranged",
+        ["melee"] = ":melee",
+    }
+    local retVal;
+    retVal = filtertype[string.lower(sText)];
+
+    if retVal then
+        return retVal;
+    else
+        return sText;
+    end
+end
+
 function getLargestStrLen(msgTable)
     --MRT_Debug("getLargestStrLen: Called!");
     --return the largetst string length
@@ -573,7 +628,16 @@ end
 -- Chat handler
 local MRT_ChatHandler = {};
 function MRT_ChatHandler:CHAT_MSG_WHISPER_Filter(event, msg, from, ...)
-    if (not MRT_TimerFrame.GARunning) then return false; end
+    --keeping next line to test
+    local sCom = strsub(msg,1,4);
+    MRT_Debug("Message filtered... ");
+    --if (not MRT_TimerFrame.GARunning) then return false; end
+
+    if sCom == "epgp" then
+        return true
+    else
+        return false
+    end
     if ( MRT_Options["Attendance_GuildAttendanceCheckUseTrigger"] and (MRT_Options["Attendance_GuildAttendanceCheckTrigger"] == msg) ) then
         MRT_Debug("Message filtered... - Msg was '"..msg.."' from '"..from.."'");
         return true;
@@ -1223,6 +1287,8 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
     end);
     -- update LDB text and icon
     MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_enabled";
+
+    --send message to chatchannel with new raid info serialize MRT_RaidInfo
 end
 
 function MRT_ResumeLastRaid()
