@@ -336,52 +336,86 @@ function ProcessWhisper(text, playerName)
     --if text:gsub("^%s*(.-)%s*$", "%1") == AutoInviteSettings.AutoInviteKeyword then
     local stext = text:gsub("^%s*(.-)%s*$", "%1")
     local sCom = strsub(stext,1,3);
-    local sParams = strsub(stext,4)
+    local sParams = strsub(stext,5)
     MRT_Debug("Process Whisper: sCom: " ..sCom);
     MRT_Debug("Process Whisper: sParams: " ..sParams);
     if string.lower(sCom) == string.lower ("!PR") then
         --SendChatMessage("What!?", "WHISPER",_ ,playerName);
         if sParams == "?" then
-            SendChatMessage("usage: !PR? - Get help msg", "WHISPER",_ ,playerName);
-            SendChatMessage("usage: !PR:classname - filter by class (!PR:Warrior - returns warriors)", "WHISPER",_ ,playerName);
-            SendChatMessage("usage: !PR<character name> - filter by character (!PR moncholy - returns Moncholy's PR", "WHISPER",_ ,playerName);
-        else 
+            SendChatMessage("usage: !PR ? - Get help msg", "WHISPER",_ ,playerName);
+            SendChatMessage("usage: !PR :classname - filter by class (!PR :Warrior - returns warriors)", "WHISPER",_ ,playerName);
+            SendChatMessage("usage: !PR <character name> - filter by character (!PR Moncholy - returns Moncholy's PR", "WHISPER",_ ,playerName);
+        else
             doPRReply(playerName, sParams);
         end
 	end
 end
-function doPRReply(playerName)
+function doPRReply(playerName, sParams)
     local RaidAttendees = nil;
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local filter = sParams
     MRT_Debug("doPRReply: raid_select: " ..raid_select);
     MRT_Debug("doPRReply: raidnum: " ..raidnum);
     if (raid_select) and (raidnum) then 
         RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, true)
+        table.sort(RaidAttendees, function (a, b)
+            if a[3] > b[3] then
+                    return true;
+            else
+                    return false;
+            end
+        end)
     end
-    local strMessage = "";
-    if (RaidAttendees) then 
-        SendChatMessage("Player Name ____PR", "WHISPER", _, playerName);
+    
+    if (RaidAttendees) and table.maxn(RaidAttendees) > 0 then 
+        --SendChatMessage("Player Name PR", "WHISPER", _, playerName);
+        local msgTable = {};
+        --build table
+        tinsert(msgTable, "PlayerName PR");
         for i, v in ipairs(RaidAttendees) do
-            --MRT_Debug("doPRReply: i: " ..i);
-            strMessage = strMessage ..cleanString(v[2], true).." "..v[3];
-            --MRT_Debug("doPRReply:strMessage: "..strMessage);
-            strMessage = format2Table(strMessage);
+            tinsert(msgTable, cleanString(v[2], true).." "..v[3]);
+        end
+        local largestLen = getLargestStrLen(msgTable);
+        --send tell
+        for i, v in ipairs(msgTable) do
+            local strMessage
+            MRT_Debug("doPRReply: i: " ..i);
+            MRT_Debug("doPRReply: v: "..v);
+            strMessage = format2Table(v, largestLen);
             SendChatMessage(strMessage, "WHISPER", _, playerName);
             strMessage = "";
         end
+        
+
     else
         SendChatMessage("PR info not available", "WHISPER", _, playerName);
     end
 end
-function format2Table(message)
+function getLargestStrLen(msgTable)
+    MRT_Debug("getLargestStrLen: Called!");
+    --return the largetst string length
+    local largestLength = 0
+    for i, v in ipairs(msgTable) do
+        --MRT_Debug("getLargestStrLen: i: " ..i);
+        --MRT_Debug("getLargestStrLen: v: "..v);
+        if strlen(v) > largestLength then
+            largestLength = strlen(v);
+        end
+    end
+    MRT_Debug("getLargestStrLen: largestLength: " ..largestLength);
+    return largestLength;
+end
+function format2Table(message, largeLength)
     local indexOfSpace = strfind(message," ");
     local newString
     local endString = strsub(message,indexOfSpace+1);
-    --start PR at 19.
+    --start PR at largestLength
     newString = strsub(message,1,indexOfSpace);
-    for i = 1, (16 - indexOfSpace) do
-        newString = newString.."_"
+    local newlength = ((largeLength* 3.14) - (strlen(message)*.85)) *.75
+    MRT_Debug("format2Table: newlength : " ..newlength);
+    for i = 1, (newlength - indexOfSpace) do
+        newString = newString.."."
     end
     newString = newString..endString;
     return newString

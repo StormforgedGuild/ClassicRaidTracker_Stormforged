@@ -2264,9 +2264,9 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
     
     if (dataonly) then
         --return table
-        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
         return MRT_GUI_RaidAttendeesTableData;
     end
+    MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
     table.sort(MRT_GUI_RaidAttendeesTableData, sortbyclassthenPR);
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
@@ -2300,20 +2300,20 @@ function parseFilter(strText)
 end
 
 function parseFilter4Classes(strText)
-    --MRT_Debug("parseFilter4Classes called!");
+    MRT_Debug("parseFilter4Classes called!");
     classFilters = {}
     local retVal = string.gsub(strText, " ", "")
-    --MRT_Debug("parseFilter4Classes retVal == "..retVal);
-    if string.len(retVal) > 3 then
+    MRT_Debug("parseFilter4Classes retVal == "..retVal);
+    if string.len(retVal) > 3 and substr(strText,":") then
         for i in string.gmatch(retVal, "%a+") do
             MRT_Debug("parseFilter4Classes i == "..i);
             table.insert(classFilters, i);
         end
         if table.maxn(classFilters) > 0 then
-            --MRT_Debug("parseFilter4Classes:classFilters true");
+            MRT_Debug("parseFilter4Classes:classFilters true");
             return classFilters, true;
         else
-            --MRT_Debug("parseFilter4Classes:classFilters false");
+            MRT_Debug("parseFilter4Classes:classFilters false");
             return strText, false;
         end 
     else
