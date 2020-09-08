@@ -256,7 +256,7 @@ function MRT_OnEvent(frame, event, ...)
         local prefix, messageFromAddon = ...;
   --      MRT_Debug(prefix);
         if prefix == "SFRT" then
-           MRT_Debug("SFRT: "..messageFromAddon);
+           --MRT_Debug("SFRT: "..messageFromAddon);
         end
 
     elseif (event == "PLAYER_ENTERING_WORLD") then
@@ -332,6 +332,7 @@ function MRT_OnEvent(frame, event, ...)
 
     end
 end
+local SupressMsg = {}
 function ProcessWhisper(text, playerName)
     --if text:gsub("^%s*(.-)%s*$", "%1") == AutoInviteSettings.AutoInviteKeyword then
     local stext = text:gsub("^%s*(.-)%s*$", "%1")
@@ -340,13 +341,30 @@ function ProcessWhisper(text, playerName)
     --MRT_Debug("Process Whisper: sCom: " ..sCom);
     --MRT_Debug("Process Whisper: sParams: " ..sParams);
     if string.lower(sCom) == string.lower ("epgp") then
-        --SendChatMessage("What!?", "WHISPER",_ ,playerName);
+        --SendChatMessage("What!?", "WHISPER",nil ,playerName);
         if sParams == "?" then
-            SendChatMessage("usage: epgp (return your PR)", "WHISPER",_ ,playerName);
-            SendChatMessage("epgp healers (or melee/casters)", "WHISPER",_ ,playerName);
-            SendChatMessage("epgp druids (or warriors/hunters, etc...)", "WHISPER",_ ,playerName);
-            SendChatMessage("epgp scrapper (or hokie/moncholyg, etc...)", "WHISPER",_ ,playerName);
-            SendChatMessage("epgp all (this might be throttled)", "WHISPER",_ ,playerName);
+            local sendMsg = "usage: epgp (return your PR)"
+            --MRT_ChatHandler.MsgToBlock = sendMsg;
+            tinsert(SupressMsg, sendMsg);
+            SendChatMessage(sendMsg, "WHISPER", nil, playerName);
+            --MRT_ChatHandler.MsgToBlock = sendMsg;
+            tinsert(SupressMsg, sendMsg);
+            sendMsg = "usage: epgp healers (or melee/casters)"
+            SendChatMessage(sendMsg, "WHISPER", nil, playerName);
+            --MRT_ChatHandler.MsgToBlock = sendMsg;
+            tinsert(SupressMsg, sendMsg);
+            sendMsg = "usage: epgp druids (or warriors/hunters, etc...)"
+            SendChatMessage(sendMsg, "WHISPER", nil, playerName);
+            --MRT_ChatHandler.MsgToBlock = sendMsg;
+            tinsert(SupressMsg, sendMsg);
+            sendMsg = "usage: epgp scrapper (or hokie/moncholyg, etc...)"
+            SendChatMessage(sendMsg, "WHISPER", nil, playerName);
+            --MRT_ChatHandler.MsgToBlock = sendMsg;
+            tinsert(SupressMsg, sendMsg);
+            sendMsg = "usage: epgp all (this might be throttled)"
+            SendChatMessage(sendMsg, "WHISPER",nil , playerName);
+            --MRT_ChatHandler.MsgToBlock = sendMsg;
+            tinsert(SupressMsg, sendMsg);
         else
             doPRReply(playerName, sParams);
         end
@@ -360,8 +378,12 @@ function doPRReply(playerName, sParams)
     --MRT_Debug("Process Whisper: MRT_NumOFCurrentRaid: " ..MRT_NumOfCurrentRaid);
     if not(MRT_NumOfCurrentRaid) then
         raid_select = MRT_GUI_RaidLogTable:GetSelection();
-        --MRT_Debug("doPRReply: raid_select: " .. raid_select);
-        raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+        if not raid_select then
+            raidnum = 1
+        else
+            --MRT_Debug("doPRReply: raid_select: " .. raid_select);
+            raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+        end
     else
         raidnum = MRT_NumOfCurrentRaid
     end
@@ -426,11 +448,13 @@ function doPRReply(playerName, sParams)
             MRT_Debug("doPRReply: i: " ..i);
             MRT_Debug("doPRReply: v: "..v);
             strMessage = format2Table(v, largestLen);
-            SendChatMessage(strMessage, "WHISPER", _, playerName);
+            SendChatMessage(strMessage, "WHISPER", nil, playerName);
+            --MRT_ChatHandler.MsgToBlock = strMessage;
+            tinsert(SupressMsg, strMessage);
             strMessage = "";
         end
     else
-        SendChatMessage("PR info not available or player(s) not found.  epgp ? for help", "WHISPER", _, playerName);
+        SendChatMessage("PR info not available or player(s) not found.  epgp ? for help", "WHISPER", nil, playerName);
     end
 end
 function cleanPR (PR)
@@ -631,10 +655,11 @@ local MRT_ChatHandler = {};
 function MRT_ChatHandler:CHAT_MSG_WHISPER_Filter(event, msg, from, ...)
     --keeping next line to test
     local sCom = strsub(msg,1,4);
-    MRT_Debug("Message filtered... ");
+    --MRT_Debug("Message MSG_Whisper_filtered... ");
     --if (not MRT_TimerFrame.GARunning) then return false; end
 
     if sCom == "epgp" then
+        MRT_Debug("Message filtered... - Msg was '"..msg.."' from '"..from.."'");
         return true
     else
         return false
@@ -652,10 +677,15 @@ function MRT_ChatHandler:CHAT_MSG_WHISPER_Filter(event, msg, from, ...)
 end
 
 function MRT_ChatHandler:CHAT_MSG_WHISPER_INFORM_FILTER(event, msg, from, ...)
-    if (not MRT_TimerFrame.GARunning) then return false; end
-    if (msg == MRT_ChatHandler.MsgToBlock) then
-        MRT_Debug("Message filtered... - Msg was '"..msg.."' from '"..from.."'");
-        return true;
+    --MRT_Debug("Message MSG_Whisper_INFORM_Filter... ");
+    --if (not MRT_TimerFrame.GARunning) then return false; end
+    --if (msg == MRT_ChatHandler.MsgToBlock) then
+    --if (msg == blockmsg) then
+    for i, v in ipairs(SupressMsg) do
+        if msg == v then
+            MRT_Debug("Message filtered... - Msg was '"..msg.."' from '"..from.."'" .."blocked Msg: "..v);
+            return true;
+        end
     end
     return false;
 end
