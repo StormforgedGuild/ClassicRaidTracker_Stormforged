@@ -724,12 +724,12 @@ do
 
 	
 	function doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, disabledeselect, groupby, ...)
-		MRT_Debug("ST_doOnclick fired!");
+		--MRT_Debug("ST_doOnclick fired!");
 		st = table;
 		if button == "LeftButton" then	-- LS: only handle on LeftButton click (right passes thru)
-			MRT_Debug("ST_doOnclick button == Leftbutton");
+			--MRT_Debug("ST_doOnclick button == Leftbutton");
 			if not (row or realrow) then
-				MRT_Debug("ST_doOnclick not (row or realrow) sorting!");
+				--MRT_Debug("ST_doOnclick not (row or realrow) sorting!");
 				for i, col in ipairs(st.cols) do
 					if i ~= column then -- clear out all other sort marks
 						cols[i].sort = nil;
@@ -761,7 +761,7 @@ do
 				
 
 			else
-				MRT_Debug("ST_doOnclick row or realrow");
+				--MRT_Debug("ST_doOnclick row or realrow");
 				if table:GetSelection() == realrow then
 					if not disabledeselect then				--disable deselect in loot table
 						MRT_Debug("ST_doOnclick not disabledeselect");
@@ -770,7 +770,7 @@ do
 						MRT_Debug("ST_doOnclick disabledeselect"); -- do nothing in the loot table
 					end
 				else
-					MRT_Debug("ST_doOnclick setselction");
+					--MRT_Debug("ST_doOnclick setselction");
 					table:SetSelection(realrow);
 				end
 			end
@@ -847,7 +847,7 @@ do
 				return true;
 			end,
 			["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...)		-- LS: added "button" argument
-				MRT_Debug("ST_Onclick fired!");
+				--MRT_Debug("ST_Onclick fired!");
 				doOnClick(rowFrame, cellFrame, data, cols, row, realrow, column, table, button, ...);
 				return true;
 				--[[ if button == "LeftButton" then	-- LS: only handle on LeftButton click (right passes thru)
