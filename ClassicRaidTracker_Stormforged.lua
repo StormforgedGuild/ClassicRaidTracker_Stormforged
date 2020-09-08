@@ -374,6 +374,7 @@ function doPRReply(playerName, sParams)
         if not raid_select then
             MRT_GUI_RaidLogTable:SetSelection(1)
             raid_select = MRT_GUI_RaidLogTable:GetSelection();
+            MRT_GUI_RaidLogTable:ClearSelection()
         end
         --MRT_Debug("doPRReply: raid_select: " .. raid_select);
         raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
@@ -451,7 +452,9 @@ function doPRReply(playerName, sParams)
             strMessage = "";
         end
     else
-        SendChatMessage("PR info not available or you don't have PR info in Master Looter's raid.  epgp ? for help", "WHISPER", nil, playerName);
+        strMessage = "PR info not available or you don't have PR info in Master Looter's raid.  epgp ? for help";
+        tinsert(SupressMsg, strMessage);
+        SendChatMessage(strMessage, "WHISPER", nil, playerName);
     end
 end
 function cleanPR (PR)
