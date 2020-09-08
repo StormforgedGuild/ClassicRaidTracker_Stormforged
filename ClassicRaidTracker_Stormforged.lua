@@ -344,27 +344,20 @@ function ProcessWhisper(text, playerName)
         --SendChatMessage("What!?", "WHISPER",nil ,playerName);
         if sParams == "?" then
             local sendMsg = "usage: epgp (return your PR)"
-            --MRT_ChatHandler.MsgToBlock = sendMsg;
             tinsert(SupressMsg, sendMsg);
             SendChatMessage(sendMsg, "WHISPER", nil, playerName);
-            --MRT_ChatHandler.MsgToBlock = sendMsg;
-            tinsert(SupressMsg, sendMsg);
-            sendMsg = "usage: epgp healers (or melee/casters)"
+            --[[ sendMsg = "usage: epgp healers (or melee/casters)"
             SendChatMessage(sendMsg, "WHISPER", nil, playerName);
-            --MRT_ChatHandler.MsgToBlock = sendMsg;
             tinsert(SupressMsg, sendMsg);
             sendMsg = "usage: epgp druids (or warriors/hunters, etc...)"
             SendChatMessage(sendMsg, "WHISPER", nil, playerName);
-            --MRT_ChatHandler.MsgToBlock = sendMsg;
             tinsert(SupressMsg, sendMsg);
             sendMsg = "usage: epgp scrapper (or hokie/moncholyg, etc...)"
             SendChatMessage(sendMsg, "WHISPER", nil, playerName);
-            --MRT_ChatHandler.MsgToBlock = sendMsg;
             tinsert(SupressMsg, sendMsg);
             sendMsg = "usage: epgp all (this might be throttled)"
             SendChatMessage(sendMsg, "WHISPER",nil , playerName);
-            --MRT_ChatHandler.MsgToBlock = sendMsg;
-            tinsert(SupressMsg, sendMsg);
+            tinsert(SupressMsg, sendMsg); ]]
         else
             doPRReply(playerName, sParams);
         end
@@ -379,41 +372,45 @@ function doPRReply(playerName, sParams)
     if not(MRT_NumOfCurrentRaid) then
         raid_select = MRT_GUI_RaidLogTable:GetSelection();
         if not raid_select then
-            raidnum = 1
-        else
-            --MRT_Debug("doPRReply: raid_select: " .. raid_select);
-            raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+            MRT_GUI_RaidLogTable:SetSelection(1)
+            raid_select = MRT_GUI_RaidLogTable:GetSelection();
         end
+        --MRT_Debug("doPRReply: raid_select: " .. raid_select);
+        raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     else
         raidnum = MRT_NumOfCurrentRaid
     end
-    MRT_Debug("doPRReply: raidnum " ..raidnum);
-    local allIndex = substr(sParams, "all")
+    --MRT_Debug("doPRReply: raidnum " ..raidnum);
+    --local allIndex = substr(sParams, "all")
     
-    if (allIndex) then
+    --if (allIndex) then
         --strip out all, it's special for whisper
         --MRT_Debug("doPRReply: stripping :all sParams: " ..sParams);
-        local allGone = strsub(sParams,1,allIndex-1)..strsub(sParams,allIndex+4);
-        filter = applyFilterSyntax(allGone)
+      --  local allGone = strsub(sParams,1,allIndex-1)..strsub(sParams,allIndex+4);
+      --  filter = applyFilterSyntax(allGone)
         --[[ if not filter then
             MRT_Debug("doPRReply: stripping :filter: nil");
         else     
             MRT_Debug("doPRReply: stripping :filter: " ..filter);
             MRT_Debug("doPRReply: stripping :len (filter): " ..strlen(filter));
         end ]]
-    else
+    --else
         --MRT_Debug("doPRReply: default path");
         --TODOif we see a class name or class group, add a ":"
 
-        filter = applyFilterSyntax(sParams)
-    end
-    if not(sParams) or sParams == "" then
+        --filter = applyFilterSyntax(sParams)
+    --end
+    --if not(sParams) or sParams == "" then
         --MRT_Debug("doPRReply: no sParam");
         --strip off realmname from player
-
-        filter = strsub(playerName, 1, substr(playerName, "-")-1);
+        local realmIndex = substr(playerName, "-");
+        if realmIndex then
+            filter = strsub(playerName, 1, realmIndex - 1);
+        else 
+            filter = playerName
+        end
         --MRT_Debug("doPRReply: filter: "  ..filter.. " strlen(filter): " ..strlen(filter));
-    end
+    --end
     --MRT_Debug("doPRReply: raid_select: " ..raid_select);
     --MRT_Debug("doPRReply: raidnum: " ..raidnum);
     
@@ -454,7 +451,7 @@ function doPRReply(playerName, sParams)
             strMessage = "";
         end
     else
-        SendChatMessage("PR info not available or player(s) not found.  epgp ? for help", "WHISPER", nil, playerName);
+        SendChatMessage("PR info not available or you don't have PR info in Master Looter's raid.  epgp ? for help", "WHISPER", nil, playerName);
     end
 end
 function cleanPR (PR)
@@ -529,6 +526,10 @@ function format2Table(message, largeLength)
         newString = newString.."."
     end ]]
     dotlen = dotlen + (countLetters(newString, "i")*4) + (countLetters(newString, "l") *5) + countLetters(newString, "t") + countLetters(newString, "r") - (countLetters(newString, "W")*2) - countLetters(newString, "w") - (countLetters(newString, "M")*2) - (countLetters(newString, "m")*2)
+    
+    if dotlen < 0 then
+        dotlen = 2
+    end
     for i = 1, dotlen do
         newString = newString..".";
     end
