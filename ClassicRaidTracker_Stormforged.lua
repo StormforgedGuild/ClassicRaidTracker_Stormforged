@@ -182,7 +182,7 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("TRADE_SHOW");
     frame:RegisterEvent("TRADE_CLOSED");
     frame:RegisterEvent("BAG_UPDATE");
-    frame:RegisterEvent("CHAT_MSG_ADDON");
+    --frame:RegisterEvent("CHAT_MSG_ADDON");
 end
 
 -------------------------
@@ -252,12 +252,12 @@ function MRT_OnEvent(frame, event, ...)
             MRT_EndActiveRaid();
         end
 
-    elseif (event == "CHAT_MSG_ADDON") then
-        local prefix, messageFromAddon = ...;
+    --elseif (event == "CHAT_MSG_ADDON") then
+        --local prefix, messageFromAddon = ...;
   --      MRT_Debug(prefix);
-        if prefix == "SFRT" then
+        --if prefix == "SFRT" then
            --MRT_Debug("SFRT: "..messageFromAddon);
-        end
+        --end
 
     elseif (event == "PLAYER_ENTERING_WORLD") then
         frame:UnregisterEvent("PLAYER_ENTERING_WORLD");
