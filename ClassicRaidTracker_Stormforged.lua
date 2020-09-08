@@ -182,6 +182,8 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("TRADE_SHOW");
     frame:RegisterEvent("TRADE_CLOSED");
     frame:RegisterEvent("BAG_UPDATE");
+    frame:RegisterEvent("MERCHANT_SHOW");
+    frame:RegisterEvent("MERCHANT_UPDATE");
     --frame:RegisterEvent("CHAT_MSG_ADDON");
 end
 
@@ -235,6 +237,13 @@ function MRT_OnEvent(frame, event, ...)
     elseif (event == "COMBAT_LOG_EVENT_UNFILTERED") then
         if (not MRT_Options["General_MasterEnable"]) then return end;
         MRT_CombatLogHandler(...);
+
+    elseif (event == "MERCHANT_SHOW") then
+        ArghEasterEgg();
+
+    elseif (event == "MERCHANT_UPDATE") then
+        ArghEasterEgg();
+        MRT_Debug("merchant update fired");
 
     elseif (event == "ENCOUNTER_END") then
         local encounterID, name, difficulty, size, success = ...
@@ -332,6 +341,50 @@ function MRT_OnEvent(frame, event, ...)
 
     end
 end
+
+function ArghEasterEgg()
+    if not (UnitName("player")=="Arghkettnaad") then
+      return;
+    end
+    --MRT_Debug("Merchant Window Opened: "..UnitName("player"));
+    --MRT_Debug("Free Slots: ".. countEmptyBagSlots());
+
+    local merchantSellsHammers = checkIfMerchantSellsHammers();
+    if (merchantSellsHammers == -1) then 
+        MRT_Debug("The merchant doesn't sell hammers");
+        return;  -- no hammers
+    end
+
+    if countEmptyBagSlots() > 0 then
+        BuyMerchantItem(merchantSellsHammers);
+    end
+end
+
+function countEmptyBagSlots()
+
+    local freeSlots =0;
+    for bagID=0, 5 do
+        local singleBagFreeSlots, BagType = GetContainerNumFreeSlots(bagID);
+        freeSlots = freeSlots + singleBagFreeSlots;
+    end
+
+    return freeSlots;
+end
+
+function checkIfMerchantSellsHammers()
+
+    local merchantInventoryCount = GetMerchantNumItems();
+
+    for inventoryIndex=0, merchantInventoryCount do
+        local merchantItemName = GetMerchantItemInfo(inventoryIndex)
+        if (merchantItemName == "Blacksmith Hammer") then
+            return inventoryIndex
+        end
+    end
+    return -1;
+end
+
+
 local SupressMsg = {}
 function ProcessWhisper(text, playerName)
     --if text:gsub("^%s*(.-)%s*$", "%1") == AutoInviteSettings.AutoInviteKeyword then
