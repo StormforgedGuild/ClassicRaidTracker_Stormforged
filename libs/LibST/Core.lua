@@ -467,8 +467,14 @@ do
 	function cStrTimetoInt(sText, cIndex)
 		local sH, sM;
 		sH = string.sub(sText,1,cIndex-1)
+		if not sH or sH == "" then
+			sH = 0;
+		end
 		--MRT_Debug("ST:stringTimetonumberTime: sH: " ..sH);
 		sM = string.sub(sText,cIndex+1)
+		if not sM or sM == "" then
+			sM = 0
+		end
 		--MRT_Debug("ST:stringTimetonumberTime: sM: " ..sM);
 		return (tonumber(sH)*60) + tonumber(sM);
 	end
