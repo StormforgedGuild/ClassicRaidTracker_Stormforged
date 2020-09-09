@@ -1245,7 +1245,7 @@ function MRT_GUI_LootModify()
     end);
     MRT_GUI_FourRowDialog_EB1:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
-    --MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
+    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
     --autocomplete here.
     if not bAutoCompleteCreated then
         MRT_Debug("MRT_GUI_LootModify: Creating autocomplete table");
@@ -1597,7 +1597,44 @@ function MRT_GUI_TradeLink()
          end
     end
 end
-
+local messwArghCounter = 1
+local messwArghCounter1 = 0
+function MessWArgh() 
+    -- to be used for surprise. -- Arghkettnaad
+    MRT_Debug("Surprise!")
+    local MLplayerName = UnitName("player") 
+    if MLplayerName == "Chiapet" then -- Arghkettnaad
+        local found, container, slot = findItemInBag("Runecloth")
+        if found then
+            MRT_Debug("item found!")
+            MRT_Debug("messwArchCounter: " ..messwArghCounter % 14)
+            MRT_Debug("messwArchCounter1: " ..messwArghCounter1 % 5)
+            PickupContainerItem(messwArghCounter1 % 5, messwArghCounter % 14);
+            local bag = bagWFreeSlots()
+            if bag then
+                MRT_Debug("bag with free slot found bag: " ..bag)
+                if bag == 0 then
+                    PutItemInBackpack();
+                else 
+                    PutItemInBag(bag + 19);
+                end 
+                SplitContainerItem(container, slot, 1)
+                PutItemInBackpack();
+                messwArghCounter = messwArghCounter + 1;
+                messwArghCounter1 = messwArghCounter1 + 1;
+            end
+            
+        end
+    end
+end
+function bagWFreeSlots()
+    for container = 0, 5 do
+        if GetContainerNumFreeSlots(container) > 0 then
+            return container
+        end
+    end
+    return
+end
 --returns true/false, container, and slot numbers of the item found. 
 function findItemInBag(name)
     local c,s,t
