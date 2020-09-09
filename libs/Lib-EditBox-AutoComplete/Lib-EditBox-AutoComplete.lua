@@ -68,21 +68,21 @@ function SetupAutoComplete(editbox, valueList, maxButtonCount)
 		EditBox_ClearHighlight(editbox)
 	end)
 	editbox:SetScript("OnEscapePressed", function(editbox)
-		MRT_Debug("LEB:EB:OnEscapePressed");
+		--MRT_Debug("LEB:EB:OnEscapePressed");
 		if not EditBoxAutoComplete_OnEscapePressed(editbox) then
-			MRT_Debug("LEB:EB:OnEscapePressed:inside not Edit");
+			--MRT_Debug("LEB:EB:OnEscapePressed:inside not Edit");
 			if (editbox.old_OnEscapePressed) then
 				MRT_Debug("LEB:EB:OnEscapePressed:editbox.old_onEscapePressed is true");
 				return editbox.old_OnEscapePressed(editBox)
 			end
 			if AceGUI then
-				MRT_Debug("LEB:EB:OnEscapePressed:AceGUI");
+				--MRT_Debug("LEB:EB:OnEscapePressed:AceGUI");
 				AceGUI:ClearFocus(editbox.obj)
 				--AceGUI:ClearFocus(editbox)
 				--AceGUI:ClearFocus()
 				editbox:ClearFocus()
 			else
-				MRT_Debug("LEB:EB:OnEscapePressed:not AceGUI");
+				--MRT_Debug("LEB:EB:OnEscapePressed:not AceGUI");
 				editbox:ClearFocus()
 			end
 			
