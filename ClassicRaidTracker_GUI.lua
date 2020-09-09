@@ -288,8 +288,18 @@ function MRT_GUI_ParseValues()
     MRT_GUI_RaidBosskillsTable:EnableSelection(true);
     MRT_GUI_RaidBosskillsTable:Hide();
 
-    MRT_GUIFrame_BossLoot_Filter:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 198, -15);
+    MRT_GUIFrame_BossLoot_Filter:SetPoint("TOPLEFT", MRT_GUIFrame_RaidLogTitle, "BOTTOMLEFT", 198, -15);    
+    --setup bossloot filter
+    MRT_GUIFrame_BossLoot_Filter:SetScript("OnEscapePressed", function (...)
+            MRT_GUI_BossLootFilterResetFilter();
+            return true;
+        end);
+    --local valueLootList = {":casters", ":druid", ":healers", ":hunter", ":mage", ":melee", ":ranged", ":paladin", ":players", ":rogue", ":shaman", ":warlock", ":warrior"}
+    local valueLootList = {":player", ":players"}
+    local maxButtonCount = 15;
+    SetupAutoComplete(MRT_GUIFrame_BossLoot_Filter, valueLootList, maxButtonCount);
     MRT_GUIFrame_BossLoot_Filter:SetAutoFocus(false);
+
     MRT_GUIFrame_BossLoot_Add_Button:SetText(MRT_L.GUI["Button_Small_Add"]);
     MRT_GUIFrame_BossLoot_Add_Button:SetPoint("RIGHT", MRT_GUIFrame_BossLoot_Filter, "RIGHT", 23, 0);
     MRT_GUIFrame_BossLoot_Delete_Button:SetText(MRT_L.GUI["Button_Small_Delete"]);
@@ -2229,7 +2239,13 @@ end
 
 
 function MRT_GUI_RaidAttendeeResetFilter()
+    --MRT_Debug("MRT_GUI_RaidAttendeeResetFilter called!");
     MRT_GUIFrame_RaidAttendees_Filter:ClearFocus();
+end
+
+function MRT_GUI_BossLootFilterResetFilter()
+    --MRT_Debug("MRT_GUI_BossLootFilterResetFilter called!");
+    MRT_GUIFrame_BossLoot_Filter:ClearFocus();
 end
 
 -- update raid attendees table
@@ -2364,6 +2380,42 @@ function parseFilter4Classes(strText)
         return strText;
     end
 end
+function parseFilter4Special(strText)
+    --MRT_Debug("parseFilter4Special called!");
+    specialFilters = {}
+    local retVal = string.gsub(strText, " ", "")
+    --MRT_Debug("parseFilter4Special retVal == "..retVal);
+    if string.len(retVal) > 3 and substr(strText,":") then
+        for i in string.gmatch(retVal, "%a+") do
+            --MRT_Debug("parseFilter4Special i == "..i);
+            table.insert(specialFilters, i);
+        end
+        if table.maxn(specialFilters) > 0 then
+            --MRT_Debug("parseFilter4Special:classFilters true");
+            return specialFilters, true;
+        else
+            --MRT_Debug("parseFilter4Special:classFilters false");
+            return strText, false;
+        end 
+    else
+        return strText;
+    end
+end
+function isLooterInSpecialFilter(looter, specialFilter)
+    --return if looter is not in special filter
+    --MRT_Debug("isLooterInSpecialFilter:Called!");
+    MRT_Debug("isLooterInSpecialFilter: # of items: "..table.maxn(specialFilter));
+    for i, v in pairs(specialFilter) do
+        --MRT_Debug("isLooterInSpecialFilter:looter == " ..looter);
+        --MRT_Debug("isLooterInSpecialFilter:i == " ..i.." :v == " ..v);
+        if string.lower(v) == string.lower(looter) then
+            return false;
+        else 
+            --MRT_Debug("isLooterInSpecialFilter: looter not in table");
+        end
+    end
+    return true;
+end
 function isClassinClassFilter(class, classFilter)
     local strClass = class;
     if (not strClass) or (strClass == "") then
@@ -2371,16 +2423,17 @@ function isClassinClassFilter(class, classFilter)
     end
     --MRT_Debug("isClassinClassFilter");
     for i, v in pairs(classFilter) do
-        --MRT_Debug("isClassinClassFilter:class == " ..strClass);
-        --MRT_Debug("isClassinClassFilter:v == " ..v);
+        MRT_Debug("isClassinClassFilter:class == " ..strClass);
+        MRT_Debug("isClassinClassFilter:v == " ..v);
         if string.lower(v) == string.lower(strClass) then
+            MRT_Debug("isClassinClassFilter: condition is true");
             return true;
         end
     end
     return false;
 end 
 function check4GroupFilters(classFilter)
-    --MRT_Debug("check4GroupFilters: called!");
+    MRT_Debug("check4GroupFilters: called!");
 
     local sgroupFilters = {
         ["healer"] = {"druid", "paladin", "priest"},
@@ -2389,15 +2442,19 @@ function check4GroupFilters(classFilter)
         ["casters"] = {"mage", "warlock"},
         ["ranged"] = {"mage", "warlock", "hunter"},
         ["melee"] = {"warrior", "rogue"},
+        ["players"] = {"bank", "disenchanted"},
+        ["player"] = {"bank", "disenchanted"},
     }
     local oclassFilter = classFilter;
+    
     for i, v in pairs(oclassFilter) do
         --look for special filter
         local tblGroupFilter = sgroupFilters[string.lower(v)];
+
         if (tblGroupFilter) then
             --add the list into the classFilter
             for i1, v1 in pairs(tblGroupFilter) do
-                --MRT_Debug("check4GroupFilters: called!");
+                --MRT_Debug("check4GroupFilters: i1: " ..i1.. " v1: " ..v1);
                 table.insert(oclassFilter,v1)
             end
         end
@@ -2650,19 +2707,48 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                 end 
                 index = index + 1;
-            else 
-                indexofsub1 = substr(v["ItemName"], filter);
-                indexofsub2 = substr(v["Looter"], filter);
-                if not indexofsub1 and not indexofsub2 then
-                    --skip
-                else
-                    ---
-                    if v["Looter"] == "unassigned" then
-                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
+            else
+                local checkFilter = filter;
+                if not checkFilter then
+                    checkFilter = MRT_GUIFrame_BossLoot_Filter:GetText();
+                end
+                -- need function here to return true if there are classes to filter
+                --local strFilter, isSpecialFilter = parseFilter4Special(checkFilter); 
+                local strFilter, isSpecialFilter = parseFilter4Classes(checkFilter);
+                if isSpecialFilter then
+                    -- if there are classes or special to filter check for which classes
+                    -- checking if class is in the classfilter list
+                    -- new function to return true if class is in classfilter table.
+                    -- old code: indexofsub = substr(v["Class"], strFilter);
+                    -- old code: if not indexofsub then
+                    local tblSpecialFilter = check4GroupFilters(strFilter);
+                    --tblSpecialFilter = filter out list.
+
+                    if not (isLooterInSpecialFilter(v["Looter"], tblSpecialFilter)) then
+                        --skip no special matches so don't do anything.
                     else 
-                        MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
-                    end 
-                    index = index + 1;
+                        --special match found so include in table
+                        if v["Looter"] == "unassigned" then
+                            MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
+                        else 
+                            MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
+                        end 
+                        index = index + 1;
+                    end
+                else -- if not special filter, do the normal thing 
+                    indexofsub1 = substr(v["ItemName"], filter);
+                    indexofsub2 = substr(v["Looter"], filter);
+                    if not indexofsub1 and not indexofsub2 then
+                        --skip
+                    else
+                        ---
+                        if v["Looter"] == "unassigned" then
+                            MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
+                        else 
+                            MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
+                        end 
+                        index = index + 1;
+                    end
                 end
             end
         end

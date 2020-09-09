@@ -78,6 +78,9 @@ function SetupAutoComplete(editbox, valueList, maxButtonCount)
 			if AceGUI then
 				MRT_Debug("LEB:EB:OnEscapePressed:AceGUI");
 				AceGUI:ClearFocus(editbox.obj)
+				--AceGUI:ClearFocus(editbox)
+				--AceGUI:ClearFocus()
+				editbox:ClearFocus()
 			else
 				MRT_Debug("LEB:EB:OnEscapePressed:not AceGUI");
 				editbox:ClearFocus()
@@ -326,7 +329,7 @@ end
 
 function EditBoxAutoComplete_OnEscapePressed(self)
 	local autoComplete = EditBoxAutoCompleteBox;
-	if ( autoComplete:IsShown() and autoComplete.parent == self ) then
+	if (autoComplete:IsShown() and autoComplete.parent == self ) then
 		EditBoxAutoComplete_HideIfAttachedTo(self);
 		return true;
 	end
