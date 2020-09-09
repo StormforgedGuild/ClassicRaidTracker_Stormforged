@@ -391,10 +391,16 @@ local SupressMsg = {}
 function ProcessWhisper(text, playerName)
     --if text:gsub("^%s*(.-)%s*$", "%1") == AutoInviteSettings.AutoInviteKeyword then
     local stext = text:gsub("^%s*(.-)%s*$", "%1")
-    local sCom = strsub(stext,1,4);
-    local sParams = strsub(stext,6)
-    --MRT_Debug("Process Whisper: sCom: " ..sCom);
-    --MRT_Debug("Process Whisper: sParams: " ..sParams);
+    MRT_Debug("Process Whisper: stext: " ..stext);
+    local prefix = strsub(stext, 1, 5)
+    local nopunc
+    local numstripped = 0;
+    nopunc, numstripped = string.gsub(prefix,"%p", "")
+    MRT_Debug("Process Whisper: numstripped: " ..numstripped);
+    local sCom = strsub(nopunc,1,4);
+    local sParams = strsub(stext,6 + numstripped)
+    MRT_Debug("Process Whisper: sCom: " ..sCom);
+    MRT_Debug("Process Whisper: sParams: " ..sParams);
     if string.lower(sCom) == string.lower ("epgp") then
         --SendChatMessage("What!?", "WHISPER",nil ,playerName);
         if sParams == "?" then
@@ -713,11 +719,13 @@ end
 local MRT_ChatHandler = {};
 function MRT_ChatHandler:CHAT_MSG_WHISPER_Filter(event, msg, from, ...)
     --keeping next line to test
-    local sCom = strsub(msg,1,4);
+    local nopunc, numstripped = string.gsub(msg,"%p", "")
+    local sCom = strsub(nopunc,1,4);
+    --local sCom = strsub(msg,1,4);
     --MRT_Debug("Message MSG_Whisper_filtered... ");
     --if (not MRT_TimerFrame.GARunning) then return false; end
 
-    if sCom == "epgp" then
+    if string.lower(sCom) == "epgp" then
         MRT_Debug("Message filtered... - Msg was '"..msg.."' from '"..from.."'");
         return true
     else
