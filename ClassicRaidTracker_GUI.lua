@@ -1648,7 +1648,7 @@ function GetContainerItemTradeTimeRemaining(container, slot)
 				for hour=1, 0, -1 do -- time>=60s, format: "1 hour", "1 hour 59 min", "59 min", "1 min"
 					local hourText = ""
 					if hour > 0 then
-						hourText = self:CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_HOURS, hour)
+						hourText = CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_HOURS, hour)
 					end
 					for min=59,0,-1 do
 						local time = hourText
@@ -1656,7 +1656,7 @@ function GetContainerItemTradeTimeRemaining(container, slot)
 							if time ~= "" then
 								time = time..TIME_UNIT_DELIMITER
 							end
-							time = time..self:CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_MIN, min)
+							time = time..CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_MIN, min)
 						end
 
 						if time == timeText then
@@ -1665,7 +1665,7 @@ function GetContainerItemTradeTimeRemaining(container, slot)
 					end
 				end
 				for sec=59, 1, -1 do -- time<60s, format: "59 s", "1 s"
-					local time = self:CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_SEC, sec)
+					local time = CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_SEC, sec)
 					if time == timeText then
 						return sec
 					end
@@ -1681,6 +1681,15 @@ function GetContainerItemTradeTimeRemaining(container, slot)
 		return 0
 	else
 		return math.huge
+	end
+end
+
+function CompleteFormatSimpleStringWithPluralRule(str, count)
+	local text = format(str, count)
+	if count < 2 then
+		return text:gsub("|4(.+):(.+);", "%1")
+	else
+		return text:gsub("|4(.+):(.+);", "%2")
 	end
 end
 
