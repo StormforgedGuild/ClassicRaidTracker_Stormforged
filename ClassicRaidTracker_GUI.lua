@@ -1245,7 +1245,7 @@ function MRT_GUI_LootModify()
     end);
     MRT_GUI_FourRowDialog_EB1:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
-    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4)));
+    MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4),true));
     --autocomplete here.
     if not bAutoCompleteCreated then
         MRT_Debug("MRT_GUI_LootModify: Creating autocomplete table");
