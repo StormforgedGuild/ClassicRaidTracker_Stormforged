@@ -1611,35 +1611,49 @@ local messwArghCounter = 1
 local messwArghCounter1 = 0
 function MessWArgh() 
     -- to be used for surprise. -- Arghkettnaad
-    MRT_Debug("Surprise!")
+    --MRT_Debug("Surprise!")
     local MLplayerName = UnitName("player") 
-    if MLplayerName == "Chiapet" then -- Arghkettnaad
-        local found, container, slot = findItemInBag("Runecloth")
+    if MLplayerName == "Arghkettnaad" then -- Arghkettnaad
+        local found, container, slot = findItemInBag("Sacred Candles")
         if found then
-            MRT_Debug("item found!")
-            MRT_Debug("messwArchCounter: " ..messwArghCounter % 14)
-            MRT_Debug("messwArchCounter1: " ..messwArghCounter1 % 5)
-            PickupContainerItem(messwArghCounter1 % 5, messwArghCounter % 14);
-            local bag = bagWFreeSlots()
-            if bag then
-                MRT_Debug("bag with free slot found bag: " ..bag)
-                if bag == 0 then
+            --MRT_Debug("item found!")
+            local bag2 = bagWFreeSlots(container)
+            if bag2 then
+                --MRT_Debug("bag with free slot found bag2: " ..bag2)
+                SplitContainerItem(container, slot, 1)
+                if bag2 == 0 then
+                    --MRT_Debug("Putting thing in backpack")
                     PutItemInBackpack();
                 else 
-                    PutItemInBag(bag + 19);
+                    --MRT_Debug("Putting thing in bag with open")
+                    PutItemInBag(bag2 + 19);
                 end 
-                SplitContainerItem(container, slot, 1)
-                PutItemInBackpack();
-                messwArghCounter = messwArghCounter + 1;
-                messwArghCounter1 = messwArghCounter1 + 1;
             end
-            
         end
+        local bag1 = messwArghCounter1 % 5
+        local slot1 = messwArghCounter % (GetContainerNumSlots(bag1))
+        --MRT_Debug("picking up bag1: " ..bag1.. " slot1: " ..slot1)
+        --PickupContainerItem(bag1, slot1);
+        SplitContainerItem(bag1, slot1, 1)
+        local bag = bagWFreeSlots(bag1)
+        if bag then
+            MRT_Debug("bag with free slot found bag: " ..bag)
+            if bag == 0 then
+                --MRT_Debug("putting in backback")
+                PutItemInBackpack();
+            else 
+                --MRT_Debug("putting in bag: " ..bag)
+                PutItemInBag(bag + 19);
+            end 
+        end
+        messwArghCounter = messwArghCounter + 1;
+        messwArghCounter1 = messwArghCounter1 + 1;
     end
 end
-function bagWFreeSlots()
+function bagWFreeSlots(bag)
+    --bag is where the item is, so return first empty bag without the item
     for container = 0, 5 do
-        if GetContainerNumFreeSlots(container) > 0 then
+        if GetContainerNumFreeSlots(container) > 0 and (container ~= bag) then
             return container
         end
     end
