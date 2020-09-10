@@ -264,7 +264,7 @@ function MRT_GUI_ParseValues()
 
  --   MRT_GUIFrame_RaidAttendees_Filter:SetText(MRT_L.GUI["Header_Title"]);
     MRT_GUIFrame_RaidAttendees_Filter:SetPoint("TOPLEFT", MRT_GUI_RaidLogTable.frame, "BOTTOMLEFT", 7, -5);
-    local valueList = {":casters", ":druid", ":healers", ":hunter", ":mage", ":melee", ":ranged", ":paladin", ":rogue", ":shaman", ":warlock", ":warrior"}
+    local valueList = {":casters", ":druid", ":healers", ":hunter", ":mage", ":melee", ":paladin", ":command", ":dominance", ":ranged",  ":rogue", ":shaman", ":diadem", ":circlet", ":warlock", ":warrior"}
     local maxButtonCount = 20;
     SetupAutoComplete(MRT_GUIFrame_RaidAttendees_Filter, valueList, maxButtonCount);
     --MRT_GUIFrame_RaidAttendees_Filter:SetAutoFocus(false);
@@ -2458,6 +2458,10 @@ function check4GroupFilters(classFilter)
         ["melee"] = {"warrior", "rogue"},
         ["players"] = {"bank", "disenchanted"},
         ["player"] = {"bank", "disenchanted"},
+        ["command"] = {"warrior", "hunter", "rogue", "priest"},
+        ["dominance"] = {"druid", "mage", "paladin", "warlock", "shaman"},
+        ["diadem"] = {"druid", "hunter", "paladin", "rogue", "shaman"},
+        ["circlet"] = {"mage", "priest", "warlock", "warrior"},
     }
     local oclassFilter = classFilter;
     
@@ -2468,7 +2472,7 @@ function check4GroupFilters(classFilter)
         if (tblGroupFilter) then
             --add the list into the classFilter
             for i1, v1 in pairs(tblGroupFilter) do
-                --MRT_Debug("check4GroupFilters: i1: " ..i1.. " v1: " ..v1);
+                MRT_Debug("check4GroupFilters: i1: " ..i1.. " v1: " ..v1);
                 table.insert(oclassFilter,v1)
             end
         end
@@ -2794,12 +2798,18 @@ function calculateLootTimeLeft (timeLooted)
     if deltaTime > 0 then
         local hours = math.floor(deltaTime /3600);
         local minutes = math.floor( (deltaTime - (hours*3600) )/60);
+        local strM --string for minutes to get 01 instead of 1
+        if minutes > 10 then
+            strM = "0"..minutes
+        else
+            strM = minutes
+        end
         -- MRT_Debug(hours);
         -- MRT_Debug(minutes);
         if hours > 0 then
-            lootTime = hours ..":" ..minutes;
+            lootTime = hours ..":" ..strM;
         else
-            lootTime = ":" ..minutes;
+            lootTime = ":" ..strM;
         end
     else
         lootTime = date("%I:%M", timeLooted); --default to time stamp if the loot has expired
