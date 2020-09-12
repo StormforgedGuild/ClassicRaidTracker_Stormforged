@@ -2799,7 +2799,7 @@ function calculateLootTimeLeft (timeLooted)
         local hours = math.floor(deltaTime /3600);
         local minutes = math.floor( (deltaTime - (hours*3600) )/60);
         local strM --string for minutes to get 01 instead of 1
-        if minutes > 10 then
+        if minutes < 10 then
             strM = "0"..minutes
         else
             strM = minutes
