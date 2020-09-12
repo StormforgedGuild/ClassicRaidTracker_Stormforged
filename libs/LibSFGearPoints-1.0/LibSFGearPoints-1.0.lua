@@ -855,7 +855,7 @@ function lib:GetValue(item)
 
   local itemName, itemLink, rarity, level, _, _, _, _, equipLoc = GetItemInfo(item)
 
-  MRT_Debug("GetValue called itemName: "..itemName.."rarity:"..rarity.."level: "..level); 
+  --MRT_Debug("GetValue called itemName: "..itemName.."rarity:"..rarity.."level: "..level); 
   if not itemLink then return end
 
   -- Get the item ID to check against known token IDs
@@ -868,7 +868,7 @@ function lib:GetValue(item)
   if not rarity or rarity < quality_threshold then
       
       --SF this is mostly for testing purposes
-      MRT_Debug("GetValue: rarity too low"); 
+      --MRT_Debug("GetValue: rarity too low"); 
       low = SF_ITEM_DATA[itemName];
       return low, level, rarity, equipLoc
   end
@@ -877,13 +877,13 @@ function lib:GetValue(item)
 
   -- SF: Not really sure why this is needed.  keeping in just in case.
   if level < 463 then
-    MRT_Debug("GetValue: level < 463, is this needed?");
+    --MRT_Debug("GetValue: level < 463, is this needed?");
     --old code low = SF_ITEM_DATA[itemName];     
     low = getGP(itemName,true);     
     return low, level, rarity, equipLoc
   end
   --SF: Get the GP For the item
-  MRT_Debug("GetValue: Getting GP"); 
+  --MRT_Debug("GetValue: Getting GP"); 
   --old code low = SF_ITEM_DATA[itemName];
   low = getGP(itemName, true);     
   return low, level, rarity, equipLoc

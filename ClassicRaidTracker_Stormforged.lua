@@ -184,6 +184,7 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("BAG_UPDATE");
     frame:RegisterEvent("MERCHANT_SHOW");
     frame:RegisterEvent("MERCHANT_UPDATE");
+    frame:RegisterEvent("MERCHANT_UPDATE");
     --frame:RegisterEvent("CHAT_MSG_ADDON");
 end
 
@@ -759,7 +760,6 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", MRT_ChatHandler.CHAT_MSG_WHISPER_Filter);
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", MRT_ChatHandler.CHAT_MSG_WHISPER_INFORM_FILTER);
 
-
 ------------------
 --  Initialize  --
 ------------------
@@ -831,12 +831,12 @@ function MRT_Initialize(frame)
 
    -- C_ChatInfo.RegisterAddonMessagePrefix("SFRT")
 
+   HookToolTips();
 
     -- Finish
     MRT_Debug("Addon loaded.");
 
 end
-
 
 ----------------------
 --  Apply Defaults  --
@@ -946,7 +946,6 @@ function MRT_UpdateSavedOptions()
         MRT_Options["General_OptionsVersion"] = 19;
     end
 end
-
 
 -----------------------------------------------
 --  Make configuration changes if necessary  --
@@ -1075,7 +1074,6 @@ function MRT_VersionUpdate()
     
 end
 
-
 ----------------------------
 --  Periodic maintenance  --
 ----------------------------
@@ -1133,7 +1131,6 @@ function MRT_PeriodicMaintenance()
     end
     MRT_Debug("Maintenance finished in "..tostring(time() - startTime).." seconds. Deleted "..tostring(deletedEntries).." player entries.");
 end
-
 
 -----------------
 --  API-Stuff  --
@@ -2386,8 +2383,6 @@ end
 function MRT_MakeEQDKP_TimeShort(timestamp)
     return date("%H:%M:%S", timestamp)
 end
-
-
 
 function MRT_DeleteRaidLog()
     if (MRT_NumOfCurrentRaid) then

@@ -32,3 +32,5 @@ ClassicRaidTracker_Stormforged.lua
 ClassicRaidTracker_Options.xml
 ClassicRaidTracker_GUI.xml
 ClassicRaidTracker_API.lua
+ClassicRaidTracker_Stormforged.lua
+ClassicRaidTracker_ToolTipValues.lua

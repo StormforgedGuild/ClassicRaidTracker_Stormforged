@@ -37,12 +37,9 @@ LibSFGP:CacheTokenItemInfo();
 local ag -- import reminder animationgroup
 local agTrade -- trade reminder animationgroup
 
-
 local MRT_GUI_RaidLogTableSelection = nil;
 local MRT_GUI_RaidBosskillsTableSelection = nil;
-
 local MRT_ExternalLootNotifier = {};
-
 local lastShownNumOfRaids = nil;
 local lastSelectedRaidNum = nil;
 local lastShownNumOfBosses = nil;
@@ -52,6 +49,7 @@ local lastLootNum = nil;
 local lastBossNum = nil;
 local lastRaidNum = nil;
 local MRT_RaidPlayerList= {};
+
 --state of dialog
 local lastLooter = nil;
 local lastValue = nil;
@@ -60,7 +58,6 @@ local lastOS = nil;
 local lootFilterHack = 0;
 local attendeeFilterHack = 0;
 local bAutoCompleteCreated = false;
-
 
 --tooltip for parsing loot time remaining
 local tooltipForParsing = CreateFrame("GameTooltip", "RCLootCouncil_Tooltip_Parse", nil, "GameTooltipTemplate")
