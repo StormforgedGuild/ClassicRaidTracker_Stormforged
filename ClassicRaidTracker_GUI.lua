@@ -73,8 +73,8 @@ local MRT_RaidLogTableColDef = {
 local MRT_RaidAttendeesTableColDef = {
     {["name"] = "", ["width"] = 1},                            -- invisible column for storing the player number index from the raidlog-table
     {["name"] = MRT_L.GUI["Col_Name"], ["width"] = 75},
-    {["name"] = MRT_L.GUI["Col_PR"], ["width"] = 40},
-    {["name"] = MRT_L.GUI["Col_Join"], ["width"] = 35},
+    {["name"] = MRT_L.GUI["Col_PR"], ["width"] = 37},
+    {["name"] = MRT_L.GUI["Col_Join"], ["width"] = 38},
 
 };
 --SF: Old RaidBosskillstable
