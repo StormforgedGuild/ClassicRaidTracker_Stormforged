@@ -457,7 +457,7 @@ do
 		local cIndex = strfind(sText1, ":")
 		--MRT_Debug("ST:stringTimetonumberTime: Called!");
 		--MRT_Debug("ST:stringTimetonumberTime: sText" ..sText1);
-		if (cIndex) then MRT_Debug("ST:stringTimetonumberTime: cIndex" ..cIndex);end
+		--if (cIndex) then MRT_Debug("ST:stringTimetonumberTime: cIndex" ..cIndex);end
 		if not cIndex then
 			return sText1;
 		end

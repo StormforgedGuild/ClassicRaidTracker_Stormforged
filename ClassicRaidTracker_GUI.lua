@@ -476,7 +476,8 @@ end
 ---------------------
 --  Show/Hide GUI  --
 ---------------------
-function MRT_GUI_Toggle()
+function MRT_GUI_Toggle(readonly)
+
     if (not MRT_GUIFrame:IsShown()) then
         MRT_GUIFrame:Show();
         MRT_GUIFrame:SetScript("OnUpdate", function() MRT_GUI_OnUpdateHandler(); end);
@@ -506,9 +507,18 @@ function MRT_GUI_Toggle()
                 MRT_GUI_RaidLogTable:SetSelection(1);   --if there is a row, select the most current
             end 
         end
-
-        ImportReminder();
-
+        --if this is readonly mode we need to set things up
+        if readonly then
+            --setup UI for readonly mode
+            --setup event bypassing to channel
+            MRT_Debug("MRT_GUI_Toggle: readonly = True")
+            MRT_ReadOnly = true;
+        else
+            --only run this if we're not in readonly mode
+            MRT_Debug("MRT_GUI_Toggle: readonly = false")
+            MRT_ReadOnly = false;
+            ImportReminder();
+        end
     else
         MRT_GUIFrame:Hide();
         MRT_GUIFrame:SetScript("OnUpdate", nil);
@@ -742,6 +752,7 @@ function MRT_GUI_BossAddAccept(raidnum)
     else
         -- prepare bossdata table
         local bossdata = {};
+        
         bossdata["Players"] = {};
         bossdata["Name"] = bossname;
         bossdata["Date"] = bossTimestamp;
@@ -1187,7 +1198,7 @@ function RemoveAutoComplete(editbox)
 	editbox.buttonCount = nil;
 end
 function MRT_GUI_LootModify()
-
+    
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1207,7 +1218,20 @@ function MRT_GUI_LootModify()
             bAutoCompleteCreated = false;
         end
     end 
+    
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    --MRT_Debug("MRT_GUI_LootModify: raidnum: " ..raidnum.." MRT_NumOfCurrentRaid: " .. MRT_NumOfCurrentRaid);
+    --[[ --debugging
+    local dbgLootTable = MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"];
+    if dbgLootTable then 
+        local numofloot = table.maxn(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"])
+        if numofloot then
+            MRT_Debug("MRT_GUI_LootModify: numofloot: " ..numofloot)
+            for i,v in pairs(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"]) do
+                MRT_Debug("MRT_GUI_LootModify: new entry added.. loot entry name: "..v["ItemName"])
+            end
+        end
+    end ]]
     lastloot_select = loot_select;
     lastLootNum = lootnum;
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
@@ -1216,9 +1240,9 @@ function MRT_GUI_LootModify()
     local lootoffspec = MRT_RaidLog[raidnum]["Loot"][lootnum]["Offspec"];
     
     if lootoffspec then
-        MRT_Debug("MRT_GUI_LootModify: lootoffspec: True");
+        --MRT_Debug("MRT_GUI_LootModify: lootoffspec: True");
     else
-        MRT_Debug("MRT_GUI_LootModify: lastLooter: False");
+        --MRT_Debug("MRT_GUI_LootModify: lastLooter: False");
     end
 
     -- Force item into cache:
@@ -1341,13 +1365,34 @@ function MRT_GUI_PlayerDropDownList_Toggle()
     end
 end
 
-function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
+function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     MRT_Debug("MRT_GUI_LootModifyAccept:Called!");
-    local itemLinkFromText = MRT_GUI_FourRowDialog_EB1:GetText();
-    local looter = MRT_GUI_FourRowDialog_EB2:GetText();
-    local cost = MRT_GUI_FourRowDialog_EB3:GetText();
-    local lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
-    local offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
+    local itemLinkFromText = "";
+    local looter = "";
+    local cost = "";
+    local lootNote = "";
+    local offspec = "";
+    local strMsg = "";
+    if not msg then 
+        itemLinkFromText = MRT_GUI_FourRowDialog_EB1:GetText();
+        looter = MRT_GUI_FourRowDialog_EB2:GetText();
+        cost = MRT_GUI_FourRowDialog_EB3:GetText();
+        lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
+        offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
+    else
+        itemLinkFromText, strMsg = getToken(msg, ";")
+        looter, strMsg = getToken(strMsg, ";")
+        cost, strMsg = getToken(strMsg,";")
+        lootNote, strMsg = getToken(strMsg,";")
+        if strMsg =="false" then
+            offspec = false;
+        else
+            offspec = true;
+        end
+    end
+    
+    --MRT_Debug("MRT_GUI_LootModifyAccept: itemLinkFromText: "..itemLinkFromText.." looter: "..looter.." cost: "..cost.." lootNote: "..lootNote.." offspec: "..tostring(offspec));
+    
     local newloot = false;
     if (cost == "") then cost = 0; end
     cost = tonumber(cost);
@@ -1355,7 +1400,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     -- sanity-check values here - especially the itemlink / looter is free text / cost has to be a number
     local itemName, itemLink, itemId, itemString, itemRarity, itemColor, _, _, _, _, _, _, _, _ = MRT_GetDetailedItemInformation(itemLinkFromText);
     if itemColor then 
-        MRT_Debug("MRT_GUI_LootModifyAccept:itemColor: "..itemColor);
+        --MRT_Debug("MRT_GUI_LootModifyAccept:itemColor: "..itemColor);
     end
     if (not itemName) then
         MRT_Print(MRT_L.GUI["No itemLink found"]);
@@ -1371,20 +1416,41 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     local clooter = cleanFormatString(looter,true);
     --MRT_Debug("MRT_GUI_LootModifyAccept: clooter: " ..clooter);
     --MRT_Debug("MRT_GUI_LootModifyAccept: clooter:strLen " ..strlen(clooter));
-    if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked()) then
-        local validPlayerName = verifyPlayer(clooter);
-        if not validPlayerName then
-            StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-            StaticPopup_Show("MRT_GUI_ok");
+    --MRT_Debug("MRT_GUI_LootModifyAccept: not channel msg, do dirty check")
+    if not msg then 
+        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked()) then
+            local validPlayerName = verifyPlayer(clooter);
+            if not validPlayerName then
+                StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                StaticPopup_Show("MRT_GUI_ok");
+                return true;
+            end
+        else
+            MRT_GUI_HideDialogs();
             return true;
         end
-    else
-        MRT_GUI_HideDialogs();
-        return true;
     end
+     
     MRT_GUI_HideDialogs();
+    --MRT_Debug("MRT_GUI_LootModifyAccept: after Dirty check")
     -- insert new values here / if (lootnum == nil) then treat as a newly added item
     if (looter == "") then looter = "disenchanted"; end
+    --create channel message data here.  bossnum;lootnum;itemLink;Looter;cost;lootNote;offspec, eventid=4
+    if isMasterLooter() then 
+        MRT_Debug("MRT_GUI_LootModifyAccept: MasterLooter send message");
+        -- send message to addon channel with new loot message
+        if not MRT_MasterLooter then
+            MRT_MasterLooter = getMasterLooter();
+        end
+        local msg = {
+            ["RaidID"] = MRT_MasterLooter,
+            ["ID"] = MRT_Msg_ID,
+            ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+            ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec),
+            ["EventID"] = "4",
+        }
+        MRT_SendAddonMessage(msg, "RAID");
+    end
     local MRT_LootInfo = {
         ["ItemLink"] = itemLink,
         ["ItemString"] = itemString,
@@ -1398,17 +1464,23 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
         ["Offspec"] = offspec,
     }
     if (lootnum) then
-        MRT_Debug("MRT_GUI_LootModifyAccept:lootnum if ");
+        --MRT_Debug("MRT_GUI_LootModifyAccept:lootnum if ");
         if MRT_LootInfo["Offspec"] then
-            MRT_Debug("MRT_GUI_LootModifyAccept:Offspec = True");
+            --MRT_Debug("MRT_GUI_LootModifyAccept:Offspec = True");
         else
-            MRT_Debug("MRT_GUI_LootModifyAccept:Offspec = False");
+            --MRT_Debug("MRT_GUI_LootModifyAccept:Offspec = False");
         end
+        --MRT_Debug("MRT_GUI_LootModifyAccept:raidnum: " ..raidnum);
+        --MRT_Debug("MRT_GUI_LootModifyAccept:lootnum: " ..lootnum);
         local oldLootDB = MRT_RaidLog[raidnum]["Loot"][lootnum];
+    
         -- create a copy of the old loot data for the api
+        --MRT_Debug("MRT_GUI_LootModifyAccept:lootnum: " ..MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemName"]);
+        --MRT_Debug("MRT_GUI_LootModifyAccept: oldLootDB[itemName]".. oldLootDB["ItemName"]);
         local oldItemInfoTable = {}
         for key, val in pairs(oldLootDB) do
             oldItemInfoTable[key] = val;
+            --MRT_Debug("MRT_GUI_LootModifyAccept: val: " ..tostring(val))
         end
         MRT_LootInfo["ItemCount"] = oldLootDB["ItemCount"];
         MRT_LootInfo["Time"] = oldLootDB["Time"];
@@ -1477,18 +1549,18 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
     if (boss_select == nil) then
         if (raidnum_selected == raidnum) then
-            MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(nil,true)");
+            --MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(nil,true)");
             MRT_GUI_BossLootTableUpdate(nil, true);
         end
         return;
     end
     local bossnum_selected = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
     if (raidnum_selected == raidnum and bossnum_selected == bossnum) then
-        MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(bossnum,true)");
+        --MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(bossnum,true)");
         MRT_GUI_BossLootTableUpdate(bossnum, true);
     end
     if newloot then
-        MRT_Debug("MRT_GUI_Accept:new loot update the table");
+        --MRT_Debug("MRT_GUI_Accept:new loot update the table");
         MRT_GUI_BossLootTableUpdate(bossnum);
     end
 end

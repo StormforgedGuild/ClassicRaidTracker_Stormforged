@@ -46,6 +46,16 @@ MRT_LastPRImport = nil;
 MRT_SFExport = {};
 MRT_ArrayBossID = {};
 MRT_ArrayBosslast = nil;
+MRT_Msg_ID = 1;
+MRT_ChannelMsgStore = nil;
+MRT_ReadOnly = false;
+
+MsgEvents = {
+    [1] = "Create Raid",
+    [2] = "New Loot",
+    [3] = "Loot updated",
+};
+MRT_MasterLooter = nil;
 
 local MRT_Defaults = {
     ["Options"] = {
@@ -184,8 +194,7 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("BAG_UPDATE");
     frame:RegisterEvent("MERCHANT_SHOW");
     frame:RegisterEvent("MERCHANT_UPDATE");
-    frame:RegisterEvent("MERCHANT_UPDATE");
-    --frame:RegisterEvent("CHAT_MSG_ADDON");
+    frame:RegisterEvent("CHAT_MSG_ADDON");
 end
 
 -------------------------
@@ -205,7 +214,6 @@ function MRT_OnEvent(frame, event, ...)
         if (MRT_NumOfCurrentRaid) then
             MRT_AutoAddLoot(...);
         end
-
     elseif (event == "CHAT_MSG_WHISPER") then
         --use this to handle latest PR request
         --[[ if (not MRT_TimerFrame.GARunning) then return false; end
@@ -262,12 +270,14 @@ function MRT_OnEvent(frame, event, ...)
             MRT_EndActiveRaid();
         end
 
-    --elseif (event == "CHAT_MSG_ADDON") then
-        --local prefix, messageFromAddon = ...;
+    elseif (event == "CHAT_MSG_ADDON") then
+        local prefix, messageFromAddon, chan, sender, target = ...;
   --      MRT_Debug(prefix);
-        --if prefix == "SFRT" then
-           --MRT_Debug("SFRT: "..messageFromAddon);
-        --end
+        if prefix == "SFRT" then
+           --process message
+            --MRT_Debug("SFRT: "..messageFromAddon);
+            MRT_CHAT_MSG_ADDON_Handler(messageFromAddon, chan, sender, target);
+        end
 
     elseif (event == "PLAYER_ENTERING_WORLD") then
         frame:UnregisterEvent("PLAYER_ENTERING_WORLD");
@@ -290,6 +300,7 @@ function MRT_OnEvent(frame, event, ...)
         end);
 
     elseif (event == "PARTY_LOOT_METHOD_CHANGED") then
+        --set the loot method here... need to know if ML is set.
         MRT_Debug("Event PARTY_LOOT_METHOD_CHANGED fired.");
         if (not MRT_Options["General_MasterEnable"]) then
             MRT_Debug("MRT seems to be disabled. Ignoring Event.");
@@ -345,6 +356,95 @@ function MRT_OnEvent(frame, event, ...)
     end
 end
 
+function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
+    local strML = getMasterLooter();
+    MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: MasterLooter is " ..strML)
+    MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: got message from " ..channel.. " from "..sender)
+    MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: msg: " .. msg)
+    local sName = stripRealmFromName(sender)
+    if sName == UnitName("player") then 
+        MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: got a message from me do nothing!") 
+        return
+    end
+    if (string.lower(sName) ~= string.lower(strML)) and (channel == "RAID") then 
+         -- if message is sent to RAID channel and is not ML, ignore
+         MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: not ML or RAID")
+    else
+        local tbMsg = deserializeAddonMessage(msg);
+        MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: tbMsg RaidID = "..tbMsg["RaidID"].. " ID: " ..tbMsg["ID"].. " Time: " ..tbMsg["Time"].. " Data: " .. tbMsg["Data"].. " EventID: " ..tbMsg["EventID"])
+        if channel == "RAID" then
+            MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: Inside raid message check")
+            if not (MRT_ChannelMsgStore) then
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: channel store needs to be updated.")
+                MRT_ChannelMsgStore = {};
+                MRT_ChannelMsgStore[tbMsg["RaidID"]] = {};
+            end
+            MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: Adding msg to the channel store.")
+            addChannelMessageToStore(tbMsg);
+            if tbMsg["EventID"] == "3" then
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 3")
+                local playerName, strData = getToken(tbMsg["Data"], ";");
+                local itemLink, itemCount = getToken(strData, ";");
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: playerName: "..playerName.. " itemLink: "..itemLink)
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: playerName: itemCount: " ..itemCount)
+                MRT_AutoAddLootItem(playerName, itemLink, itemCount);
+            end
+            if tbMsg["EventID"] == "4" then
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 4")
+                --create channel message data here.  bossnum;lootnum;itemLink;Looter;cost;lootNote;offspec, eventid=4
+                local bossnum, strData = getToken(tbMsg["Data"], ";");
+                local lootnum, strData = getToken(strData, ";");
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: bossnum: "..bossnum.. " lootnum: "..lootnum)
+                MRT_GUI_LootModifyAccept(MRT_NumOfCurrentRaid, tonumber(bossnum), tonumber(lootnum), strData);
+            end
+            --process messages here
+        end
+    end
+    -- check other message here, like WHISPER
+end
+
+function stripRealmFromName(playerName)
+    return getToken(playerName, "-")
+end
+
+function addChannelMessageToStore(msg)
+    if isAddOnMessageInStore(msg) then
+        tinsert(MRT_ChannelMsgStore[msg["RaidID"]], msg);
+    end
+end
+
+function isAddOnMessageInStore(msg)
+    for i,v in pairs(MRT_ChannelMsgStore[msg["RaidID"]]) do
+        if v["ID"] == msg["ID"] then
+            return true
+        end
+    end 
+    return false
+end
+
+function deserializeAddonMessage(msg)
+    local strList = msg;
+    local strTruncList
+    local tblMsg = {};
+    -- msg["RaidID"]..","..msg["ID"]..","..msg["Time"]..","..msg["Data"]..",",msg["EventID"]
+    tblMsg["RaidID"], strTruncList = getToken(strList, ",");
+    tblMsg["ID"], strTruncList = getToken(strTruncList, ",");
+    tblMsg["Time"], strTruncList = getToken(strTruncList, ",");
+    tblMsg["Data"], strTruncList = getToken(strTruncList, ",")
+    tblMsg["EventID"] = strTruncList;
+    return tblMsg;
+end
+
+function getToken(strList, strDelim)
+    local index = substr(strList, strDelim);
+    if not index then
+        return strList, ""
+    end
+    local truncList = strsub(strList, index + 1);
+    local sTok = strsub(strList, 1, index - 1);
+    return sTok, truncList;
+end
+
 function ArghEasterEgg()
     if not (UnitName("player")=="Arghkettnaad") then
       return;
@@ -392,16 +492,16 @@ local SupressMsg = {}
 function ProcessWhisper(text, playerName)
     --if text:gsub("^%s*(.-)%s*$", "%1") == AutoInviteSettings.AutoInviteKeyword then
     local stext = text:gsub("^%s*(.-)%s*$", "%1")
-    MRT_Debug("Process Whisper: stext: " ..stext);
+    --MRT_Debug("Process Whisper: stext: " ..stext);
     local prefix = strsub(stext, 1, 5)
     local nopunc
     local numstripped = 0;
     nopunc, numstripped = string.gsub(prefix,"%p", "")
-    MRT_Debug("Process Whisper: numstripped: " ..numstripped);
+    --MRT_Debug("Process Whisper: numstripped: " ..numstripped);
     local sCom = strsub(nopunc,1,4);
     local sParams = strsub(stext,6 + numstripped)
-    MRT_Debug("Process Whisper: sCom: " ..sCom);
-    MRT_Debug("Process Whisper: sParams: " ..sParams);
+    --MRT_Debug("Process Whisper: sCom: " ..sCom);
+    --MRT_Debug("Process Whisper: sParams: " ..sParams);
     if string.lower(sCom) == string.lower ("epgp") then
         --SendChatMessage("What!?", "WHISPER",nil ,playerName);
         if sParams == "?" then
@@ -430,7 +530,7 @@ function doPRReply(playerName, sParams)
     local raid_select = nil;
     local filter = nil;
     local raidnum;
-    --MRT_Debug("Process Whisper: MRT_NumOFCurrentRaid: " ..MRT_NumOfCurrentRaid);
+    --MRT_Debug("Process Whisper: MRT_NumOfCurrentRaid: " ..MRT_NumOfCurrentRaid);
     if not(MRT_NumOfCurrentRaid) then
         raid_select = MRT_GUI_RaidLogTable:GetSelection();
         if not raid_select then
@@ -716,6 +816,12 @@ function MRT_SlashCmdHandler(msg)
     MRT_Print("'"..slashCmd.." deleteall now' deletes the complete raid log. USE WITH CAUTION!");
 end
 
+function MRT_SlashCmdHandlerRO(msg)
+    MRT_Debug("MRT_SlashCmdHandlerRO")
+    MRT_GUI_Toggle(true);
+end
+
+
 -- Chat handler
 local MRT_ChatHandler = {};
 function MRT_ChatHandler:CHAT_MSG_WHISPER_Filter(event, msg, from, ...)
@@ -760,6 +866,7 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", MRT_ChatHandler.CHAT_MSG_WHISPER_Filter);
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", MRT_ChatHandler.CHAT_MSG_WHISPER_INFORM_FILTER);
 
+
 ------------------
 --  Initialize  --
 ------------------
@@ -777,6 +884,8 @@ function MRT_Initialize(frame)
     if (MRT_Options["General_SlashCmdHandler"] and MRT_Options["General_SlashCmdHandler"] ~= "") then
         SLASH_MIZUSRAIDTRACKER1 = "/"..MRT_Options["General_SlashCmdHandler"];
         SlashCmdList["MIZUSRAIDTRACKER"] = function(msg) MRT_SlashCmdHandler(msg); end
+        SLASH_SFREADONLY1 = "/epgp";
+        SlashCmdList["SFREADONLY"] = function(msg) MRT_SlashCmdHandlerRO(msg); end
     end
     -- set up LDB data source
     MRT_LDB_DS = LDB:NewDataObject("Classic RaidTracker_Stormforged", {
@@ -828,15 +937,15 @@ function MRT_Initialize(frame)
     MRT_Options["General_Version"] = MRT_ADDON_VERSION;
     MRT_Options["General_ClientLocale"] = GetLocale();
 
+    C_ChatInfo.RegisterAddonMessagePrefix("SFRT")
 
-   -- C_ChatInfo.RegisterAddonMessagePrefix("SFRT")
-
-   HookToolTips();
+    HookToolTips();
 
     -- Finish
     MRT_Debug("Addon loaded.");
 
 end
+
 
 ----------------------
 --  Apply Defaults  --
@@ -1326,6 +1435,7 @@ function MRT_CheckZoneAndSizeStatus()
 end
 
 function MRT_CreateNewRaid(zoneName, raidSize, diffID)
+    
     assert(zoneName, "Invalid argument: zoneName is nil.")
     assert(raidSize, "Invalid argument: raidSize is nil.")
     assert(diffID, "Invalid argument: diffID is nil.")
@@ -1383,7 +1493,16 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
     -- update LDB text and icon
     MRT_LDB_DS.icon = "Interface\\AddOns\\ClassicRaidTracker_Stormforged\\icons\\icon_enabled";
 
-    --send message to chatchannel with new raid info serialize MRT_RaidInfo
+end
+
+function getMasterLooter()
+    local _, _, MasterLootRaidIndex = GetLootMethod();
+    if (MasterLootRaidIndex) then
+        local MLName = GetRaidRosterInfo(MasterLootRaidIndex);
+        return MLName;
+    else
+        return "Hokei";
+    end
 end
 
 function MRT_ResumeLastRaid()
@@ -1640,7 +1759,6 @@ end
 --getSFEPGP gets the EP and GP for a given player
 function getSFEPGP(PlayerName)
     --MRT_Debug("getSFEPGP: Called!");        
-    --MRT_Debug("getSFEPGP: PlayerName: "..PlayerName);
     return getSFData(PlayerName);
 end
 function getSFData(PlayerName)
@@ -1650,11 +1768,6 @@ function getSFData(PlayerName)
         --MRT_Debug("getSFEPGP: about to start loop");        
         local playerCount = MRT_SFExport["info"]["total_players"];
         for key, value in pairs(MRT_SFExport["players"]) do
-            --MRT_Debug("getSFEPGP: in for loop");
-            --MRT_Debug("getSFEPGP: key = "..key);
-            --MRT_Debug("getSFEPGP: PlayerName = "..PlayerName);
-            --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
-            --MRT_Debug("getSFEPGP: value[main_name]: "..value["main_name"]);  
             if strcomp(value["name"],PlayerName) then
                 --MRT_Debug("getSFEPGP: Found player"); 
                 --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
@@ -1767,10 +1880,14 @@ end
 --  loot tracking functions  --
 -------------------------------
 -- track loot based on chatmessage recognized by event CHAT_MSG_LOOT
+MRT_LastLooter = "";
+MRT_LastLootitem = "";
+MRT_LastLootTime = "";
 function MRT_AutoAddLoot(chatmsg)
     MRT_Debug("Loot event received. Processing...");
     -- patterns LOOT_ITEM / LOOT_ITEM_SELF are also valid for LOOT_ITEM_MULTIPLE / LOOT_ITEM_SELF_MULTIPLE - but not the other way around - try these first
     -- first try: somebody else received multiple loot (most parameters)
+    
     local playerName, itemLink, itemCount = deformat(chatmsg, LOOT_ITEM_MULTIPLE);
     -- next try: somebody else received single loot
     if (playerName == nil) then
@@ -1795,7 +1912,66 @@ function MRT_AutoAddLoot(chatmsg)
     -- if code reaches this point, we should have a valid looter and a valid itemLink
     -- SF: hack to assign to disenchanted playerName = "disenchanted";
     MRT_Debug("Item looted - Looter is "..playerName.." and loot is "..itemLink);
-	MRT_AutoAddLootItem(playerName, itemLink, itemCount);
+    
+    --[RaidID][ID][timesent][data][msgEventID]
+    -- _,_,MasterLootRaidIndex = GetLootMethod()
+    --cache the item
+    local itemName, _, itemId, itemString, itemRarity, itemColor, itemLevel, _, itemType, itemSubType, _, _, _, _, itemClassID, itemSubClassID = MRT_GetDetailedItemInformation(itemLink);
+    if not MRT_MasterLooter then
+        MRT_MasterLooter = getMasterLooter();
+    end
+    
+    if MRT_ReadOnly or isMasterLootSet() then
+        MRT_Debug("MRT_AutoAddLoot: readonly mode or MasterLoot set");
+        --if readlonly or ML set, wait for channel message
+        if isMasterLooter() then
+            MRT_AutoAddLootItem(playerName, itemLink, itemCount);
+        end    
+    else
+        MRT_Debug("MRT_AutoAddLoot: not readonly mode and not master loot");
+        MRT_AutoAddLootItem(playerName, itemLink, itemCount);
+        
+        MRT_LastLooter = playerName
+        MRT_LastLootitem = itemLink
+    end
+end
+
+function isMasterLootSet()
+    local strLootMethod = GetLootMethod();
+    return strLootMethod == "master";
+end
+
+function isMasterLooter()
+    -- return true if master looter and player is the same
+    MRT_Debug("IsMasterLooter called")
+    local ML = getMasterLooter();
+    MRT_Debug("IsMasterLooter: ML = " ..ML)
+
+    local PN = UnitName("player");
+    MRT_Debug("IsMasterLooter: PN = " ..PN)
+    return ML == PN;
+end
+
+function MRT_SendAddonMessage(msg, channel)
+    local strMsg = serializeAddonMessage(msg);
+    --add message to the message log
+    MRT_Debug("Sending message")
+    if not MRT_ChannelMsgStore then
+        --add first entry.
+        MRT_ChannelMsgStore = {};
+        MRT_ChannelMsgStore[msg["RaidID"]] = {};
+    end
+    tinsert(MRT_ChannelMsgStore[msg["RaidID"]], msg)
+
+    C_ChatInfo.SendAddonMessage("SFRT", strMsg, channel);
+    MRT_Debug("sending strMsg: " ..strMsg)
+    --increment message ID
+    MRT_Msg_ID = MRT_Msg_ID + 1;
+end
+
+function serializeAddonMessage(msg)
+    local retVal = msg["RaidID"]..","..msg["ID"]..","..msg["Time"]..","..msg["Data"]..","..msg["EventID"];
+    return retVal;
 end
 
 function autoAssign (itemName)
@@ -1820,12 +1996,24 @@ end
 function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
 	if (not playerName) then return; end
 	if (not itemLink) then return; end
-	if (not itemCount) then return; end
-	MRT_Debug("MRT_AutoAddLootItem called - playerName: "..playerName.." - itemLink: "..itemLink.." - itemCount: "..itemCount);
+    if (not itemCount) then return; end
+    --MRT_Debug("MRT_AutoAddLootItem wtf itemLink: "..itemLink);
+    local strItemLink = ""..itemLink;
+    --[[ MRT_Debug("MRT_AutoAddLootItem strItemLink: "..strItemLink);
+    MRT_Debug("MRT_AutoAddLootItem called playerName: "..playerName.." itemLink: "..itemLink.." itemCount: "..itemCount);
+    MRT_Debug("MRT_AutoAddLootItem strItemLink: "..strItemLink); ]]
     -- example itemLink: |cff9d9d9d|Hitem:7073:0:0:0:0:0:0:0|h[Broken Fang]|h|r (outdated!)
     local itemName, _, itemId, itemString, itemRarity, itemColor, itemLevel, _, itemType, itemSubType, _, _, _, _, itemClassID, itemSubClassID = MRT_GetDetailedItemInformation(itemLink);
+    --[[ local itemName, itemLink1, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice, itemClassID, itemSubClassID = GetItemInfo(strItemLink);
+    MRT_Debug("MRT_AutoAddLootItem after GetItemInfo itemLink1: "..itemLink1);
+    MRT_Debug("MRT_AutoAddLootItem after GetItemInfo strItemLink: "..strItemLink); ]]
+    --[[ local _, itemString, _ = deformat(itemLink1, "|c%s|H%s|h%s|h|r");
+    local itemId, _ = deformat(itemString, "item:%d:%s");
+    local itemColor = MRT_ItemColors[itemRarity + 1];
+ ]]
     if (not itemName == nil) then MRT_Debug("Panic! Item information lookup failed horribly. Source: MRT_AutoAddLootItem()"); return; end
     -- check options, if this item should be tracked
+    MRT_Debug("MRT_AutoAddLootItem itemName: " ..itemName.." itemRarity: " ..itemRarity);
     if (MRT_Options["Tracking_MinItemQualityToLog"] > itemRarity) then MRT_Debug("Item not tracked - quality is too low."); return; end
     if (MRT_Options["Tracking_OnlyTrackItemsAboveILvl"] > itemLevel) then MRT_Debug("Item not tracked - iLvl is too low."); return; end
     -- itemClassID 3 = "Gem", itemSubClassID 11 = "Artifact Relic"; itemClassID 7 = "Tradeskill", itemSubClassID 4 = "Jewelcrafting", 12 = Enchanting
@@ -1857,14 +2045,14 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     -- SF: ep/gp code here.
 
     if (MRT_Options["ItemTracking_UseEPGPValues"]) then
-        MRT_Debug("MRT_AutoAddLootItem called - pregetvalue");
+        --MRT_Debug("MRT_AutoAddLootItem called - pregetvalue");
         gp1 = LibSFGP:GetValue(itemLink);
-        MRT_Debug("MRT_AutoAddLootItem called - postgetvalue");
+        --MRT_Debug("MRT_AutoAddLootItem called - postgetvalue");
         if (not gp1) then
-            MRT_Debug("MRT_AutoAddLootItem called - gp1 =nil");
+            --MRT_Debug("MRT_AutoAddLootItem called - gp1 =nil");
             dkpValue = 0
         else
-            MRT_Debug("MRT_AutoAddLootItem called - gp1 !=nil = "..gp1);
+            --MRT_Debug("MRT_AutoAddLootItem called - gp1 !=nil = "..gp1);
             dkpValue = gp1
             --itemNote = string.format("%d", gp1);
         end
@@ -1931,8 +2119,34 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         ["Note"] = dNote, -- itemNote
         ["OffSpec"] = offspec, --OffSpec costing
     };
+    --MRT_LastLootTime = MRT_LootInfo["Time"];
+    MRT_Debug("MRT_AutoAddLootItem: inserting into MRT_RaidLog")
     tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"], MRT_LootInfo);
-    -- get current loot mode
+    MRT_GUI_RaidDetailsTableUpdate(MRT_NumOfCurrentRaid);
+
+  --[[   --debugging
+    local dbgLootTable = MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"];
+    if dbgLootTable then 
+        local numofloot = table.maxn(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"])
+        if numofloot then
+            MRT_Debug("MRT_GUI_LootModify: numofloot: " ..numofloot)
+            for i,v in pairs(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"]) do
+                MRT_Debug("MRT_GUI_LootModify: new entry added.. loot entry name: "..v["ItemName"])
+            end
+        end
+    end ]]
+    if isMasterLooter() then 
+        MRT_Debug("MRT_AutoAddLootItem: MasterLooter send message");
+        -- send message to addon channel with new loot message
+        local msg = {
+            ["RaidID"] = MRT_MasterLooter,
+            ["ID"] = MRT_Msg_ID,
+            ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+            ["Data"] = playerName..";"..itemLink..";"..itemCount,
+            ["EventID"] = "3",
+        }
+        MRT_SendAddonMessage(msg, "RAID");
+    end
     local isPersonal = select(1, GetLootMethod()) == "personalloot"
     -- check if we should ask the player for item cost
     if (supressCostDialog or (not MRT_Options["Tracking_AskForDKPValue"]) or (isPersonal and not MRT_Options["Tracking_AskForDKPValuePersonal"])) then
@@ -1958,9 +2172,14 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         end
         return;
     end
-    if (MRT_Options["Tracking_MinItemQualityToGetDKPValue"] > MRT_ItemColorValues[itemColor]) then return; end
+    MRT_Debug("MRT_AutoAddLootItem: MinItemQuality check")
+    if (MRT_Options["Tracking_MinItemQualityToGetDKPValue"] > MRT_ItemColorValues[itemColor]) then 
+        MRT_Debug("MRT_AutoAddLootItem: MinItemQuality failed, returning")
+        return; 
+    end
     -- ask the player for item cost
     MRT_DKPFrame_AddToItemCostQueue(MRT_NumOfCurrentRaid, #MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"]);
+    
 end
 
 function MRT_ManualAddLoot(itemLink, looter, cost)
@@ -2359,8 +2578,12 @@ end
 -- If itemIdentifier is not valid, the return value will be nil
 -- otherwise, it will be a long tuple of item information
 function MRT_GetDetailedItemInformation(itemIdentifier)
+    --MRT_Debug("MRT_GetDetailedItemInformation: itemIdentifier: " ..itemIdentifier)
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice, itemClassID, itemSubClassID = GetItemInfo(itemIdentifier);
-    if (not itemLink) then return nil; end
+    if (not itemLink) then 
+        --MRT_Debug("MRT_GetDetailedItemInformation: itemlink didn't return ")
+        return nil; 
+    end
     local _, itemString, _ = deformat(itemLink, "|c%s|H%s|h%s|h|r");
     local itemId, _ = deformat(itemString, "item:%d:%s");
     local itemColor = MRT_ItemColors[itemRarity + 1];
