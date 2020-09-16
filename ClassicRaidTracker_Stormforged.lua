@@ -1645,7 +1645,7 @@ function getSFEPGP(PlayerName)
 end
 function getSFData(PlayerName)
     if not MRT_SFExport["info"] then
-        return "0";
+        return "0.00";
     else
         --MRT_Debug("getSFEPGP: about to start loop");        
         local playerCount = MRT_SFExport["info"]["total_players"];
@@ -1663,7 +1663,7 @@ function getSFData(PlayerName)
                 end
             end
         end
-        return "0", "0", "0";
+        return "0.00", "0.00", "0.00";
     end
 end
 
