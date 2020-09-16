@@ -301,7 +301,7 @@ function MRT_OnEvent(frame, event, ...)
         MRT_Debug("Trade initiated");
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true);
         encourageTrade();
-        MessWArgh();
+        --MessWArgh();
 
 
     elseif (event == "TRADE_CLOSED") then
