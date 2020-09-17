@@ -312,7 +312,7 @@ function MRT_OnEvent(frame, event, ...)
         MRT_Debug("Trade initiated");
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true);
         encourageTrade();
-        MessWArgh();
+        --MessWArgh();
 
 
     elseif (event == "TRADE_CLOSED") then
@@ -1763,7 +1763,7 @@ function getSFEPGP(PlayerName)
 end
 function getSFData(PlayerName)
     if not MRT_SFExport["info"] then
-        return "0";
+        return "0.00";
     else
         --MRT_Debug("getSFEPGP: about to start loop");        
         local playerCount = MRT_SFExport["info"]["total_players"];
@@ -1776,7 +1776,7 @@ function getSFData(PlayerName)
                 end
             end
         end
-        return "0", "0", "0";
+        return "0.00", "0.00", "0.00";
     end
 end
 

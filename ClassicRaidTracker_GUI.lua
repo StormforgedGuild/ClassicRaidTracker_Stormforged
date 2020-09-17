@@ -1644,6 +1644,17 @@ function MRT_GUI_TradeLink()
     --disable animation once clicked
     stopEncouragingTrade();
 
+    --commit save if the loot dialog is visible.
+    if MRT_GUI_FourRowDialog:IsVisible() then
+        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked()) then
+            --MRT_Debug("STOnClick: isDirty == True");
+            local error = false;
+            error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+            if error then
+               --do nothing
+            end
+        end
+    end;
     --get the items the person is supposed to get
     local itemsToTrade = MRT_GetTradeableItems();
 
@@ -1706,7 +1717,7 @@ function MessWArgh()
         SplitContainerItem(bag1, slot1, 1)
         local bag = bagWFreeSlots(bag1)
         if bag then
-            MRT_Debug("bag with free slot found bag: " ..bag)
+           --MRT_Debug("bag with free slot found bag: " ..bag)
             if bag == 0 then
                 --MRT_Debug("putting in backback")
                 PutItemInBackpack();
