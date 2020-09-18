@@ -412,7 +412,6 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
             if tbMsg["EventID"] == "4" then
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 4")
                 --create channel message data here.  bossnum;lootnum;itemLink;Looter;cost;lootNote;offspec, eventid=4
-                --TODO: This event should probably also update the PR if loot is assigned to a player
                 local bossnum, strData = getToken(tbMsg["Data"], ";");
                 local lootnum, strData = getToken(strData, ";");
                 local raid_select = MRT_GUI_RaidLogTable:GetSelection();
@@ -470,15 +469,20 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
             if tbMsg["EventID"] == "1" then
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 1")
                 --testing use get current raid.
-                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-                if not MRT_NumOfCurrentRaid then
-                    strRaidNum = raidnum
+                if not(MRT_NumOfCurrentRaid) then
+                    raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                    if not raid_select then
+                        MRT_GUI_RaidLogTable:SetSelection(1)
+                        raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                        MRT_GUI_RaidLogTable:ClearSelection()
+                    end
+                    --MRT_Debug("doPRReply: raid_select: " .. raid_select);
+                    strRaidNum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
                 else
                     strRaidNum = MRT_NumOfCurrentRaid
                 end
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 1: strRaidNum: "..strRaidNum);
-                local RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum);
+                local RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
                 --create data
                 if isMasterLooter() then 
                     MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: MasterLooter send message");
@@ -1614,6 +1618,8 @@ end
 
 function getMasterLooter()
     -- for debug testing, we can set Main to someone other than the ML.
+    -- uncomment next line for testing to assign ML  replace <playername> with ML tester... this should be the one that is the "server"
+    --return "<playername>"
     local _, _, MasterLootRaidIndex = GetLootMethod();
     if (MasterLootRaidIndex) then
         local MLName = GetRaidRosterInfo(MasterLootRaidIndex);

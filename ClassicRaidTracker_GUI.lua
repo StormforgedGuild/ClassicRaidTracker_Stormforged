@@ -368,7 +368,6 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_StartNewRaid_Button:SetPoint("TOPRIGHT", MRT_GUIFrame_Import_PR_Button, "RIGHT", 22, 11);
     MRT_GUIFrame_RaidLog_Delete_Button:SetText(MRT_L.GUI["Button_Delete_Raid"]);
     MRT_GUIFrame_RaidLog_Delete_Button:SetPoint("LEFT", MRT_GUIFrame_StartNewRaid_Button, "RIGHT", 0, 0);
-
     MRT_GUIFrame_RaidAttendees_Add_Button:SetText(MRT_L.GUI["Button_Small_Add"]);
     MRT_GUIFrame_RaidAttendees_Add_Button:SetPoint("TOPLEFT", MRT_GUIFrame_RaidAttendees_Filter, "RIGHT", 1, 11);
     MRT_GUIFrame_RaidAttendees_Delete_Button:SetText(MRT_L.GUI["Button_Small_Delete"]);
@@ -513,6 +512,18 @@ function MRT_GUI_Toggle(readonly)
             --setup event bypassing to channel
             MRT_Debug("MRT_GUI_Toggle: readonly = True")
             MRT_ReadOnly = true;
+            MRT_GUIFrame_RaidLog_Export_Button:SetEnabled(false)
+            MRT_GUIFrame_Import_PR_Button:SetEnabled(false)
+            MRT_GUIFrame_RaidAttendees_Delete_Button:SetEnabled(false)
+            MRT_GUIFrame_BossLoot_Delete_Button:SetEnabled(false)
+            MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetEnabled(false)
+            MRT_GUIFrame_BossLoot_RaidLink_Button:SetEnabled(false)
+            MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false)
+            MRT_GUIFrame_RaidAttendees_Add_Button:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUIFrame_RaidAttendees_Add_Button, "BA_Update"); end);
+            MRT_GUIFrame_RaidAttendees_Add_Button:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
+            MRT_GUIFrame_BossLoot_Modify_Button:SetEnabled(false)
+            
+
         else
             --only run this if we're not in readonly mode
             MRT_Debug("MRT_GUI_Toggle: readonly = false")
