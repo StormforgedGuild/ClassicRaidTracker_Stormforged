@@ -48,8 +48,10 @@ MRT_ArrayBossID = {};
 MRT_ArrayBosslast = nil;
 MRT_Msg_ID = 1;
 MRT_ChannelMsgStore = nil;
+MRT_ChannelMsgRequestStore = nil;
 MRT_ReadOnly = false;
 MRT_ROPlayerPR = {};
+MRT_Msg_Request_ID = 1;
 
 MsgEvents = {
     [1] = "Create Raid",
@@ -441,11 +443,73 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 5: strRaidNum: "..strRaidNum) ;
                 MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
             end
+            --Event 6 is PR updated
+           --[[  if tbMsg["EventID"] == "6" then
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 6")
+                local strData = tbMsg["Data"];
+                local strRaidNum;
+                ProcessROPlayerPR(strData);
+                --testing use get current raid.
+                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                if not MRT_NumOfCurrentRaid then
+                    strRaidNum = raidnum
+                else
+                    strRaidNum = MRT_NumOfCurrentRaid
+                end
+                -- update the PR here.  set msg data to PlayerDB and update the attendees table.
+                local strName, strData = getToken(strData, ";");
+                local sPR = strData;
+                local strRealm = GetRealmName
+                MRT_ROPlayerPR[strName] = sPR;
+                MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
+            end ]]
             --process messages here
+        elseif channel == "WHISPER" then
+            --Handle Whisper request
+            if tbMsg["EventID"] == "1" then
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 1")
+                --testing use get current raid.
+                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                if not MRT_NumOfCurrentRaid then
+                    strRaidNum = raidnum
+                else
+                    strRaidNum = MRT_NumOfCurrentRaid
+                end
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 1: strRaidNum: "..strRaidNum);
+                local RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum);
+                --create data
+                if isMasterLooter() then 
+                    MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: MasterLooter send message");
+                    SendPRMsg(RaidAttendees, channel, sender);
+                    -- send message to addon channel with new loot message
+                else
+                    MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 1")
+                    local strData = tbMsg["Data"];
+                    local strRaidNum;
+                    ProcessROPlayerPR(strData);
+                    --testing use get current raid.
+                    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                    if not MRT_NumOfCurrentRaid then
+                        strRaidNum = raidnum
+                    else
+                        strRaidNum = MRT_NumOfCurrentRaid
+                    end
+                    MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 1: strRaidNum: "..strRaidNum) ;
+                    MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
+                end
+                
+                    
+                
+            end
+
         end
         -- We might use a whisper channel to request new PR - maybe add UI for the ReadOnly mode to request PR update.
     end
     -- check other message here, like WHISPER
+    
 end
 
 function stripRealmFromName(playerName)
@@ -2013,21 +2077,40 @@ function isMasterLooter()
     return ML == PN;
 end
 
-function MRT_SendAddonMessage(msg, channel)
+function MRT_SendAddonMessage(msg, channel, target)
     local strMsg = serializeAddonMessage(msg);
     --add message to the message log
-    MRT_Debug("Sending message")
-    if not MRT_ChannelMsgStore then
-        --add first entry.
-        MRT_ChannelMsgStore = {};
-        MRT_ChannelMsgStore[msg["RaidID"]] = {};
-    end
-    tinsert(MRT_ChannelMsgStore[msg["RaidID"]], msg)
+    if channel == "RAID" then
+        MRT_Debug("MRT_SendAddonMessage: Sending message to RAID")
+        if not MRT_ChannelMsgStore then
+            --add first entry.
+            MRT_ChannelMsgStore = {};
+            MRT_ChannelMsgStore[msg["RaidID"]] = {};
+        end
+        tinsert(MRT_ChannelMsgStore[msg["RaidID"]], msg)
 
-    C_ChatInfo.SendAddonMessage("SFRT", strMsg, channel);
-    MRT_Debug("sending strMsg: " ..strMsg)
-    --increment message ID
-    MRT_Msg_ID = MRT_Msg_ID + 1;
+        C_ChatInfo.SendAddonMessage("SFRT", strMsg, channel);
+        MRT_Debug("sending strMsg: " ..strMsg)
+        --increment message ID
+        MRT_Msg_ID = MRT_Msg_ID + 1;
+    elseif channel == "WHISPER" then
+        MRT_Debug("MRT_SendAddonMessage: Sending message to WHISPER")
+        if not MRT_ChannelMsgRequestStore then
+            --add first entry.
+            MRT_ChannelMsgRequestStore = {};
+            MRT_ChannelMsgRequestStore[msg["RaidID"]] = {};
+        end
+        tinsert(MRT_ChannelMsgRequestStore[msg["RaidID"]], msg);
+        local strTarget
+        if not target then 
+            strTarget = getMasterLooter();
+        else
+            strTarget = target
+        end
+        C_ChatInfo.SendAddonMessage("SFRT", strMsg, channel, strTarget);
+        MRT_Debug("sending strMsg: " ..strMsg)
+        MRT_Msg_Request_ID = MRT_Msg_Request_ID + 1;
+    end
 end
 
 function serializeAddonMessage(msg)

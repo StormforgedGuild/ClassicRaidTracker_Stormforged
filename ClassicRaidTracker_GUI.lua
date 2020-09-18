@@ -869,29 +869,43 @@ end
 end ]]
 
 function MRT_GUI_RaidAttendeeAdd()
+    if not MRT_ReadOnly then 
+        MRT_GUI_HideDialogs();
+        local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+        if (raid_select == nil) then
+            MRT_Print(MRT_L.GUI["No raid selected"]);
+            return;
+        end
+        local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+        MRT_GUI_ThreeRowDialog_Title:SetText(MRT_L.GUI["Add raid attendee"]);
+        MRT_GUI_ThreeRowDialog_EB1_Text:SetText(MRT_L.GUI["Col_Name"]);
+        MRT_GUI_ThreeRowDialog_EB1:SetText("");
+        MRT_GUI_ThreeRowDialog_EB2_Text:SetText(MRT_L.GUI["Col_Join"]);
+        MRT_GUI_ThreeRowDialog_EB2:SetText("");
+        MRT_GUI_ThreeRowDialog_EB2:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUI_ThreeRowDialog_EB2, "Attendee_Add_JoinEB"); end);
+        MRT_GUI_ThreeRowDialog_EB2:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
+        MRT_GUI_ThreeRowDialog_EB3_Text:SetText(MRT_L.GUI["Col_Leave"]);
+        MRT_GUI_ThreeRowDialog_EB3:SetText("");
+        MRT_GUI_ThreeRowDialog_EB3:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUI_ThreeRowDialog_EB3, "Attendee_Add_LeaveEB"); end);
+        MRT_GUI_ThreeRowDialog_EB3:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
+        MRT_GUI_ThreeRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
+        MRT_GUI_ThreeRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_RaidAttendeeAddAccept(raidnum); end);
+        MRT_GUI_ThreeRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
+        MRT_GUI_ThreeRowDialog:Show();
+    else
+        --update attendee PR
+        --TODO: send whisper message to ML to update PR
+        local msg = {
+            ["RaidID"] = "1",
+            ["ID"] = MRT_Msg_Request_ID,
+            ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+            ["Data"] = "",
+            ["EventID"] = "1",
+        }
+        MRT_SendAddonMessage(msg, "WHISPER");
+        
 
-    MRT_GUI_HideDialogs();
-    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-    if (raid_select == nil) then
-        MRT_Print(MRT_L.GUI["No raid selected"]);
-        return;
     end
-    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-    MRT_GUI_ThreeRowDialog_Title:SetText(MRT_L.GUI["Add raid attendee"]);
-    MRT_GUI_ThreeRowDialog_EB1_Text:SetText(MRT_L.GUI["Col_Name"]);
-    MRT_GUI_ThreeRowDialog_EB1:SetText("");
-    MRT_GUI_ThreeRowDialog_EB2_Text:SetText(MRT_L.GUI["Col_Join"]);
-    MRT_GUI_ThreeRowDialog_EB2:SetText("");
-    MRT_GUI_ThreeRowDialog_EB2:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUI_ThreeRowDialog_EB2, "Attendee_Add_JoinEB"); end);
-    MRT_GUI_ThreeRowDialog_EB2:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
-    MRT_GUI_ThreeRowDialog_EB3_Text:SetText(MRT_L.GUI["Col_Leave"]);
-    MRT_GUI_ThreeRowDialog_EB3:SetText("");
-    MRT_GUI_ThreeRowDialog_EB3:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUI_ThreeRowDialog_EB3, "Attendee_Add_LeaveEB"); end);
-    MRT_GUI_ThreeRowDialog_EB3:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
-    MRT_GUI_ThreeRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
-    MRT_GUI_ThreeRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_RaidAttendeeAddAccept(raidnum); end);
-    MRT_GUI_ThreeRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
-    MRT_GUI_ThreeRowDialog:Show();
 end
 
 function MRT_GUI_RaidAttendeeAddAccept(raidnum)
@@ -1436,21 +1450,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     -- insert new values here / if (lootnum == nil) then treat as a newly added item
     if (looter == "") then looter = "disenchanted"; end
     --create channel message data here.  bossnum;lootnum;itemLink;Looter;cost;lootNote;offspec, eventid=4
-    if isMasterLooter() then 
-        MRT_Debug("MRT_GUI_LootModifyAccept: MasterLooter send message");
-        -- send message to addon channel with new loot message
-        if not MRT_MasterLooter then
-            MRT_MasterLooter = getMasterLooter();
-        end
-        local msg = {
-            ["RaidID"] = "1",
-            ["ID"] = MRT_Msg_ID,
-            ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
-            ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec),
-            ["EventID"] = "4",
-        }
-        MRT_SendAddonMessage(msg, "RAID");
-    end
+    
     local MRT_LootInfo = {
         ["ItemLink"] = itemLink,
         ["ItemString"] = itemString,
@@ -1513,12 +1513,39 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
                 pcall(val, itemInfo, MRT_NOTIFYSOURCE_EDIT_GUI, raidnum, lootnum, oldItemInfoTable);
             end
         end
+        if isMasterLooter() then 
+            MRT_Debug("MRT_GUI_LootModifyAccept: sending Loot Updated msg");
+            -- send message to addon channel with new loot message
+            if not MRT_MasterLooter then
+                MRT_MasterLooter = getMasterLooter();
+            end
+            local msg = {
+                ["RaidID"] = "1",
+                ["ID"] = MRT_Msg_ID,
+                ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+                ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec),
+                ["EventID"] = "4",
+            }
+            MRT_SendAddonMessage(msg, "RAID");
+        end
     else
         newloot = true;
         MRT_LootInfo["ItemCount"] = 1;
         MRT_LootInfo["Time"] = MRT_RaidLog[raidnum]["Bosskills"][bossnum]["Date"] + 15;
         tinsert(MRT_RaidLog[raidnum]["Loot"], MRT_LootInfo);
         -- notify registered, external functions
+        if isMasterLooter() then 
+            MRT_Debug("MRT_GUI_LootModifyAccept: sending new loot msg");
+            -- send message to addon channel with new loot message
+            local msg = {
+                ["RaidID"] = "1",
+                ["ID"] = MRT_Msg_ID,
+                ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+                ["Data"] = MRT_LootInfo["Looter"]..";"..MRT_LootInfo["ItemLink"]..";".."1",
+                ["EventID"] = "3",
+            }
+            MRT_SendAddonMessage(msg, "RAID");
+        end
         if (#MRT_ExternalLootNotifier > 0) then
             local itemNum = #MRT_RaidLog[raidnum]["Loot"];
             local itemInfo = {};
@@ -1541,7 +1568,27 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     end
     -- do table update, if selected loot table was modified
     MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
-    
+    -- Send updated PR msg here.
+  --[[   if isPlayer(MRT_LootInfo["Looter"]) then
+        MRT_Debug("MRT_GUI_LootModifyAccept: sending modified PR msg");
+        MRT_Debug("MRT_GUI_LootModifyAccept: MRT_LootInfo[Looter]"..MRT_LootInfo["Looter"]);
+            -- send message to addon channel with new loot message
+            local msg = {
+                ["RaidID"] = "1",
+                ["ID"] = MRT_Msg_ID,
+                ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+                ["Data"] = MRT_LootInfo["Looter"]..";"..getModifiedPR(raidnum, MRT_LootInfo["Looter"]),
+                ["EventID"] = "6",
+            }
+            MRT_SendAddonMessage(msg, "RAID");    
+    end ]]
+    local RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum);
+    --create data
+    if isMasterLooter() then 
+        MRT_Debug("MRT_GUI_LootModifyAccept: MasterLooter send message");
+        SendPRMsg(RaidAttendees);
+        -- send message to addon channel with new loot message
+    end
     local item_select = MRT_GUI_BossLootTable:GetSelection();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then return; end
@@ -1564,6 +1611,13 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
         MRT_GUI_BossLootTableUpdate(bossnum);
     end
 end
+
+--This function returns whether or not a name is a reserved name, pug, bank, unassigned, disenchanted
+
+function isPlayer(PlayerName)
+    return (PlayerName ~= "pug") or (PlayerName  ~= "bank") or (PlayerName ~= "unassigned") or (PlayerName ~= "disenchanted");
+end
+
 
 function MRT_GUI_LootRaidWinner()
     --MRT_GUI_HideDialogs();
