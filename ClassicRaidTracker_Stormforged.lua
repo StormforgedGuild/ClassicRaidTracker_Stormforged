@@ -49,11 +49,13 @@ MRT_ArrayBosslast = nil;
 MRT_Msg_ID = 1;
 MRT_ChannelMsgStore = nil;
 MRT_ReadOnly = false;
+MRT_ROPlayerPR = {};
 
 MsgEvents = {
     [1] = "Create Raid",
     [2] = "New Loot",
     [3] = "Loot updated",
+    [4] = "PR Imported"
 };
 MRT_MasterLooter = nil;
 
@@ -307,6 +309,17 @@ function MRT_OnEvent(frame, event, ...)
             return;
         end;
         MRT_CheckZoneAndSizeStatus();
+        if isMasterLootSet() then
+            --get master looter if masterlooter ~= player then set mode to readonly
+            --MRT_ReadOnly = not isMasterLooter();
+            if isMasterLooter() then
+                MRT_ReadOnly = false;
+            else
+                MRT_ReadOnly = true;
+            end
+        else
+            --if not ML mode, do nothing.
+        end
 
     elseif (event == "TRADE_SHOW") then
         MRT_Debug("Trade initiated");
@@ -357,6 +370,7 @@ function MRT_OnEvent(frame, event, ...)
 end
 
 function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
+    --if debugging, change the ML in getMasterLooter()
     local strML = getMasterLooter();
     MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: MasterLooter is " ..strML)
     MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: got message from " ..channel.. " from "..sender)
@@ -381,6 +395,8 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
             end
             MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: Adding msg to the channel store.")
             addChannelMessageToStore(tbMsg);
+            
+            -- Event 3 is the new loot message
             if tbMsg["EventID"] == "3" then
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 3")
                 local playerName, strData = getToken(tbMsg["Data"], ";");
@@ -389,16 +405,45 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: playerName: itemCount: " ..itemCount)
                 MRT_AutoAddLootItem(playerName, itemLink, itemCount);
             end
+
+            --Event 4 is loot modified message
             if tbMsg["EventID"] == "4" then
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 4")
                 --create channel message data here.  bossnum;lootnum;itemLink;Looter;cost;lootNote;offspec, eventid=4
+                --TODO: This event should probably also update the PR if loot is assigned to a player
                 local bossnum, strData = getToken(tbMsg["Data"], ";");
                 local lootnum, strData = getToken(strData, ";");
+                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                if not MRT_NumOfCurrentRaid then
+                    strRaidNum = raidnum
+                else
+                    strRaidNum = MRT_NumOfCurrentRaid
+                end
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: bossnum: "..bossnum.. " lootnum: "..lootnum)
-                MRT_GUI_LootModifyAccept(MRT_NumOfCurrentRaid, tonumber(bossnum), tonumber(lootnum), strData);
+                MRT_GUI_LootModifyAccept(strRaidNum, tonumber(bossnum), tonumber(lootnum), strData);
+            end
+
+            --Event 5 is PR imported
+            if tbMsg["EventID"] == "5" then
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 5")
+                local strData = tbMsg["Data"];
+                local strRaidNum;
+                ProcessROPlayerPR(strData);
+                --testing use get current raid.
+                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                if not MRT_NumOfCurrentRaid then
+                    strRaidNum = raidnum
+                else
+                    strRaidNum = MRT_NumOfCurrentRaid
+                end
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 5: strRaidNum: "..strRaidNum) ;
+                MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
             end
             --process messages here
         end
+        -- We might use a whisper channel to request new PR - maybe add UI for the ReadOnly mode to request PR update.
     end
     -- check other message here, like WHISPER
 end
@@ -818,6 +863,7 @@ end
 
 function MRT_SlashCmdHandlerRO(msg)
     MRT_Debug("MRT_SlashCmdHandlerRO")
+    MRT_ReadOnly = true;
     MRT_GUI_Toggle(true);
 end
 
@@ -1447,6 +1493,13 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
     local currentTime = MRT_GetCurrentTime();
     local MRT_RaidInfo = {["Players"] = {}, ["Bosskills"] = {}, ["Loot"] = {}, ["DiffID"] = diffID, ["RaidZone"] = zoneName, ["RaidSize"] = raidSize, ["Realm"] = GetRealmName(), ["StartTime"] = currentTime};
     MRT_Debug(tostring(numRaidMembers).." raidmembers found. Processing RaidRoster...");
+    if isMasterLootSet() then
+        if isMasterLooter() then
+            MRT_ReadOnly = false
+        else
+            MRT_ReadOnly = true
+        end
+    end
     for i = 1, numRaidMembers do
         local playerName, _, playerSubGroup, playerLvl, playerClassL, playerClass, _, playerOnline = GetRaidRosterInfo(i);
         local UnitID = "raid"..tostring(i);
@@ -1454,7 +1507,7 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
         local playerSex = UnitSex(UnitID);
         local playerGuild = GetGuildInfo(UnitID);
         local playerPR = getPlayerPR(playerName);  -- write a function that returns player PR from website export
-        MRT_Debug("CreateNewRaid: playerPR: " ..playerPR);
+        --MRT_Debug("CreateNewRaid: playerPR: " ..playerPR);
         local playerInfo = {
             ["Name"] = playerName,
             ["Join"] = currentTime,
@@ -1496,11 +1549,13 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
 end
 
 function getMasterLooter()
+    -- for debug testing, we can set Main to someone other than the ML.
     local _, _, MasterLootRaidIndex = GetLootMethod();
     if (MasterLootRaidIndex) then
         local MLName = GetRaidRosterInfo(MasterLootRaidIndex);
         return MLName;
     else
+        --we should do something here if MasterLooter is not set... defaulting to Hokei for now.
         return "Hokei";
     end
 end
@@ -1528,7 +1583,7 @@ function MRT_ResumeLastRaid()
         local playerRaceL, playerRace = UnitRace(UnitID);
         local playerSex = UnitSex(UnitID);
         local playerGuild = GetGuildInfo(UnitID);
-        local playerPR = 0;  -- write a function that returns player PR from website export
+        local playerPR = "0.0";  -- write a function that returns player PR from website export
         local playerInfo = {
             ["Name"] = playerName,
             ["Join"] = currentTime,
@@ -1730,31 +1785,32 @@ end
 -- GetPlayerPR  There are potentially 3 ways to get a PR.  PlayerDB, MRT_SFExport (imported from website), or adjusted PR based on selected Raid.
 -- Current implementation is only from MRT_SFExport (PlayerDB is updated on new raid, but that data is not currently being used.)
 function getPlayerPR(PlayerName)
-    return getSFData(PlayerName);
-    --[[ if not MRT_SFExport["info"] then
-        return "";
+    MRT_Debug("getPlayerPR called!")
+    --if not readonly mode, then get the PR the regular way (MRT_SFExport) if readonly mode
+    if not MRT_ReadOnly then 
+        MRT_Debug("getPlayerPR not MRT_Readonly")
+        return getSFData(PlayerName);
     else
-        --MRT_Debug("getPlayerPR: about to start loop");        
-        local playerCount = MRT_SFExport["info"]["total_players"];
-        for key, value in pairs(MRT_SFExport["players"]) do
-            --MRT_Debug("getPlayerPR: inside loop");
-            --MRT_Debug("getPlayerPR: key = "..key);
-            --MRT_Debug("getPlayerPR: value[name]: "..value["name"]);        
-            --MRT_Debug("getPlayerPR: value[main_name]: "..value["main_name"]); 
-            if strcomp(value["name"], PlayerName) then
-                --MRT_Debug("getPlayerPR: Found player"); 
-                --MRT_Debug("getPlayerPR: Value[Points]: " .. value["points"]["points_earned"]); 
-                for k, v in pairs(value["points"]) do
-                    --MRT_Debug("getPlayerPR: inside mini loop for points table"); 
-                    --MRT_Debug("getPlayerPR: k: " ..k); 
-                    --MRT_Debug("getPlayerPR: v[pts_currnnt] "..v["points_current"]);        
-                    return (v["points_current"]);
-                end
-                return "";
-            end
+        MRT_Debug("getPlayerPR: readonly mode get PR from MRT_ROPlayerPR")
+        --If readonly mode, we need to get the PR data from ML if ML doesn't exist, use local data.
+        local retVal
+        retVal = MRT_ROPlayerPR[PlayerName]
+        if not retVal then
+            return "0.0"
+        else 
+            return retVal
         end
-        return "";
-    end ]]
+    end
+end
+
+function ProcessROPlayerPR(data)
+    local strName = ""
+    local strPR = ""
+    local strList = data;
+    while strList ~= "" do
+        strName, strList = getToken(strList,";")
+        MRT_ROPlayerPR[strName], strList = getToken(strList,";");
+    end
 end
 --getSFEPGP gets the EP and GP for a given player
 function getSFEPGP(PlayerName)
@@ -1880,9 +1936,7 @@ end
 --  loot tracking functions  --
 -------------------------------
 -- track loot based on chatmessage recognized by event CHAT_MSG_LOOT
-MRT_LastLooter = "";
-MRT_LastLootitem = "";
-MRT_LastLootTime = "";
+
 function MRT_AutoAddLoot(chatmsg)
     MRT_Debug("Loot event received. Processing...");
     -- patterns LOOT_ITEM / LOOT_ITEM_SELF are also valid for LOOT_ITEM_MULTIPLE / LOOT_ITEM_SELF_MULTIPLE - but not the other way around - try these first
@@ -1931,8 +1985,6 @@ function MRT_AutoAddLoot(chatmsg)
         MRT_Debug("MRT_AutoAddLoot: not readonly mode and not master loot");
         MRT_AutoAddLootItem(playerName, itemLink, itemCount);
         
-        MRT_LastLooter = playerName
-        MRT_LastLootitem = itemLink
     end
 end
 
@@ -2004,13 +2056,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     MRT_Debug("MRT_AutoAddLootItem strItemLink: "..strItemLink); ]]
     -- example itemLink: |cff9d9d9d|Hitem:7073:0:0:0:0:0:0:0|h[Broken Fang]|h|r (outdated!)
     local itemName, _, itemId, itemString, itemRarity, itemColor, itemLevel, _, itemType, itemSubType, _, _, _, _, itemClassID, itemSubClassID = MRT_GetDetailedItemInformation(itemLink);
-    --[[ local itemName, itemLink1, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice, itemClassID, itemSubClassID = GetItemInfo(strItemLink);
-    MRT_Debug("MRT_AutoAddLootItem after GetItemInfo itemLink1: "..itemLink1);
-    MRT_Debug("MRT_AutoAddLootItem after GetItemInfo strItemLink: "..strItemLink); ]]
-    --[[ local _, itemString, _ = deformat(itemLink1, "|c%s|H%s|h%s|h|r");
-    local itemId, _ = deformat(itemString, "item:%d:%s");
-    local itemColor = MRT_ItemColors[itemRarity + 1];
- ]]
+    
     if (not itemName == nil) then MRT_Debug("Panic! Item information lookup failed horribly. Source: MRT_AutoAddLootItem()"); return; end
     -- check options, if this item should be tracked
     MRT_Debug("MRT_AutoAddLootItem itemName: " ..itemName.." itemRarity: " ..itemRarity);
@@ -2119,27 +2165,16 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         ["Note"] = dNote, -- itemNote
         ["OffSpec"] = offspec, --OffSpec costing
     };
-    --MRT_LastLootTime = MRT_LootInfo["Time"];
+    
     MRT_Debug("MRT_AutoAddLootItem: inserting into MRT_RaidLog")
     tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"], MRT_LootInfo);
     MRT_GUI_RaidDetailsTableUpdate(MRT_NumOfCurrentRaid);
 
-  --[[   --debugging
-    local dbgLootTable = MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"];
-    if dbgLootTable then 
-        local numofloot = table.maxn(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"])
-        if numofloot then
-            MRT_Debug("MRT_GUI_LootModify: numofloot: " ..numofloot)
-            for i,v in pairs(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"]) do
-                MRT_Debug("MRT_GUI_LootModify: new entry added.. loot entry name: "..v["ItemName"])
-            end
-        end
-    end ]]
     if isMasterLooter() then 
         MRT_Debug("MRT_AutoAddLootItem: MasterLooter send message");
         -- send message to addon channel with new loot message
         local msg = {
-            ["RaidID"] = MRT_MasterLooter,
+            ["RaidID"] = "1",
             ["ID"] = MRT_Msg_ID,
             ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
             ["Data"] = playerName..";"..itemLink..";"..itemCount,
