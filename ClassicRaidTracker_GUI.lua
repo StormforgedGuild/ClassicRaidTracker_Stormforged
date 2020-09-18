@@ -2651,10 +2651,25 @@ function getModifiedPR(raidnum, PlayerName)
     else 
         --MRT_Debug("getModifiedPR: readonly mode get PR from MRT_ROPlayerPR")
         --If readonly mode, we need to get the PR data from ML if ML doesn't exist, use local data.
+        local currentrealm = GetRealmName();
         local retVal
+        local playerCheck
         retVal = MRT_ROPlayerPR[PlayerName]
         if not retVal then
-            return "0.00"
+            MRT_Debug("getModifiedPR: MRT_ROPlayerPR is blank, checking MRT_PlayerDB")
+            MRT_Debug("getModifiedPR: currentrealm: " ..currentrealm.. " PlayerName: ".. PlayerName)
+            --look for playing playerDB
+            playerCheck = MRT_PlayerDB[currentrealm][PlayerName]
+            if (playerCheck) then 
+                retVal = MRT_PlayerDB[currentrealm][PlayerName]["PR"]
+            else 
+                return "0.00"
+            end
+            if not retVal then
+                return "0.00"
+            else
+                return retVal
+            end
         else 
             return retVal
         end

@@ -1785,6 +1785,7 @@ end
 -- GetPlayerPR  There are potentially 3 ways to get a PR.  PlayerDB, MRT_SFExport (imported from website), or adjusted PR based on selected Raid.
 -- Current implementation is only from MRT_SFExport (PlayerDB is updated on new raid, but that data is not currently being used.)
 function getPlayerPR(PlayerName)
+    local currentrealm = GetRealmName();
     MRT_Debug("getPlayerPR called!")
     --if not readonly mode, then get the PR the regular way (MRT_SFExport) if readonly mode
     if not MRT_ReadOnly then 
@@ -1796,7 +1797,15 @@ function getPlayerPR(PlayerName)
         local retVal
         retVal = MRT_ROPlayerPR[PlayerName]
         if not retVal then
-            return "0.0"
+            MRT_Debug("getPlayerPR: MRT_ROPlayerPR is blank, checking MRT_PlayerDB")
+            MRT_Debug("getPlayerPR: currentrealm: " ..currentrealm.. " PlayerName: ".. PlayerName)
+            --look for playing playerDB
+            reVal = MRT_PlayerDB[currentrealm][PlayerName]["PR"]
+            if not retVal then
+                return "0.00"
+            else
+                return retVal
+            end
         else 
             return retVal
         end
