@@ -1620,6 +1620,7 @@ function getMasterLooter()
     -- for debug testing, we can set Main to someone other than the ML.
     -- uncomment next line for testing to assign ML  replace <playername> with ML tester... this should be the one that is the "server"
     --return "<playername>"
+    return "Moncha"
     local _, _, MasterLootRaidIndex = GetLootMethod();
     if (MasterLootRaidIndex) then
         local MLName = GetRaidRosterInfo(MasterLootRaidIndex);
