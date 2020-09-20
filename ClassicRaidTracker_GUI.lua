@@ -55,6 +55,7 @@ local lastLooter = nil;
 local lastValue = nil;
 local lastNote = nil;
 local lastOS = nil;
+local lastTraded = nil;
 local lootFilterHack = 0;
 local attendeeFilterHack = 0;
 local bAutoCompleteCreated = false;
@@ -229,9 +230,9 @@ end
 --  Helper Function to detect dirty dialog                   --
 ---------------------------------------------------------------
 
-function isDirty (strLooter, strValue, strNote, strOS)
+function isDirty (strLooter, strValue, strNote, strOS, strTraded)
     --MRT_Debug("isDirty fired!");
-    if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) and (strOS == lastOS) then
+    if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) and (strOS == lastOS) and (strTraded == lastTraded) then
         --MRT_Debug("isDirty = false");
         return false;
     else
@@ -427,6 +428,11 @@ function MRT_GUI_ParseValues()
 
     ag = MRT_GUIFrame_Import_PR_Button:CreateAnimationGroup(); -- import button animationgroup
     agTrade =  MRT_GUIFrame_BossLoot_Trade_Button:CreateAnimationGroup(); -- trade button animationgroup
+
+
+    MRT_GUI_FourRowDialog_CB1:SetHitRectInsets(0, 0, 0, 0)
+    MRT_GUI_FourRowDialog_CBTraded:SetHitRectInsets(0, 0, 0, 0)
+    MRT_GUI_FourRowDialog_CBTraded:Disable();
 
 end
 
@@ -1365,12 +1371,21 @@ function MRT_GUI_LootModify()
     lastBossNum = bossnum;
     local lootnote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"];
     local lootoffspec = MRT_RaidLog[raidnum]["Loot"][lootnum]["Offspec"];
+    local lootTraded = MRT_RaidLog[raidnum]["Loot"][lootnum]["Traded"];
     
+<<<<<<< HEAD
     if lootoffspec then
         --MRT_Debug("MRT_GUI_LootModify: lootoffspec: True");
     else
         --MRT_Debug("MRT_GUI_LootModify: lastLooter: False");
     end
+=======
+   --if lootoffspec then
+   --    MRT_Debug("MRT_GUI_LootModify: lootoffspec: True");
+   -- else
+   --     MRT_Debug("MRT_GUI_LootModify: lastLooter: False");
+   -- end
+>>>>>>> 3b06b51f548dd7e8ec184843d8f03fc314e216a0
 
     -- Force item into cache:
     GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
@@ -1398,7 +1413,7 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     MRT_GUI_FourRowDialog_EB1:SetScript("OnEnter", function(self) 
         local ttText = "Prio to: " ..LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText());
-        MRT_Debug("EB:OnEnter ttText: " ..ttText);
+        --MRT_Debug("EB:OnEnter ttText: " ..ttText);
         MRT_GUI_SetPrioTT(self,ttText);
     end);
     MRT_GUI_FourRowDialog_EB1:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
@@ -1454,12 +1469,18 @@ function MRT_GUI_LootModify()
     else
         MRT_GUI_FourRowDialog_CB1:SetChecked(false);
     end
-    lastOS = MRT_GUI_FourRowDialog_CB1:GetChecked();
-    if lastOS then 
-        MRT_Debug("MRT_GUI_LootModify: lastOS = True");
+    if lootTraded then 
+        MRT_GUI_FourRowDialog_CBTraded:SetChecked(true);
     else
-        MRT_Debug("MRT_GUI_LootModify: lastOS = False");
+        MRT_GUI_FourRowDialog_CBTraded:SetChecked(false);
     end
+    lastOS = MRT_GUI_FourRowDialog_CB1:GetChecked();
+    lastTraded = MRT_GUI_FourRowDialog_CBTraded:GetChecked();
+    --if lastOS then 
+    --    MRT_Debug("MRT_GUI_LootModify: lastOS = True");
+    --else
+    --    MRT_Debug("MRT_GUI_LootModify: lastOS = False");
+    --end
     lastValue = MRT_GUI_FourRowDialog_EB3:GetText();
     --MRT_Debug("MRT_GUI_LootModify: lastValue: "..lastValue);
     MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
@@ -1537,6 +1558,11 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
         MRT_Print(MRT_L.GUI["Item cost invalid"]);
         return true;
     end
+    --if (not traded) then
+    --    MRT_Debug("Saving item: Item Not traded");
+    --else
+    --    MRT_Debug("Saving item: Item traded");
+    --end
     --uncomment when ready to verify
     --MRT_Debug("MRT_GUI_LootModifyAccept: looter: " ..looter);
     --MRT_Debug("MRT_GUI_LootModifyAccept: looter:strlen " ..strlen(looter));
@@ -1572,6 +1598,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
         ["ItemColor"] = itemColor,
         ["BossNumber"] = bossnum,
         ["Looter"] = looter,
+        ["Traded"] = traded,
         ["DKPValue"] = cost,
         ["Note"] = lootNote,
         ["Offspec"] = offspec,
@@ -1641,6 +1668,8 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
             }
             MRT_SendAddonMessage(msg, "RAID");
         end
+        -- do table update, if selected loot table was modified
+        MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
     else
         newloot = true;
         MRT_LootInfo["ItemCount"] = 1;
@@ -1678,23 +1707,10 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
                 pcall(val, itemInfo, MRT_NOTIFYSOURCE_ADD_GUI, raidnum, itemNum);
             end
         end
+        -- do table update, if selected loot table was modified
+        MRT_GUI_RaidDetailsTableUpdate(raidnum);
     end
-    -- do table update, if selected loot table was modified
-    MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
-    -- Send updated PR msg here.
-  --[[   if isPlayer(MRT_LootInfo["Looter"]) then
-        MRT_Debug("MRT_GUI_LootModifyAccept: sending modified PR msg");
-        MRT_Debug("MRT_GUI_LootModifyAccept: MRT_LootInfo[Looter]"..MRT_LootInfo["Looter"]);
-            -- send message to addon channel with new loot message
-            local msg = {
-                ["RaidID"] = "1",
-                ["ID"] = MRT_Msg_ID,
-                ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
-                ["Data"] = MRT_LootInfo["Looter"]..";"..getModifiedPR(raidnum, MRT_LootInfo["Looter"]),
-                ["EventID"] = "6",
-            }
-            MRT_SendAddonMessage(msg, "RAID");    
-    end ]]
+    
     local RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum);
     --create data
     if isMasterLooter() then 
@@ -1707,6 +1723,13 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     if (raid_select == nil) then return; end
     local raidnum_selected = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
+
+    if newloot then
+        MRT_Debug("MRT_GUI_Accept:new loot update the table");
+        MRT_GUI_BossLootTableUpdate(bossnum);
+        return; 
+    end
+
     if (boss_select == nil) then
         if (raidnum_selected == raidnum) then
             --MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(nil,true)");
@@ -1768,6 +1791,17 @@ function MRT_GUI_LootRaidWinner()
     SendChatMessage(rwMessage, "Raid");
 end
 
+function GetSelectedRaid()
+    local raidnum = nil;
+    -- check if a raid is selected
+    if (MRT_GUI_RaidLogTable:GetSelection()) then
+        raidnum = MRT_GUI_RaidLogTable:GetCell(MRT_GUI_RaidLogTableSelection, 1);
+    end
+
+    return raidnum;
+end
+
+
 function MRT_GetTradeableItems()
 
     --Get name of player with an open trade window
@@ -1794,7 +1828,7 @@ function MRT_GetTradeableItems()
     local index = 1;
     for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
 
-        if v["Looter"] == tradePartnerName then
+        if v["Looter"] == tradePartnerName and v["Traded"] == false then
             itemsToTrade[index] = v["ItemName"];
             MRT_Debug(tradePartnerName.. " should receive "..itemsToTrade[index]);
         end
@@ -1813,7 +1847,7 @@ function MRT_GUI_TradeLink()
 
     --commit save if the loot dialog is visible.
     if MRT_GUI_FourRowDialog:IsVisible() then
-        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked()) then
+        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
             --MRT_Debug("STOnClick: isDirty == True");
             local error = false;
             error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
@@ -1844,7 +1878,18 @@ function MRT_GUI_TradeLink()
                         itemAlreadyTraded = true;
                     end
                 end
-        
+
+                --make sure the person hasn't already gotten traded that item, as it's been marked traded
+                --for u, v in ipairs(MRT_RaidLog[GetSelectedRaid()]["Loot"]) do
+
+                --    if v["ItemName"] == itemsToTrade[i] then
+                 --       if v["Traded"] == true then
+                 --            itemAlreadyTraded = true;
+                 --            MRT_Print("Yo, you were already traded "..itemsToTrade[i]);
+                --         end
+                --    end
+                --end
+   
                 if itemAlreadyTraded == false then
                     --Place those items in the trade window
                     MRT_Debug("about to use item: "..containerID..slotID)
@@ -2875,19 +2920,47 @@ function MRT_GUI_RaidBosskillsTableUpdate(raidnum)
     lastShownNumOfBosses = MRT_BosskillsCount;
 end
 
+function SetDoneState(looter, traded, itemName)
+
+    local doneState = false;
+
+    --if it's assigned to disenchanted or bank... it's done
+    if (looter == "disenchanted") or (looter == "bank") then
+        doneState=true;
+    end
+
+    --if it's been marked traded by the trade process.. it's done
+    if traded then
+        doneState=true;
+    end
+
+    --if item is assigned to a player & not in your bag (or in your bag, but loot timer expired) set to done
+    local foundInBag, containerID, slotID = findItemInBag(itemName);
+    if not foundInBag then
+        --not in your bag .
+        doneState = true;
+    else
+        local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
+        if timeRemaining==0 then
+            --in your bag but not tradeable (loot timer expired), your done
+            doneState=true;
+        end
+    end
+
+    return doneState;
+end    
+
 -- update bossloot table
 function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
-    if skipsort then 
-        --MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True");
-    else
-        --MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil ");
-    end
+    --if skipsort then 
+    --    MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True");
+    --else
+    --    MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil ");
+    --end
     local MRT_GUI_BossLootTableData = {};
     local raidnum;
     local indexofsub1;
     local indexofsub2;
-
-  --  C_ChatInfo.SendAddonMessage("SFRT", MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime())..": Updating the loot table!", "RAID");
 
     -- check if a raid is selected
     if (MRT_GUI_RaidLogTable:GetSelection()) then
@@ -2909,25 +2982,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 loottime = calculateLootTimeLeft(v["Time"])
 
                 --SetDoneState
-                local doneState = false;
-                if (v["Looter"] == "disenchanted") or (v["Looter"] == "bank") then
-                    doneState=true;
-                elseif (v["Looter"] == "unassigned") then
-                    doneState=false;
-                else
-                    --if item is assigned to a player & not in your bag (or in your bag, but loot timer expired) set to done
-                    local foundInBag, containerID, slotID = findItemInBag(v["ItemName"]);
-                    if not foundInBag then
-                        --not in your bag .
-                        doneState = true;
-                    else
-                        local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
-                        if timeRemaining==0 then
-                            --in your bag but not tradeable (loot timer expired), your done
-                            doneState=true;
-                        end
-                    end
-                end
+                local doneState = SetDoneState(v["Looter"], v["Traded"], v["ItemName"])
 
                 if v["Looter"] == "unassigned" then
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
@@ -2955,7 +3010,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
         MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_BossLootTitle"]);
     -- there is only a raidnum and no bossnum, list raid loot
     elseif (raidnum) then
---        MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
         local index = 1;
 
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
@@ -2965,34 +3020,15 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
             --Set Class Color
             classColor = "ff9d9d9d";
             local playerClass = getPlayerClass(v["Looter"]);   
-            classColor = getClassColor(playerClass);      
-     --       MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition: looter: " ..v["Looter"] .."playerClass: "..playerClass..", classColor: " ..classColor);
+            classColor = getClassColor(playerClass);  
+            --MRT_Debug("Row: "..v["ItemName"])
+           --MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition: looter: " ..v["Looter"] .."playerClass: "..playerClass..", classColor: " ..classColor);
             
             --GetDate 
             loottime = calculateLootTimeLeft(v["Time"])
 
             --SetDoneState
-            local doneState = false;
-            if (v["Looter"] == "disenchanted") or (v["Looter"] == "bank") then
-                doneState=true;
-            elseif (v["Looter"] == "unassigned") then
-                doneState=false;
-            else
-                   --if item is assigned to a player & not in your bag (or in your bag, but loot timer expired) set to done
-                local foundInBag, containerID, slotID = findItemInBag(v["ItemName"]);
-                if not foundInBag then
-                    --not in your bag .
-                    doneState = true;
-                else
-                    local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
-                    if timeRemaining==0 then
-                        --in your bag but not tradeable (loot timer expired), your done
-                        doneState=true;
-                    end
-                end
-            end
-
-          --  C_ChatInfo.SendAddonMessage("SFRT", MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime())..": "..v["ItemId"]..", "..v["ItemName"]..", "..v["Looter"], "RAID");
+            local doneState = SetDoneState(v["Looter"], v["Traded"], v["ItemName"])
 
             if not filter then
                 if v["Looter"] == "unassigned" then
@@ -3054,9 +3090,9 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     table.sort(MRT_GUI_BossLootTableData, function(a, b) return (a[3] < b[3]); end);
     --MRT_GUI_BossLootTable:ClearSelection();
     if skipsort then 
-     --   MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True about to call SetData");
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True about to call SetData");
     else
-     --   MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil about to call SetData");
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil about to call SetData");
     end
     MRT_GUI_BossLootTable:SetData(MRT_GUI_BossLootTableData, true, skipsort);
     lastSelectedBossNum = bossnum;

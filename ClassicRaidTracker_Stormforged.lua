@@ -194,11 +194,15 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("RAID_ROSTER_UPDATE");
     frame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
     frame:RegisterEvent("TRADE_SHOW");
-    frame:RegisterEvent("TRADE_CLOSED");
+    frame:RegisterEvent("TRADE_ACCEPT_UPDATE");
     frame:RegisterEvent("BAG_UPDATE");
     frame:RegisterEvent("MERCHANT_SHOW");
     frame:RegisterEvent("MERCHANT_UPDATE");
+<<<<<<< HEAD
     frame:RegisterEvent("CHAT_MSG_ADDON");
+=======
+    --frame:RegisterEvent("CHAT_MSG_ADDON");
+>>>>>>> 3b06b51f548dd7e8ec184843d8f03fc314e216a0
 end
 
 -------------------------
@@ -328,13 +332,25 @@ function MRT_OnEvent(frame, event, ...)
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true);
         encourageTrade();
         MessWArgh();
+<<<<<<< HEAD
 
 
     elseif (event == "TRADE_CLOSED") then
         MRT_Debug("Trade initiated");
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
         stopEncouragingTrade();
+=======
+>>>>>>> 3b06b51f548dd7e8ec184843d8f03fc314e216a0
 
+    elseif (event == "TRADE_ACCEPT_UPDATE") then
+        MRT_Debug("Trade status changed");
+        local playerTradeStatus, targetTradeStatus = ...
+        if playerTradeStatus and targetTradeStatus then
+          MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
+          stopEncouragingTrade();
+          MarkAsTraded();
+        end
+        
     elseif (event == "BAG_UPDATE") then
         MRT_GUI_BossLootTableUpdate(nil, true);
 
@@ -371,6 +387,7 @@ function MRT_OnEvent(frame, event, ...)
     end
 end
 
+<<<<<<< HEAD
 function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
     --if debugging, change the ML in getMasterLooter()
     local strML = getMasterLooter();
@@ -597,6 +614,44 @@ function getToken(strList, strDelim)
     local truncList = strsub(strList, index + 1);
     local sTok = strsub(strList, 1, index - 1);
     return sTok, truncList;
+=======
+function MarkAsTraded()
+
+    MRT_Debug("Checking for items to mark traded")
+
+    --Get name of player with an open trade window
+    local tradePartnerName = UnitName("NPC");
+    local itemsToTrade = {};
+
+    -- check if a raid is selected
+    local raidnum = GetSelectedRaid();
+    if not raidnum then
+        return
+    end
+
+    --check for all the items that are being traded
+    for j=1, 7 do
+        local tradedItemName, texture, quantity, quality, isUsable, enchant =  GetTradePlayerItemInfo(j);
+
+        if tradedItemName then
+          MRT_Debug("Checking if this item should be marked traded: "..tradedItemName)
+        end
+
+        --iterate through all the items in the raid log to see if it's an item that dropped being traded to it's new owner.
+        for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
+
+            if v["Looter"] == tradePartnerName then
+                if tradedItemName == v["ItemName"] then
+                 MRT_Debug(tradePartnerName.. " has been traded "..tradedItemName);
+                  v["Traded"] = true;
+                end
+            end
+        end
+    end
+
+    --Refresh the Loot UI
+
+>>>>>>> 3b06b51f548dd7e8ec184843d8f03fc314e216a0
 end
 
 function ArghEasterEgg()
@@ -953,9 +1008,10 @@ function MRT_SlashCmdHandler(msg)
         if (not itemLink) then
             itemLink, looter = string.match(msg, 'additem%s+(|c.+|r)%s+(%a+)');
             cost = 0;
+            traded = false; 
         end
         if (itemLink) then
-            MRT_ManualAddLoot(itemLink, looter, cost);
+            MRT_ManualAddLoot(itemLink, looter, cost, traded);
             return;
         end
     end
@@ -2258,6 +2314,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
             ["ItemColor"] = itemColor,
             ["ItemCount"] = itemCount,
             ["Looter"] = playerName,
+            ["Traded"] = false,
             ["DKPValue"] = dkpValue,
             ["Time"] = MRT_GetCurrentTime(),
         };
@@ -2303,6 +2360,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         ["ItemColor"] = itemColor,
         ["ItemCount"] = itemCount,
         ["Looter"] = dLooter, -- playerName
+        ["Traded"] = false,
         ["DKPValue"] = dkpValue,
         ["BossNumber"] = MRT_NumOfLastBoss,
         ["Time"] = MRT_GetCurrentTime(),
@@ -2361,7 +2419,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     
 end
 
-function MRT_ManualAddLoot(itemLink, looter, cost)
+function MRT_ManualAddLoot(itemLink, looter, cost, traded)
     if (not MRT_NumOfCurrentRaid) then
         MRT_Print(MRT_L["GUI"]["No active raid"]);
         return;
@@ -2369,6 +2427,7 @@ function MRT_ManualAddLoot(itemLink, looter, cost)
     if (not MRT_NumOfLastBoss) then MRT_AddBosskill(MRT_L.Core["Trash Mob"]); end
     local itemName, _, itemId, itemString, itemRarity, itemColor, itemLevel, _, itemType, itemSubType, _, _, _, _ = MRT_GetDetailedItemInformation(itemLink);
     local offspec = false;
+    local traded = false;
     if (not itemName) then
         MRT_Debug("MRT_ManualAddLoot(): Failed horribly when trying to get item informations.");
         return;
@@ -2384,6 +2443,7 @@ function MRT_ManualAddLoot(itemLink, looter, cost)
         ["ItemColor"] = itemColor,
         ["ItemCount"] = 1,
         ["Looter"] = looter,
+        ["Traded"] = traded,
         ["DKPValue"] = cost,
         ["BossNumber"] = MRT_NumOfLastBoss,
         ["Time"] = MRT_GetCurrentTime(),
@@ -2508,6 +2568,7 @@ function MRT_DKPFrame_Handler(button)
         MRT_RaidLog[raidNum]["Loot"][itemNum]["Looter"] = looter;
         MRT_RaidLog[raidNum]["Loot"][itemNum]["DKPValue"] = dkpValue;
         MRT_RaidLog[raidNum]["Loot"][itemNum]["Note"] = lootNote;
+        MRT_RaidLog[raidNum]["Loot"][itemNum]["Traded"] = MRT_GUI_FourRowDialog_CBTraded:GetChecked(); 
     elseif (button == "Cancel") then
     elseif (button == "Delete") then
         MRT_RaidLog[raidNum]["Loot"][itemNum]["Looter"] = "_deleted_";
@@ -2516,10 +2577,12 @@ function MRT_DKPFrame_Handler(button)
         MRT_RaidLog[raidNum]["Loot"][itemNum]["Looter"] = "bank";
         MRT_RaidLog[raidNum]["Loot"][itemNum]["Note"] = lootNote;
         MRT_RaidLog[raidNum]["Loot"][itemNum]["DKPValue"] = 0;
+        MRT_RaidLog[raidNum]["Loot"][itemNum]["Traded"] = MRT_GUI_FourRowDialog_CBTraded:GetChecked(); 
     elseif (button == "Disenchanted") then
         MRT_RaidLog[raidNum]["Loot"][itemNum]["Looter"] = "disenchanted";
         MRT_RaidLog[raidNum]["Loot"][itemNum]["Note"] = lootNote;
         MRT_RaidLog[raidNum]["Loot"][itemNum]["DKPValue"] = 0;
+        MRT_RaidLog[raidNum]["Loot"][itemNum]["Traded"] = MRT_GUI_FourRowDialog_CBTraded:GetChecked(); 
     end
     -- notify registered, external functions
     if (#MRT_ExternalLootNotifier > 0) then
