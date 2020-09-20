@@ -198,11 +198,7 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("BAG_UPDATE");
     frame:RegisterEvent("MERCHANT_SHOW");
     frame:RegisterEvent("MERCHANT_UPDATE");
-<<<<<<< HEAD
     frame:RegisterEvent("CHAT_MSG_ADDON");
-=======
-    --frame:RegisterEvent("CHAT_MSG_ADDON");
->>>>>>> 3b06b51f548dd7e8ec184843d8f03fc314e216a0
 end
 
 -------------------------
@@ -387,7 +383,6 @@ function MRT_OnEvent(frame, event, ...)
     end
 end
 
-<<<<<<< HEAD
 function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
     --if debugging, change the ML in getMasterLooter()
     local strML = getMasterLooter();
@@ -614,7 +609,6 @@ function getToken(strList, strDelim)
     local truncList = strsub(strList, index + 1);
     local sTok = strsub(strList, 1, index - 1);
     return sTok, truncList;
-=======
 function MarkAsTraded()
 
     MRT_Debug("Checking for items to mark traded")
@@ -651,7 +645,6 @@ function MarkAsTraded()
 
     --Refresh the Loot UI
 
->>>>>>> 3b06b51f548dd7e8ec184843d8f03fc314e216a0
 end
 
 function ArghEasterEgg()
