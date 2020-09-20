@@ -1464,6 +1464,8 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
                 pcall(val, itemInfo, MRT_NOTIFYSOURCE_EDIT_GUI, raidnum, lootnum, oldItemInfoTable);
             end
         end
+        -- do table update, if selected loot table was modified
+        MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
     else
         newloot = true;
         MRT_LootInfo["ItemCount"] = 1;
@@ -1489,9 +1491,11 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
                 pcall(val, itemInfo, MRT_NOTIFYSOURCE_ADD_GUI, raidnum, itemNum);
             end
         end
+        -- do table update, if selected loot table was modified
+        MRT_GUI_RaidDetailsTableUpdate(raidnum);
     end
-    -- do table update, if selected loot table was modified
-    MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
+    
+    
     
     local item_select = MRT_GUI_BossLootTable:GetSelection();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
