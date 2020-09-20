@@ -327,7 +327,7 @@ function MRT_OnEvent(frame, event, ...)
         MRT_Debug("Trade initiated");
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true);
         encourageTrade();
-        --MessWArgh();
+        MessWArgh();
 
 
     elseif (event == "TRADE_CLOSED") then
@@ -336,7 +336,7 @@ function MRT_OnEvent(frame, event, ...)
         stopEncouragingTrade();
 
     elseif (event == "BAG_UPDATE") then
-        MRT_GUI_BossLootTableUpdate(nil, false);
+        MRT_GUI_BossLootTableUpdate(nil, true);
 
     elseif (event == "RAID_ROSTER_UPDATE") then
         MRT_Debug("RAID_ROSTER_UPDATE fired!");
