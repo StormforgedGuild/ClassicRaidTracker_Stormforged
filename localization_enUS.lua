@@ -355,6 +355,7 @@ as the most recent of the current raid.]=]
 MRT_L.GUI["TT_Boss_Delete"] = "Delete selected boss encounter."
 MRT_L.GUI["TT_Boss_Export"] = "Export selected boss encounter."
 MRT_L.GUI["TT_Loot_Add"] = "Add an item to the loot list."
+MRT_L.GUI["TT_Loot_Request"] = "Update Loot list from Master Looter."
 MRT_L.GUI["TT_Loot_Delete"] = "Delete selected item."
 MRT_L.GUI["TT_Loot_Modify"] = "Modify data of selected item."
 MRT_L.GUI["TT_RA_Add"] = "Add an attendee to the raid attendee list."

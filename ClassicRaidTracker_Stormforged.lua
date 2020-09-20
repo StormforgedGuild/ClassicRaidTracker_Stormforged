@@ -479,7 +479,7 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                     --MRT_Debug("doPRReply: raid_select: " .. raid_select);
                     strRaidNum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
                 else
-                    strRaidNum = MRT_NumOfCurrentRaid
+                    strRaidNum = MRT_NumOfCurrentRaid;
                 end
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 1: strRaidNum: "..strRaidNum);
                 local RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
@@ -504,7 +504,48 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                     MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 1: strRaidNum: "..strRaidNum) ;
                     MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
                 end
-                
+            elseif tbMsg["EventID"] == "2" then
+                --handle incoming
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 2")
+                --testing use get current raid.
+                if not(MRT_NumOfCurrentRaid) then
+                    raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                    if not raid_select then
+                        MRT_GUI_RaidLogTable:SetSelection(1)
+                        raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                        MRT_GUI_RaidLogTable:ClearSelection()
+                    end
+                    --MRT_Debug("doPRReply: raid_select: " .. raid_select);
+                    strRaidNum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                else
+                    strRaidNum = MRT_NumOfCurrentRaid
+                end
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 2: strRaidNum: "..strRaidNum);
+                local strData = tbMsg["Data"];
+                local strNewData = "";
+                --if MasterLooter, then respond
+                if isMasterLooter() then 
+                    MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: WHISPER: EventID = 2: MasterLooter send message");
+                    --build a list of items and return
+                    --check current data with list and only send back missing items
+                    for i, v in ipairs(MRT_RaidLog[strRaidNum]["Loot"]) do
+                        local iIndex = substr(v["ItemLink"], strData);
+                        if not iIndex then
+                            strNewData = strNewData..v["ItemLink"]..";"
+                            MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: WHISPER: EventID = 2: strNewData" ..strNewData);
+                        else
+                            strData = strsub(strData,1,iIndex-1)..strsub(strData,iIndex+string.len(v["ItemLink"])+1)
+                            MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: WHISPER: EventID = 2: strData" ..strData);
+                        end
+                    end
+                    --now send the message
+                    --model after this SendPRMsg(RaidAttendees, channel, sender);
+                else
+                    --processing response from MasterLooter, should be a list of missing loot
+                    MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 2");
+                    
+                    
+                end
                     
                 
             end
@@ -1287,7 +1328,7 @@ function MRT_VersionUpdate()
                     local name = playerInfo["Name"];
                     if (playerInfo["PR"]) then
                         MRT_PlayerDB[realm][name]["PR"] = playerInfo["PR"];
-                        playerInfo["PR"] = "";
+                        playerInfo["PR"] = "0.00";
                     end
                 end
             end
