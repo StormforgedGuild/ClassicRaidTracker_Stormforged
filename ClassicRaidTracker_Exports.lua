@@ -125,35 +125,65 @@ function MRT_ImportButtonClick()
 end
 
 --write function that sends attendee PR to channel on import
-function SendPRMsg(attendeetable)
+function SendPRMsg(attendeetable, channel, target)
+    local strChannel
+    local strID
+    local strEventID
+    if not channel then
+        strChannel = "RAID";
+    else
+        strChannel = channel;
+    end 
     if (attendeetable) and table.maxn(attendeetable) > 0 then 
         local index = 1
         local strData = ""
         for i, v in ipairs(attendeetable) do
             strData = strData..cleanString(v[2], true)..";"..v[3].. ";"
-            if index % 10 == 0 then 
+            if index % 10 == 0 then
+                if not channel then
+                    strID = MRT_Msg_ID
+                    strEventID = "5"
+                else
+                    strID = MRT_Msg_Request_ID
+                    strEventID = "1"
+                end  
                 local msg = {
                     ["RaidID"] = "1",
-                    ["ID"] = MRT_Msg_ID,
+                    ["ID"] = strID,
                     ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
                     ["Data"] = strData,
-                    ["EventID"] = "5",
+                    ["EventID"] = strEventID,
                 }
-                MRT_SendAddonMessage(msg, "RAID");                
+                if not channel then 
+                    MRT_SendAddonMessage(msg, strChannel);
+                else
+                    MRT_SendAddonMessage(msg, strChannel, target);
+                end              
                 strData = "";
             end
             index = index + 1;
         end
         MRT_Debug("SendPRMsg: index: " ..index)
         MRT_Debug("SendPRMsg: strData: " ..strData)
+        if not channel then
+            strID = MRT_Msg_ID;
+            strEventID = "5";
+        else
+            strID = MRT_Msg_Request_ID
+            strEventID = "1"
+        end 
         local msg = {
             ["RaidID"] = "1",
-            ["ID"] = MRT_Msg_ID,
+            ["ID"] = strID,
             ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
             ["Data"] = strData,
-            ["EventID"] = "5",
+            ["EventID"] = strEventID,
         }
-        MRT_SendAddonMessage(msg, "RAID");
+        if not channel then 
+            MRT_SendAddonMessage(msg, strChannel);
+        else
+            MRT_SendAddonMessage(msg, strChannel, target);
+        end 
     end
 end
 ------------------------
