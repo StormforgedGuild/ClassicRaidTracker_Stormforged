@@ -484,15 +484,20 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
             if tbMsg["EventID"] == "1" then
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 1")
                 --testing use get current raid.
-                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-                if not MRT_NumOfCurrentRaid then
-                    strRaidNum = raidnum
+                if not(MRT_NumOfCurrentRaid) then
+                    raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                    if not raid_select then
+                        MRT_GUI_RaidLogTable:SetSelection(1)
+                        raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                        MRT_GUI_RaidLogTable:ClearSelection()
+                    end
+                    --MRT_Debug("doPRReply: raid_select: " .. raid_select);
+                    strRaidNum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
                 else
                     strRaidNum = MRT_NumOfCurrentRaid
                 end
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler:WHISPER: EventID = 1: strRaidNum: "..strRaidNum);
-                local RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(raidnum);
+                local RaidAttendees = MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
                 --create data
                 if isMasterLooter() then 
                     MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: MasterLooter send message");
@@ -1290,7 +1295,7 @@ function MRT_VersionUpdate()
                     local name = playerInfo["Name"];
                     if (playerInfo["PR"]) then
                         MRT_PlayerDB[realm][name]["PR"] = playerInfo["PR"];
-                        playerInfo["PR"] = "";
+                        playerInfo["PR"] = "0.00";
                     end
                 end
             end
@@ -1620,6 +1625,9 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
 end
 
 function getMasterLooter()
+    -- for debug testing, we can set Main to someone other than the ML.
+    -- uncomment next line for testing to assign ML  replace <playername> with ML tester... this should be the one that is the "server"
+    --return "<playername>"
     local _, _, MasterLootRaidIndex = GetLootMethod();
     if (MasterLootRaidIndex) then
         local MLName = GetRaidRosterInfo(MasterLootRaidIndex);
@@ -2057,16 +2065,17 @@ function MRT_AutoAddLoot(chatmsg)
 
     if MRT_ReadOnly or isMasterLootSet() then
         MRT_Debug("MRT_AutoAddLoot: readonly mode or MasterLoot set");
-        --if readlonly or ML set, wait for channel message
+        --if readonly or ML set, wait for channel message
+        --should set an option here to sync with channel or proximity
         if isMasterLooter() then
             MRT_AutoAddLootItem(playerName, itemLink, itemCount);
         end    
     else
         MRT_Debug("MRT_AutoAddLoot: not readonly mode and not master loot");
         MRT_AutoAddLootItem(playerName, itemLink, itemCount);
-
-        MRT_LastLooter = playerName
-        MRT_LastLootitem = itemLink
+        --I don't think this is needed...
+        --MRT_LastLooter = playerName
+        --MRT_LastLootitem = itemLink
     end
 end
 

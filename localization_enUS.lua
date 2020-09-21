@@ -345,6 +345,7 @@ MRT_L.GUI["TT_Attendee_Add_LeaveEB"] = [=[Format HH:MM
 If left blank, MRT will use
 the raid end time or current time.]=]
 MRT_L.GUI["TT_BA_Add"] = "Add an attendee to the raid."
+MRT_L.GUI["TT_BA_Update"] = "Refresh PR data with Master Looter"
 MRT_L.GUI["TT_BA_Delete"] = "Delete selected boss attendee."
 MRT_L.GUI["TT_Boss_Add"] = "Add a boss encounter."
 MRT_L.GUI["TT_Boss_Add_TimeEB"] = [=[Format HH:MM
@@ -354,6 +355,7 @@ as the most recent of the current raid.]=]
 MRT_L.GUI["TT_Boss_Delete"] = "Delete selected boss encounter."
 MRT_L.GUI["TT_Boss_Export"] = "Export selected boss encounter."
 MRT_L.GUI["TT_Loot_Add"] = "Add an item to the loot list."
+MRT_L.GUI["TT_Loot_Request"] = "Update Loot list from Master Looter."
 MRT_L.GUI["TT_Loot_Delete"] = "Delete selected item."
 MRT_L.GUI["TT_Loot_Modify"] = "Modify data of selected item."
 MRT_L.GUI["TT_RA_Add"] = "Add an attendee to the raid attendee list."

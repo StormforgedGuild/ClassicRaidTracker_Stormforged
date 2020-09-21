@@ -319,43 +319,47 @@ function MRT_GUI_ParseValues()
     MRT_GUI_BossLootTable:RegisterEvents({
         ["OnDoubleClick"] = function(rowFrame,cellFrame, data, cols, row, realrow, coloumn, scrollingTable, ...)
             --MRT_Debug("Doubleclick fired!");
-            if MRT_GUI_FourRowDialog:IsVisible() then
-                if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
-                    --MRT_Debug("STOnDoubleClick: isDirty == True");
-                    local error = false;
-                    error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
-                    if error then
-                        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-                        StaticPopup_Show("MRT_GUI_ok");
-                        MRT_GUI_BossLootTable:SetSelection(lastloot_select);
+            if not MRT_ReadOnly then 
+                if MRT_GUI_FourRowDialog:IsVisible() then
+                    if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
+                        --MRT_Debug("STOnDoubleClick: isDirty == True");
+                        local error = false;
+                        error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                        if error then
+                            StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                            StaticPopup_Show("MRT_GUI_ok");
+                            MRT_GUI_BossLootTable:SetSelection(lastloot_select);
+                        end
                     end
+                    MRT_GUI_LootModify();
+                else
+                    --MRT_Debug("in false condition");
+                    MRT_GUI_LootModify();
                 end
-                MRT_GUI_LootModify();
-            else
-                --MRT_Debug("in false condition");
-                MRT_GUI_LootModify();
-            end;
+            end
         end,
         ["OnClick"] = function(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, ...)
             --MRT_Debug("MRT_BoosLootTable:Onclick fired!");
-            donotdeselect = false;
-            doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, true, false)  --passing true so that we don't deselect in the loot table.
-            if MRT_GUI_FourRowDialog:IsVisible() then
-                if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked(),  MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
-                    --MRT_Debug("STOnClick: isDirty == True");
-                    local error = false;
-                    error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
-                    if error then
-                        MRT_Debug("STOnClick:error occured");
-                        StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-                        StaticPopup_Show("MRT_GUI_ok");
-                        MRT_GUI_BossLootTable:SetSelection(lastloot_select);
-                        return true
+            if not MRT_ReadOnly then 
+                donotdeselect = false;
+                doOnClick(rowFrame, cellFrame, data, cols, row, realrow, coloumn, scrollingTable, button, true, false)  --passing true so that we don't deselect in the loot table.
+                if MRT_GUI_FourRowDialog:IsVisible() then
+                    if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked(),  MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
+                        --MRT_Debug("STOnClick: isDirty == True");
+                        local error = false;
+                        error = MRT_GUI_LootModifyAccept(lastRaidNum, lastBossNum, lastLootNum);
+                        if error then
+                            MRT_Debug("STOnClick:error occured");
+                            StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                            StaticPopup_Show("MRT_GUI_ok");
+                            MRT_GUI_BossLootTable:SetSelection(lastloot_select);
+                            return true
+                        end
                     end
+                    MRT_GUI_LootModify();
                 end
-                MRT_GUI_LootModify();
-            end;
-            return true;
+                return true;
+            end
         end,
         
     });
@@ -483,8 +487,12 @@ end
 --  Show/Hide GUI  --
 ---------------------
 function MRT_GUI_Toggle(readonly)
-    
+
     if (not MRT_GUIFrame:IsShown()) then
+        if MRT_ReadOnly then
+            MRT_ReadOnly = false;
+            RevertUI(false)
+        end
         MRT_GUIFrame:Show();
         MRT_GUIFrame:SetScript("OnUpdate", function() MRT_GUI_OnUpdateHandler(); end);
         if (lastShownNumOfRaids ~= #MRT_RaidLog) then
@@ -519,16 +527,47 @@ function MRT_GUI_Toggle(readonly)
             --setup event bypassing to channel
             MRT_Debug("MRT_GUI_Toggle: readonly = True")
             MRT_ReadOnly = true;
+            RevertUI(true)
+
         else
             --only run this if we're not in readonly mode
             MRT_Debug("MRT_GUI_Toggle: readonly = false")
             MRT_ReadOnly = false;
             ImportReminder();
         end
-        
     else
         MRT_GUIFrame:Hide();
         MRT_GUIFrame:SetScript("OnUpdate", nil);
+    end
+end
+
+function RevertUI(readonly)
+    if readonly then
+        MRT_GUIFrame_RaidLog_Export_Button:SetEnabled(false)
+        MRT_GUIFrame_Import_PR_Button:SetEnabled(false)
+        MRT_GUIFrame_RaidAttendees_Delete_Button:SetEnabled(false)
+        MRT_GUIFrame_BossLoot_Delete_Button:SetEnabled(false)
+        MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetEnabled(false)
+        MRT_GUIFrame_BossLoot_RaidLink_Button:SetEnabled(false)
+        MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false)
+        MRT_GUIFrame_RaidAttendees_Add_Button:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUIFrame_RaidAttendees_Add_Button, "BA_Update"); end);
+        MRT_GUIFrame_RaidAttendees_Add_Button:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
+        MRT_GUIFrame_BossLoot_Add_Button:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUIFrame_RaidAttendees_Add_Button, "Loot_Request"); end);
+        MRT_GUIFrame_BossLoot_Add_Button:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
+        MRT_GUIFrame_BossLoot_Modify_Button:SetEnabled(false)
+    else
+        MRT_GUIFrame_RaidLog_Export_Button:SetEnabled(true)
+        MRT_GUIFrame_Import_PR_Button:SetEnabled(true)
+        MRT_GUIFrame_RaidAttendees_Delete_Button:SetEnabled(true)
+        MRT_GUIFrame_BossLoot_Delete_Button:SetEnabled(true)
+        MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetEnabled(true)
+        MRT_GUIFrame_BossLoot_RaidLink_Button:SetEnabled(true)
+        MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true)
+        MRT_GUIFrame_RaidAttendees_Add_Button:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUIFrame_RaidAttendees_Add_Button, "BA_Add"); end);
+        MRT_GUIFrame_RaidAttendees_Add_Button:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
+        MRT_GUIFrame_BossLoot_Add_Button:SetScript("OnEnter", function() MRT_GUI_SetTT(MRT_GUIFrame_RaidAttendees_Add_Button, "Loot_Add"); end);
+        MRT_GUIFrame_BossLoot_Add_Button:SetScript("OnLeave", function() MRT_GUI_HideTT(); end);
+        MRT_GUIFrame_BossLoot_Modify_Button:SetEnabled(true)
     end
 end
 
@@ -1079,82 +1118,88 @@ function MRT_GUI_RaidAttendeeDeleteAccept(raidnum, attendee)
 end
 
 function MRT_GUI_LootAdd()
-    MRT_GUI_HideDialogs();
-    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-    if (raid_select == nil) then
-        MRT_Print(MRT_L.GUI["No raid selected"]);
-        return;
-    end
-    local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
-    --[[ if (boss_select == nil) then
-        MRT_Print(MRT_L.GUI["No boss selected"]);
-        return;
-    end ]]
-    local createdTrash = false;
-    if (boss_select == nil) then
-        if (MRT_NumOfLastBoss == nil) or (MRT_NumOfLastBoss == 0) then
-            MRT_Debug("MRT_GUI_LootAdd: adding boss kill");
-            MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
-            boss_select = 1;
-            createdTrash = true;
-        else
-            MRT_Debug("MRT_GUI_LootAdd: MRT_NumOfLastBoss = " ..MRT_NumOfLastBoss);    
-            MRT_GUI_RaidBosskillsTable:SetSelection(1);
-            boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
-            --use last boss since the table is gone.
-            --boss_select = 1;
+    --overload for readonly mode.
+    if not MRT_ReadOnly then 
+        MRT_GUI_HideDialogs();
+        local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+        if (raid_select == nil) then
+            MRT_Print(MRT_L.GUI["No raid selected"]);
+            return;
         end
+        local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
+        --[[ if (boss_select == nil) then
+            MRT_Print(MRT_L.GUI["No boss selected"]);
+            return;
+        end ]]
+        local createdTrash = false;
+        if (boss_select == nil) then
+            if (MRT_NumOfLastBoss == nil) or (MRT_NumOfLastBoss == 0) then
+                MRT_Debug("MRT_GUI_LootAdd: adding boss kill");
+                MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
+                boss_select = 1;
+                createdTrash = true;
+            else
+                MRT_Debug("MRT_GUI_LootAdd: MRT_NumOfLastBoss = " ..MRT_NumOfLastBoss);    
+                MRT_GUI_RaidBosskillsTable:SetSelection(1);
+                boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
+                --use last boss since the table is gone.
+                --boss_select = 1;
+            end
+        end
+        
+        local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+        if createdTrash then
+            --no boss is available, add one and select
+            MRT_Debug("MRT_GUI_LootAdd: createdTrash == true ");
+            --MRT_Debug("MRT_GUI_LootAdd: MRT_NumOfLastBoss = " ..MRT_NumOfLastBoss);    
+            bossnum = 1;
+        else
+            MRT_Debug("MRT_GUI_LootAdd: boss_select: " ..boss_select);
+            local bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
+            MRT_GUI_RaidBosskillsTable:ClearSelection();
+            --local bossnum = MRT_NumOfLastBoss;
+        end
+        -- gather playerdata and fill drop down menu
+        local playerData = {};
+        for i, val in ipairs(MRT_RaidLog[raidnum]["Bosskills"][bossnum]["Players"]) do
+            playerData[i] = { val };
+        end
+        table.sort(playerData, function(a, b) return (a[1] < b[1]); end );
+        tinsert(playerData, 1, { "disenchanted" } );
+        tinsert(playerData, 1, { "bank" } );
+        tinsert(playerData,1, {"unassigned"});
+        tinsert(playerData, 1, {"pug"} );
+        MRT_RaidPlayerList = playerData;
+        MRT_GUI_PlayerDropDownTable:SetData(playerData, true);
+        if (#playerData < 9) then
+            MRT_GUI_PlayerDropDownTable:SetDisplayRows(#playerData, 15);
+        else
+            MRT_GUI_PlayerDropDownTable:SetDisplayRows(9, 15);
+        end
+        MRT_GUI_PlayerDropDownTable.frame:Hide();
+        -- prepare dialog
+        MRT_GUI_FourRowDialog_Title:SetText(MRT_L.GUI["Add loot data"]);
+        MRT_GUI_FourRowDialog_EB1:SetEnabled(true);
+        MRT_GUI_FourRowDialog_EB1:SetAutoFocus(true);
+        MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
+        MRT_GUI_FourRowDialog_EB1:SetText("");
+        MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
+        MRT_GUI_FourRowDialog_EB2:SetText("unassigned");
+        MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
+        MRT_GUI_FourRowDialog_EB3:SetText("");                         --setting default to zero so that we won't get errors with OS
+        MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
+        MRT_GUI_FourRowDialog_EB4:SetText("Loot added manually");
+        MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
+        MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
+        MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
+        MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
+        MRT_GUI_FourRowDialog:Show();
+    else
+        --update loot table
+        --message to ML to send updated loot table.. but only diff of what I already have.
+
     end
     
-    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-    if createdTrash then
-        --no boss is available, add one and select
-        MRT_Debug("MRT_GUI_LootAdd: createdTrash == true ");
-        --MRT_Debug("MRT_GUI_LootAdd: MRT_NumOfLastBoss = " ..MRT_NumOfLastBoss);    
-        bossnum = 1;
-    else
-        MRT_Debug("MRT_GUI_LootAdd: boss_select: " ..boss_select);
-        local bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
-        MRT_GUI_RaidBosskillsTable:ClearSelection();
-        --local bossnum = MRT_NumOfLastBoss;
-    end
-    -- gather playerdata and fill drop down menu
-    local playerData = {};
-    for i, val in ipairs(MRT_RaidLog[raidnum]["Bosskills"][bossnum]["Players"]) do
-        playerData[i] = { val };
-    end
-    table.sort(playerData, function(a, b) return (a[1] < b[1]); end );
-    tinsert(playerData, 1, { "disenchanted" } );
-    tinsert(playerData, 1, { "bank" } );
-    tinsert(playerData,1, {"unassigned"});
-    tinsert(playerData, 1, {"pug"} );
-    MRT_RaidPlayerList = playerData;
-    MRT_GUI_PlayerDropDownTable:SetData(playerData, true);
-    if (#playerData < 9) then
-        MRT_GUI_PlayerDropDownTable:SetDisplayRows(#playerData, 15);
-    else
-        MRT_GUI_PlayerDropDownTable:SetDisplayRows(9, 15);
-    end
-    MRT_GUI_PlayerDropDownTable.frame:Hide();
-    -- prepare dialog
-    MRT_GUI_FourRowDialog_Title:SetText(MRT_L.GUI["Add loot data"]);
-    MRT_GUI_FourRowDialog_EB1:SetEnabled(true);
-    MRT_GUI_FourRowDialog_EB1:SetAutoFocus(true);
-    MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
-    MRT_GUI_FourRowDialog_EB1:SetText("");
-    MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
-    MRT_GUI_FourRowDialog_EB2:SetText("unassigned");
-    MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
-    MRT_GUI_FourRowDialog_EB3:SetText("");                         --setting default to zero so that we won't get errors with OS
-    MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
-    MRT_GUI_FourRowDialog_EB4:SetText("Loot added manually");
-    MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
-    MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
-    MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
-    MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
-    MRT_GUI_FourRowDialog_CBTraded:SetChecked(false);
-    MRT_GUI_FourRowDialog_CB1:SetChecked(false);
-    MRT_GUI_FourRowDialog:Show();
 end
 
 function verifyPlayer(PlayerName)
@@ -2953,11 +2998,11 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     end
     table.sort(MRT_GUI_BossLootTableData, function(a, b) return (a[3] < b[3]); end);
     --MRT_GUI_BossLootTable:ClearSelection();
-    if skipsort then 
+    --[[ if skipsort then 
         MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort==True about to call SetData");
     else
         MRT_Debug("MRT_GUI_BossLootTableUpdate: skipsort:Nil about to call SetData");
-    end
+    end ]]
     MRT_GUI_BossLootTable:SetData(MRT_GUI_BossLootTableData, true, skipsort);
     lastSelectedBossNum = bossnum;
 end
