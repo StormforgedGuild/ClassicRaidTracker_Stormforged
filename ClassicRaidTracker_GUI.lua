@@ -482,7 +482,8 @@ end
 ---------------------
 --  Show/Hide GUI  --
 ---------------------
-function MRT_GUI_Toggle()
+function MRT_GUI_Toggle(readonly)
+    
     if (not MRT_GUIFrame:IsShown()) then
         MRT_GUIFrame:Show();
         MRT_GUIFrame:SetScript("OnUpdate", function() MRT_GUI_OnUpdateHandler(); end);
@@ -512,9 +513,19 @@ function MRT_GUI_Toggle()
                 MRT_GUI_RaidLogTable:SetSelection(1);   --if there is a row, select the most current
             end 
         end
-
-        ImportReminder();
-
+        --if this is readonly mode we need to set things up
+        if readonly then
+            --setup UI for readonly mode
+            --setup event bypassing to channel
+            MRT_Debug("MRT_GUI_Toggle: readonly = True")
+            MRT_ReadOnly = true;
+        else
+            --only run this if we're not in readonly mode
+            MRT_Debug("MRT_GUI_Toggle: readonly = false")
+            MRT_ReadOnly = false;
+            ImportReminder();
+        end
+        
     else
         MRT_GUIFrame:Hide();
         MRT_GUIFrame:SetScript("OnUpdate", nil);
@@ -1356,14 +1367,42 @@ function MRT_GUI_PlayerDropDownList_Toggle()
     end
 end
 
-function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
+function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     MRT_Debug("MRT_GUI_LootModifyAccept:Called!");
-    local itemLinkFromText = MRT_GUI_FourRowDialog_EB1:GetText();
-    local looter = MRT_GUI_FourRowDialog_EB2:GetText();
-    local cost = MRT_GUI_FourRowDialog_EB3:GetText();
-    local lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
-    local offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
-    local traded = MRT_GUI_FourRowDialog_CBTraded:GetChecked(); 
+    
+    local itemLinkFromText = "";
+    local looter = "";
+    local cost = "";
+    local lootNote = "";
+    local offspec = "";
+    local traded = "";
+    local strMsg = "";
+    
+    if not msg then 
+        itemLinkFromText = MRT_GUI_FourRowDialog_EB1:GetText();
+        looter = MRT_GUI_FourRowDialog_EB2:GetText();
+        cost = MRT_GUI_FourRowDialog_EB3:GetText();
+        lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
+        offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
+        traded = MRT_GUI_FourRowDialog_CBTraded:GetChecked(); 
+    else
+        itemLinkFromText, strMsg = getToken(msg, ";")
+        looter, strMsg = getToken(strMsg, ";")
+        cost, strMsg = getToken(strMsg,";")
+        lootNote, strMsg = getToken(strMsg,";")
+        offspec, strMsg = getToken(strMsg, ";")
+        if offspec =="false" then
+            offspec = false;
+        else
+            offspec = true;
+        end
+        if strMsg =="false" then
+            traded = false;
+        else
+            traded = true;
+        end
+    end
+
     local newloot = false;
     if (cost == "") then cost = 0; end
     cost = tonumber(cost);
@@ -1392,21 +1431,39 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum)
     local clooter = cleanFormatString(looter,true);
     --MRT_Debug("MRT_GUI_LootModifyAccept: clooter: " ..clooter);
     --MRT_Debug("MRT_GUI_LootModifyAccept: clooter:strLen " ..strlen(clooter));
-    if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
-        local validPlayerName = verifyPlayer(clooter);
+    if not msg then 
+        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
+            local validPlayerName = verifyPlayer(clooter);
 
-        if not validPlayerName then
-            StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
-            StaticPopup_Show("MRT_GUI_ok");
+            if not validPlayerName then
+                StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
+                StaticPopup_Show("MRT_GUI_ok");
+                return true;
+            end
+        else
+            MRT_GUI_HideDialogs();
             return true;
         end
-    else
-        MRT_GUI_HideDialogs();
-        return true;
     end
     MRT_GUI_HideDialogs();
     -- insert new values here / if (lootnum == nil) then treat as a newly added item
     if (looter == "") then looter = "disenchanted"; end
+    --create channel message data here.  bossnum;lootnum;itemLink;Looter;cost;lootNote;offspec, eventid=4
+    if isMasterLooter() then 
+        MRT_Debug("MRT_GUI_LootModifyAccept: MasterLooter send message");
+        -- send message to addon channel with new loot message
+        if not MRT_MasterLooter then
+            MRT_MasterLooter = getMasterLooter();
+        end
+        local msg = {
+            ["RaidID"] = MRT_MasterLooter,
+            ["ID"] = MRT_Msg_ID,
+            ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+            ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec),
+            ["EventID"] = "4",
+        }
+        MRT_SendAddonMessage(msg, "RAID");
+    end
     local MRT_LootInfo = {
         ["ItemLink"] = itemLink,
         ["ItemString"] = itemString,

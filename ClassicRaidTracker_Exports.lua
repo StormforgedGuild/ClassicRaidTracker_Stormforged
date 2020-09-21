@@ -104,7 +104,7 @@ function MRT_ImportButtonClick()
     local strData = prepstring(pasted);
     --MRT_SFExport = loadstring(strData);
     strData = "MRT_SFExport = {"..strData.."}"
-    MRT_Debug("strData = ".. strData);
+    --MRT_Debug("strData = ".. strData);
     loadstring(strData)();
     MRT_LastPRImport = MRT_GetCurrentTime();
     --loadstring(strData)();
@@ -114,6 +114,47 @@ function MRT_ImportButtonClick()
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     MRT_GUI_RaidAttendeesTableUpdate(raidnum);
+    --create data
+    if isMasterLooter() then 
+        MRT_Debug("MRT_GUI_LootModifyAccept: MasterLooter send message");
+        SendPRMsg(RaidAttendees);
+        -- send message to addon channel with new loot message
+    end
+
+
+end
+
+--write function that sends attendee PR to channel on import
+function SendPRMsg(attendeetable)
+    if (attendeetable) and table.maxn(attendeetable) > 0 then 
+        local index = 1
+        local strData = ""
+        for i, v in ipairs(attendeetable) do
+            strData = strData..cleanString(v[2], true)..";"..v[3].. ";"
+            if index % 10 == 0 then 
+                local msg = {
+                    ["RaidID"] = "1",
+                    ["ID"] = MRT_Msg_ID,
+                    ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+                    ["Data"] = strData,
+                    ["EventID"] = "5",
+                }
+                MRT_SendAddonMessage(msg, "RAID");                
+                strData = "";
+            end
+            index = index + 1;
+        end
+        MRT_Debug("SendPRMsg: index: " ..index)
+        MRT_Debug("SendPRMsg: strData: " ..strData)
+        local msg = {
+            ["RaidID"] = "1",
+            ["ID"] = MRT_Msg_ID,
+            ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+            ["Data"] = strData,
+            ["EventID"] = "5",
+        }
+        MRT_SendAddonMessage(msg, "RAID");
+    end
 end
 ------------------------
 --  helper functions  --
