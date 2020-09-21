@@ -105,6 +105,7 @@ local MRT_Defaults = {
         ["ItemTracking_IgnoreEnchantingMats"] = true,
         ["ItemTracking_IgnoreGems"] = true,
         ["ItemTracking_UseEPGPValues"] = true,
+        ["ItemTracking_SyncWML"] = false,
         ["Export_ExportFormat"] = 2,                                                -- 1: CTRT compatible, 2: EQdkp-Plus XML, 3: MLdkp 1.5,  4: plain text, 5: BBCode, 6: BBCode with wowhead, 7: CSS based HTML
         ["Export_ExportEnglish"] = false,                                           -- If activated, zone and boss names will be exported in english
         ["Export_CTRT_AddPoorItem"] = false,                                        -- Add a poor item as loot to each boss - Fixes encounter detection for CTRT-Import for EQDKP: true / nil
@@ -281,7 +282,9 @@ function MRT_OnEvent(frame, event, ...)
         if prefix == "SFRT" then
            --process message
            --MRT_Debug("SFRT: "..messageFromAddon);
-           MRT_CHAT_MSG_ADDON_Handler(messageFromAddon, chan, sender, target);
+            if MRT_ReadOnly or MRT_Options["ItemTracking_SyncWML"] then -- if readonly mode or syncing enabled handle the incoming message
+                MRT_CHAT_MSG_ADDON_Handler(messageFromAddon, chan, sender, target);
+            end
         end
 
     elseif (event == "PLAYER_ENTERING_WORLD") then
@@ -444,6 +447,7 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: playerName: "..playerName.. " itemLink: "..itemLink)
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: playerName: itemCount: " ..itemCount)
                 MRT_AutoAddLootItem(playerName, itemLink, itemCount);
+                MRT_GUI_BossDetailsTableUpdate();
             end
             --Event 4 is loot modified message
             if tbMsg["EventID"] == "4" then
@@ -1175,6 +1179,11 @@ function MRT_UpdateSavedOptions()
         -- BfA transition - reset logging of personal loot to true - it is the only loot mode available now
         MRT_Options["Tracking_LogLootModePersonal"] = true;
         MRT_Options["General_OptionsVersion"] = 19;
+    end
+    if MRT_Options["General_OptionsVersion"] == 19 then
+        -- BfA transition - reset logging of personal loot to true - it is the only loot mode available now
+        MRT_Options["ItemTracking_SyncWML"] = false;
+        MRT_Options["General_OptionsVersion"] = 20;
     end
 end
 
@@ -2067,11 +2076,26 @@ function MRT_AutoAddLoot(chatmsg)
         MRT_Debug("MRT_AutoAddLoot: readonly mode or MasterLoot set");
         --if readonly or ML set, wait for channel message
         --should set an option here to sync with channel or proximity
-        if isMasterLooter() then
+        
+        if isMasterLooter() then --if you're the ML, process it.
+            MRT_Debug("MRT_AutoAddLoot: You are the ML process it!");
             MRT_AutoAddLootItem(playerName, itemLink, itemCount);
-        end    
+
+        elseif not MRT_ReadOnly then  --you are not the masterlooter and not Readonly then check if sync to master is on.
+            --if not readonly and sync is not on, process it
+            MRT_Debug("MRT_AutoAddLoot: You are not ML and not readonly");
+            if not MRT_Options["ItemTracking_SyncWML"] then
+                MRT_Debug("MRT_AutoAddLoot: Syncing is not set, process it!");
+                MRT_AutoAddLootItem(playerName, itemLink, itemCount);
+            end
+        elseif not isMasterLootSet() then
+            MRT_Debug("MRT_AutoAddLoot: readonly and ML not set, process it!");
+            MRT_AutoAddLootItem(playerName, itemLink, itemCount);
+        end
+        MRT_Debug("MRT_AutoAddLoot: waiting for loot message from ML");    
     else
-        MRT_Debug("MRT_AutoAddLoot: not readonly mode and not master loot");
+        --If normal mode and masterlooter is not set process it.
+        MRT_Debug("MRT_AutoAddLoot: not readonly mode and ML not set, process it!");
         MRT_AutoAddLootItem(playerName, itemLink, itemCount);
         --I don't think this is needed...
         --MRT_LastLooter = playerName
@@ -2273,6 +2297,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     };
     tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"], MRT_LootInfo);
     MRT_GUI_RaidAttendeesTableUpdate(MRT_NumOFCurrentRaid);
+    MRT_GUI_RaidDetailsTableUpdate(MRT_NumOFCurrentRaid);
     if isMasterLooter() then 
         MRT_Debug("MRT_AutoAddLootItem: MasterLooter send message");
         -- send message to addon channel with new loot message

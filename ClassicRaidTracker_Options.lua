@@ -126,6 +126,8 @@ function MRT_Options_ParseValues()
         MRT_L.Options["TP_OnlyTrackItemsAbove"])
     MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB_Text:SetText(
         MRT_L.Options["ITP_UseEPGP_GP_Values"])
+    MRT_Options_ItemsTrackingPanel_SyncWML_CB_Text:SetText(
+        MRT_L.Options["ITP_SyncWML"])
     --MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:SetChecked(true); --SF: always set for Stormforged
     --MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:SetEnabled(false);  --SF: don't enable this option.
         MRT_Options_ItemsTrackingPanel_ChooseAutoFocus_Title:SetText(
@@ -249,6 +251,8 @@ function MRT_Options_OnOkay(panel)
         MRT_Options_ItemsTrackingPanel_MinItemQualityToGetCost_Slider:GetValue()
     MRT_Options["ItemTracking_UseEPGPValues"] =
         MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:GetChecked()
+    MRT_Options["ItemTracking_SyncWML"] =
+        MRT_Options_ItemsTrackingPanel_SyncWML_CB:GetChecked()
     MRT_Options["Tracking_AskCostAutoFocus"] =
         MRT_Lib_UIDropDownMenu_GetSelectedID(
             MRT_Options_ItemsTrackingPanel_ChooseAutoFocus_DropDownMenu)
@@ -386,6 +390,8 @@ function MRT_Options_RestoreValues()
     MRT_Options_ItemsTrackingPanel_OnlyTrackItemsAbove_EB:SetCursorPosition(0)
     MRT_Options_ItemsTrackingPanel_UseEPGPValues_CB:SetChecked(
         MRT_Options["ItemTracking_UseEPGPValues"])
+    MRT_Options_ItemsTrackingPanel_SyncWML_CB:SetChecked(
+            MRT_Options["ItemTracking_SyncWML"])
     MRT_Options_ItemsTrackingPanel_Create_ChooseAutoFocus_DropDownMenu()
     MRT_Options_ItemsTrackingPanel_IgnoreEnchantingMats_CB:SetChecked(
         MRT_Options["ItemTracking_IgnoreEnchantingMats"])

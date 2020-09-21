@@ -551,7 +551,7 @@
         -->
         <FontString name="$parent_ChooseAutoFocus_Title" inherits="GameFontWhite" text="AutoFocus on loot cost dialog (L)">
           <Anchors>
-            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_OnlyTrackItemsAbove_Text" x="0" y="-45"/>
+            <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_OnlyTrackItemsAbove_Text" x="0" y="-65"/>
           </Anchors>
         </FontString>
       </Layer>
@@ -719,6 +719,31 @@
         <Layers>
           <Layer level="OVERLAY">
             <FontString name="$parent_Text" inherits="GameFontWhite" text="Use EPGP GP values (L)">
+              <Anchors>
+                <Anchor point="LEFT" relativePoint="RIGHT"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+        <Scripts>
+            <OnClick>
+                local enable = self:GetChecked()
+                self:SetChecked(enable and true or false)
+                if enable then
+                    PlaySound(856)
+                else
+                    PlaySound(857)
+                end
+            </OnClick>
+        </Scripts>
+      </CheckButton>
+       <CheckButton name="$parent_SyncWML_CB" inherits="OptionsCheckButtonTemplate">
+        <Anchors>
+          <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent_UseEPGPValues_CB" x="0" y="0"/>
+        </Anchors>
+        <Layers>
+          <Layer level="OVERLAY">
+            <FontString name="$parent_Text" inherits="GameFontWhite" text="Sync Loot with Master Looter (L)">
               <Anchors>
                 <Anchor point="LEFT" relativePoint="RIGHT"/>
               </Anchors>
