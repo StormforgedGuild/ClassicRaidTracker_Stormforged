@@ -1456,7 +1456,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
             MRT_MasterLooter = getMasterLooter();
         end
         local msg = {
-            ["RaidID"] = MRT_MasterLooter,
+            ["RaidID"] = "1",
             ["ID"] = MRT_Msg_ID,
             ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
             ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec),
@@ -2454,7 +2454,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
     --MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
     
     if (dataonly) then
-        --return table
+        --return table before updating
         return MRT_GUI_RaidAttendeesTableData;
     end
     --MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate:about to call sort");
@@ -2462,6 +2462,8 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
     MRT_GUI_RaidAttendeesTable:ClearSelection();
     MRT_GUI_RaidAttendeesTable:SetData(MRT_GUI_RaidAttendeesTableData, true);
     MRT_GUI_RaidAttendeesTable:SortData(MRT_GUIFrame_RaidAttendee_GroupByCB:GetChecked());
+    return MRT_GUI_RaidAttendeesTableData;
+
 end
 function parseFilter(strText)
     MRT_Debug("parseFilter called!");
@@ -2649,38 +2651,48 @@ end
 -- function to get adjusted PR from bossloottable
 function getModifiedPR(raidnum, PlayerName)
     --MRT_Debug("getModifiedPR Called!");
-    local pPR, pEP, pGP = getSFEPGP(PlayerName);
-    local intLootGP = 0;
-    if not pGP then
-        pGP = "0";
-    end 
-    if not pEP then
-        pEP = "0";
-    end
-    intpEP = tonumber(pEP);
-  --  MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
-    intpGP = tonumber(pGP) + 2000;
-    --MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
-    for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
-        if v["Looter"] == PlayerName then
- --           MRT_Debug("getModifiedPR:Found Player in Loot table");
-            intLootGP = intLootGP + tonumber(v["DKPValue"]);
-  --          MRT_Debug("getModifiedPR:intLoopGP = " ..tostring(intLoopGP));
+    if not MRT_ReadOnly then 
+        local pPR, pEP, pGP = getSFEPGP(PlayerName);
+        local intLootGP = 0;
+        if not pGP then
+            pGP = "0";
         end 
-    end
-    if intLootGP == 0 then
-     --   MRT_Debug("getModifiedPR:intLootGP = 0");
-        if not pPR then
-            return "0";
-        else 
-            return pPR;
+        if not pEP then
+            pEP = "0";
         end
-    else 
-    --    MRT_Debug("getModifiedPR:intLootGP <> 0");
-        local newGP = intpGP + intLootGP
-        local newPR = intpEP / newGP
-        local retval = math.floor(newPR * 100)/100;
-        return tostring(retval);
+        intpEP = tonumber(pEP);
+    --  MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
+        intpGP = tonumber(pGP) + 2000;
+        --MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
+        for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
+            if v["Looter"] == PlayerName then
+    --           MRT_Debug("getModifiedPR:Found Player in Loot table");
+                intLootGP = intLootGP + tonumber(v["DKPValue"]);
+    --          MRT_Debug("getModifiedPR:intLoopGP = " ..tostring(intLoopGP));
+            end 
+        end
+        if intLootGP == 0 then
+        --   MRT_Debug("getModifiedPR:intLootGP = 0");
+            if not pPR then
+                return "0";
+            else 
+                return pPR;
+            end
+        else 
+        --    MRT_Debug("getModifiedPR:intLootGP <> 0");
+            local newGP = intpGP + intLootGP
+            local newPR = intpEP / newGP
+            local retval = math.floor(newPR * 100)/100;
+            return tostring(retval);
+        end
+    else
+        local retVal
+        retVal = MRT_ROPlayerPR[PlayerName]
+        if not retVal then
+            return "0.00"
+        else
+            return retVal
+        end
     end
 end
 

@@ -49,11 +49,13 @@ MRT_ArrayBosslast = nil;
 MRT_Msg_ID = 1;
 MRT_ChannelMsgStore = nil;
 MRT_ReadOnly = false;
+MRT_ROPlayerPR = {};
 
 MsgEvents = {
     [1] = "Create Raid",
     [2] = "New Loot",
     [3] = "Loot updated",
+    [4] = "PR Imported"
 };
 MRT_MasterLooter = nil;
 
@@ -307,7 +309,17 @@ function MRT_OnEvent(frame, event, ...)
             return;
         end;
         MRT_CheckZoneAndSizeStatus();
-
+        if isMasterLootSet() then
+            --get master looter if masterlooter ~= player then set mode to readonly
+            --MRT_ReadOnly = not isMasterLooter();
+            if isMasterLooter() then
+                MRT_ReadOnly = false;
+            else
+                MRT_ReadOnly = true;
+            end
+        else
+            --if not ML mode, do nothing.
+        end
     elseif (event == "TRADE_SHOW") then
         MRT_Debug("Trade initiated");
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true);
@@ -397,6 +409,7 @@ function MarkAsTraded()
 
 end
 function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
+    --if debugging, change ML in getMasterLooter()
     local strML = getMasterLooter();
     MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: MasterLooter is " ..strML)
     MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: got message from " ..channel.. " from "..sender)
@@ -421,6 +434,7 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
             end
             MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: Adding msg to the channel store.")
             addChannelMessageToStore(tbMsg);
+            --Event 3 is the new loot message
             if tbMsg["EventID"] == "3" then
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 3")
                 local playerName, strData = getToken(tbMsg["Data"], ";");
@@ -429,13 +443,38 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: playerName: itemCount: " ..itemCount)
                 MRT_AutoAddLootItem(playerName, itemLink, itemCount);
             end
+            --Event 4 is loot modified message
             if tbMsg["EventID"] == "4" then
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 4")
                 --create channel message data here.  bossnum;lootnum;itemLink;Looter;cost;lootNote;offspec, eventid=4
                 local bossnum, strData = getToken(tbMsg["Data"], ";");
                 local lootnum, strData = getToken(strData, ";");
+                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                if not MRT_NumOfCurrentRaid then
+                    strRaidNum = raidnum
+                else
+                    strRaidNum = MRT_NumOfCurrentRaid
+                end
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: bossnum: "..bossnum.. " lootnum: "..lootnum)
-                MRT_GUI_LootModifyAccept(MRT_NumOfCurrentRaid, tonumber(bossnum), tonumber(lootnum), strData);
+                MRT_GUI_LootModifyAccept(strRaidNum, tonumber(bossnum), tonumber(lootnum), strData);
+            end
+            --Event 5 is PR imported
+            if tbMsg["EventID"] == "5" then
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 5")
+                local strData = tbMsg["Data"];
+                local strRaidNum;
+                ProcessROPlayerPR(strData);
+                --testing use get current raid.
+                local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                if not MRT_NumOfCurrentRaid then
+                    strRaidNum = raidnum
+                else
+                    strRaidNum = MRT_NumOfCurrentRaid
+                end
+                MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: EventID = 5: strRaidNum: "..strRaidNum) ;
+                MRT_GUI_RaidAttendeesTableUpdate(strRaidNum);
             end
             --process messages here
         end
@@ -859,6 +898,7 @@ end
 
 function MRT_SlashCmdHandlerRO(msg)
     MRT_Debug("MRT_SlashCmdHandlerRO")
+    MRT_ReadOnly = true;
     MRT_GUI_Toggle(true);
 end
 
@@ -1485,6 +1525,13 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
     local currentTime = MRT_GetCurrentTime();
     local MRT_RaidInfo = {["Players"] = {}, ["Bosskills"] = {}, ["Loot"] = {}, ["DiffID"] = diffID, ["RaidZone"] = zoneName, ["RaidSize"] = raidSize, ["Realm"] = GetRealmName(), ["StartTime"] = currentTime};
     MRT_Debug(tostring(numRaidMembers).." raidmembers found. Processing RaidRoster...");
+    if isMasterLootSet() then
+        if isMasterLooter() then
+            MRT_ReadOnly = false
+        else
+            MRT_ReadOnly = true
+        end
+    end
     for i = 1, numRaidMembers do
         local playerName, _, playerSubGroup, playerLvl, playerClassL, playerClass, _, playerOnline = GetRaidRosterInfo(i);
         local UnitID = "raid"..tostring(i);
@@ -1492,7 +1539,7 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
         local playerSex = UnitSex(UnitID);
         local playerGuild = GetGuildInfo(UnitID);
         local playerPR = getPlayerPR(playerName);  -- write a function that returns player PR from website export
-        MRT_Debug("CreateNewRaid: playerPR: " ..playerPR);
+        --MRT_Debug("CreateNewRaid: playerPR: " ..playerPR);
         local playerInfo = {
             ["Name"] = playerName,
             ["Join"] = currentTime,
@@ -1540,6 +1587,7 @@ function getMasterLooter()
         local MLName = GetRaidRosterInfo(MasterLootRaidIndex);
         return MLName;
     else
+        --we should do something if the master looter is not set.
         return "Hokei";
     end
 end	
@@ -1568,7 +1616,7 @@ function MRT_ResumeLastRaid()
         local playerRaceL, playerRace = UnitRace(UnitID);
         local playerSex = UnitSex(UnitID);
         local playerGuild = GetGuildInfo(UnitID);
-        local playerPR = 0;  -- write a function that returns player PR from website export
+        local playerPR = "0.00";  -- write a function that returns player PR from website export
         local playerInfo = {
             ["Name"] = playerName,
             ["Join"] = currentTime,
@@ -1770,32 +1818,29 @@ end
 -- GetPlayerPR  There are potentially 3 ways to get a PR.  PlayerDB, MRT_SFExport (imported from website), or adjusted PR based on selected Raid.
 -- Current implementation is only from MRT_SFExport (PlayerDB is updated on new raid, but that data is not currently being used.)
 function getPlayerPR(PlayerName)
-    return getSFData(PlayerName);
-    --[[ if not MRT_SFExport["info"] then
-        return "";
+    MRT_Debug("getPlayerPR called!")
+    if not MRT_ReadOnly then 
+        return getSFData(PlayerName);
     else
-        --MRT_Debug("getPlayerPR: about to start loop");        
-        local playerCount = MRT_SFExport["info"]["total_players"];
-        for key, value in pairs(MRT_SFExport["players"]) do
-            --MRT_Debug("getPlayerPR: inside loop");
-            --MRT_Debug("getPlayerPR: key = "..key);
-            --MRT_Debug("getPlayerPR: value[name]: "..value["name"]);        
-            --MRT_Debug("getPlayerPR: value[main_name]: "..value["main_name"]); 
-            if strcomp(value["name"], PlayerName) then
-                --MRT_Debug("getPlayerPR: Found player"); 
-                --MRT_Debug("getPlayerPR: Value[Points]: " .. value["points"]["points_earned"]); 
-                for k, v in pairs(value["points"]) do
-                    --MRT_Debug("getPlayerPR: inside mini loop for points table"); 
-                    --MRT_Debug("getPlayerPR: k: " ..k); 
-                    --MRT_Debug("getPlayerPR: v[pts_currnnt] "..v["points_current"]);        
-                    return (v["points_current"]);
-                end
-                return "";
-            end
+        local retVal = MRT_ROPlayerPR[PlayerName]
+        if not retVal then
+            return "0.00"
+        else 
+            return retVal
         end
-        return "";
-    end ]]
+    end
 end
+
+function ProcessROPlayerPR(data)
+    local strName = ""
+    local strPR = ""
+    local strList = data;
+    while strList ~= "" do
+        strName, strList = getToken(strList,";")
+        MRT_ROPlayerPR[strName], strList = getToken(strList,";");
+    end
+end
+
 --getSFEPGP gets the EP and GP for a given player
 function getSFEPGP(PlayerName)
     --MRT_Debug("getSFEPGP: Called!");        
@@ -2157,7 +2202,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         MRT_Debug("MRT_AutoAddLootItem: MasterLooter send message");
         -- send message to addon channel with new loot message
         local msg = {
-            ["RaidID"] = MRT_MasterLooter,
+            ["RaidID"] = "1",
             ["ID"] = MRT_Msg_ID,
             ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
             ["Data"] = playerName..";"..itemLink..";"..itemCount,
