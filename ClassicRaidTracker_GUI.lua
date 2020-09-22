@@ -2469,6 +2469,7 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
     local MRT_GUI_RaidAttendeesTableData = {};
     local indexofsub
     local checkFilter = filter;
+    local PlayerCache = {};
     if not checkFilter then
         checkFilter = MRT_GUIFrame_RaidAttendees_Filter:GetText();
     end
@@ -2476,58 +2477,64 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
         --MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == true");
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
-            classColor = "ff9d9d9d";
-            -- add check here for filter
-            if (not checkFilter) or checkFilter == "" then
-                v["PR"] = getModifiedPR(raidnum, v["Name"]);
-                v["Class"] = getPlayerClass(v["Name"]);
-                classColor = getClassColor(v["Class"]);         
-                MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
-                index = index + 1;
-            else 
-                -- need function here to return true if there are classes to filter
-                --old code: local strFilter, classname = parseFilter(filter);
-                local strFilter, isClassFilter = parseFilter4Classes(checkFilter);
-                --old code: MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: strFilter =  ".. strFilter);
+            local iList = PlayerCache[v["Name"]]
+            if not iList then 
+                PlayerCache[v["Name"]] = 1
+                classColor = "ff9d9d9d";
+                -- add check here for filter
+                if (not checkFilter) or checkFilter == "" then
+                    v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                    v["Class"] = getPlayerClass(v["Name"]);
+                    classColor = getClassColor(v["Class"]);         
+                    MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
+                    index = index + 1;
+                else 
+                    -- need function here to return true if there are classes to filter
+                    --old code: local strFilter, classname = parseFilter(filter);
+                    local strFilter, isClassFilter = parseFilter4Classes(checkFilter);
+                    --old code: MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: strFilter =  ".. strFilter);
 
-                --old code if classname then  -- if there are class filters then do something
-                if isClassFilter then
-                    -- if there are classes to filter check for which classes
-                    -- checking if class is in the classfilter list
-                    -- new function to return true if class is in classfilter table.
-                    -- old code: indexofsub = substr(v["Class"], strFilter);
-                    -- old code: if not indexofsub then
-                    local tblClassFilter = check4GroupFilters(strFilter);
+                    --old code if classname then  -- if there are class filters then do something
+                    if isClassFilter then
+                        -- if there are classes to filter check for which classes
+                        -- checking if class is in the classfilter list
+                        -- new function to return true if class is in classfilter table.
+                        -- old code: indexofsub = substr(v["Class"], strFilter);
+                        -- old code: if not indexofsub then
+                        local tblClassFilter = check4GroupFilters(strFilter);
 
-                    --old code if not (isClassinClassFilter(v["Class"], strFilter)) then
-                    if not (isClassinClassFilter(v["Class"], tblClassFilter)) then
-                        --skip no class matches so don't do anything.
-                    else 
-                        --class match found so include in table
-                        v["PR"] = getModifiedPR(raidnum, v["Name"]);
-                        v["Class"] = getPlayerClass(v["Name"]);
-                        
-                        classColor = getClassColor(v["Class"]); 
+                        --old code if not (isClassinClassFilter(v["Class"], strFilter)) then
+                        if not (isClassinClassFilter(v["Class"], tblClassFilter)) then
+                            --skip no class matches so don't do anything.
+                        else 
+                            --class match found so include in table
+                            v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                            v["Class"] = getPlayerClass(v["Name"]);
+                            
+                            classColor = getClassColor(v["Class"]); 
 
-                --        MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
-                        MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
-                        index = index + 1;
-                    end
-                else --not class filter, do regular filter
-                    indexofsub = substr(v["Name"], strFilter);
-                    if not indexofsub then
-                        --skip
-                    else 
-                        v["PR"] = getModifiedPR(raidnum, v["Name"]);
-                        v["Class"] = getPlayerClass(v["Name"]);
-                        
-                        classColor = getClassColor(v["Class"]); 
+                           -- MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                            MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
+                            index = index + 1;
+                        end
+                    else --not class filter, do regular filter
+                        indexofsub = substr(v["Name"], strFilter);
+                        if not indexofsub then
+                            --skip
+                        else 
+                            v["PR"] = getModifiedPR(raidnum, v["Name"]);
+                            v["Class"] = getPlayerClass(v["Name"]);
+                            
+                            classColor = getClassColor(v["Class"]); 
 
-                --      MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
-                        MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
-                        index = index + 1;
+                    --      MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: v[PR]: ".. v["PR"]);
+                            MRT_GUI_RaidAttendeesTableData[index] = {k, "|c"..classColor..v["Name"], v["PR"], date("%H:%M", v["Join"]), v["Class"]};
+                            index = index + 1;
+                        end
                     end
                 end
+            else
+                --skip
             end
         end
     else
