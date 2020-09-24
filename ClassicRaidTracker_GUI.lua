@@ -521,6 +521,7 @@ function MRT_GUI_Toggle(readonly)
                 MRT_GUI_RaidLogTable:SetSelection(1);   --if there is a row, select the most current
             end 
         end
+        MRT_GUI_RaidLogTableSelection = MRT_GUI_RaidLogTable:GetSelection();
         --if this is readonly mode we need to set things up
         if readonly then
             --setup UI for readonly mode
@@ -535,6 +536,13 @@ function MRT_GUI_Toggle(readonly)
             MRT_ReadOnly = false;
             ImportReminder();
         end
+        --update all the tables
+        --MRT_Debug("MRT_GUI_Toggle: Updating table")
+        local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+        --MRT_Debug("MRT_GUI_Toggle: raid_select: " ..raid_select)
+        local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+        --MRT_Debug("MRT_GUI_Toggle: raidnum: " ..raidnum)
+        MRT_GUI_RaidDetailsTableUpdate(raidnum)
     else
         MRT_GUIFrame:Hide();
         MRT_GUIFrame:SetScript("OnUpdate", nil);
@@ -2477,9 +2485,9 @@ function MRT_GUI_RaidAttendeesTableUpdate(raidnum, filter, dataonly)
         --MRT_Debug("MRT_GUI_RaidAttendeesTableUpdate: raidnum == true");
         local index = 1;
         for k, v in pairs(MRT_RaidLog[raidnum]["Players"]) do
-            local iList = PlayerCache[v["Name"]]
+            local iList = PlayerCache[v["Name"]] -- if iList is nil then player has not been added to the PlayerCache
             if not iList then 
-                PlayerCache[v["Name"]] = 1
+                PlayerCache[v["Name"]] = 1  --add the player to the PlayerCache 
                 classColor = "ff9d9d9d";
                 -- add check here for filter
                 if (not checkFilter) or checkFilter == "" then
