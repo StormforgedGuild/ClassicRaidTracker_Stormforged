@@ -1950,13 +1950,22 @@ function strcomp(str1, str2)
 end
 -- @param man_diff: used by GUI when a bosskill was added manually
 --                  valid values: "H", "N", nil
-function MRT_AddBosskill(bossname, man_diff, bossID)
-    if (not MRT_NumOfCurrentRaid) then return; end
+function MRT_AddBosskill(bossname, man_diff, bossID, raidnum)
+    local lRaidNum
+    if (MRT_NumOfCurrentRaid) or (raidnum) then 
+        if not MRT_NumOFCurrentRaid then
+            lRaidNum = raidnum
+        else
+            lRaidNum = MRT_NumOFCurrentRaid
+        end
+    else 
+        return; 
+    end
     MRT_Debug("Adding bosskill to RaidLog[] - tracked boss: "..bossname);
-    local maxPlayers = MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidSize"];
+    local maxPlayers = MRT_RaidLog[lRaidNum]["RaidSize"];
     local _, _, diffID = MRT_GetInstanceInfo();
     if (man_diff) then
-        diffID = MRT_RaidLog[MRT_NumOfCurrentRaid]["DiffID"];
+        diffID = MRT_RaidLog[lRaidNum]["DiffID"];
         if (man_diff == "H" and (diffID == 3 or diffID == 4)) then
             diffID = diffID + 2;
         end
@@ -1980,8 +1989,8 @@ function MRT_AddBosskill(bossname, man_diff, bossID)
         ["Difficulty"] = diffID,
         ["BossId"] = bossID,
     }
-    tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Bosskills"], MRT_BossKillInfo);
-    MRT_NumOfLastBoss = #MRT_RaidLog[MRT_NumOfCurrentRaid]["Bosskills"];
+    tinsert(MRT_RaidLog[lRaidNum]["Bosskills"], MRT_BossKillInfo);
+    MRT_NumOfLastBoss = #MRT_RaidLog[lRaidNum]["Bosskills"];
     if (bossname ~= MRT_L.Core["GuildAttendanceBossEntry"] and MRT_Options["Attendance_GuildAttendanceCheckEnabled"]) then
         if (MRT_Options["Attendance_GuildAttendanceCheckNoAuto"]) then
             StaticPopupDialogs["MRT_GA_MSGBOX"] = {

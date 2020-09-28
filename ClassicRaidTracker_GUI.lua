@@ -1140,10 +1140,11 @@ function MRT_GUI_LootAdd()
             return;
         end ]]
         local createdTrash = false;
+        local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
         if (boss_select == nil) then
             if (MRT_NumOfLastBoss == nil) or (MRT_NumOfLastBoss == 0) then
                 MRT_Debug("MRT_GUI_LootAdd: adding boss kill");
-                MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
+                MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N", nil, raidnum);
                 boss_select = 1;
                 createdTrash = true;
             else
@@ -1154,8 +1155,7 @@ function MRT_GUI_LootAdd()
                 --boss_select = 1;
             end
         end
-        
-        local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+        local bossnum
         if createdTrash then
             --no boss is available, add one and select
             MRT_Debug("MRT_GUI_LootAdd: createdTrash == true ");
@@ -1163,9 +1163,12 @@ function MRT_GUI_LootAdd()
             bossnum = 1;
         else
             MRT_Debug("MRT_GUI_LootAdd: boss_select: " ..boss_select);
-            local bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
-            MRT_GUI_RaidBosskillsTable:ClearSelection();
-            --local bossnum = MRT_NumOfLastBoss;
+            if MRT_NumOfLastBoss then 
+                bossnum = MRT_NumOfLastBoss
+            else 
+                bossnum = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
+                MRT_GUI_RaidBosskillsTable:ClearSelection();
+            end
         end
         -- gather playerdata and fill drop down menu
         local playerData = {};
