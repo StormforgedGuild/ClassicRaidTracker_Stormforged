@@ -1637,10 +1637,12 @@ function getMasterLooter()
     -- for debug testing, we can set Main to someone other than the ML.
     -- uncomment next line for testing to assign ML  replace <playername> with ML tester... this should be the one that is the "server"
     --return "<playername>"
+    --local strML = "Hokei"
     local _, _, MasterLootRaidIndex = GetLootMethod();
     if (MasterLootRaidIndex) then
         local MLName = GetRaidRosterInfo(MasterLootRaidIndex);
         return MLName;
+        --return strML;
     else
         --we should do something if the master looter is not set.
         return "Hokei";
@@ -1883,7 +1885,13 @@ function getPlayerPR(PlayerName)
             MRT_Debug("getPlayerPR: MRT_ROPlayerPR is blank, checking MRT_PlayerDB")
             MRT_Debug("getPlayerPR: currentrealm: " ..currentrealm.. " PlayerName: ".. PlayerName)
             --look for playing playerDB
-            reVal = MRT_PlayerDB[currentrealm][PlayerName]["PR"]
+            --need to special case if PR doesn't exist.
+            local playerExists = MRT_PlayerDB[currentrealm][PlayerName]
+            if playerExists then 
+                retVal = MRT_PlayerDB[currentrealm][PlayerName]["PR"]
+            else 
+                return "0.00"
+            end
             if not retVal then
                 return "0.00"
             else 
