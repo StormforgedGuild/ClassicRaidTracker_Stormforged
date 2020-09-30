@@ -314,7 +314,7 @@ function MRT_OnEvent(frame, event, ...)
             return;
         end;
         MRT_CheckZoneAndSizeStatus();
-        if isMasterLootSet() then
+       --[[  if isMasterLootSet() then
             --get master looter if masterlooter ~= player then set mode to readonly
             --MRT_ReadOnly = not isMasterLooter();
             if isMasterLooter() then
@@ -324,7 +324,7 @@ function MRT_OnEvent(frame, event, ...)
             end
         else
             --if not ML mode, do nothing.
-        end
+        end ]]
     elseif (event == "TRADE_SHOW") then
         MRT_Debug("Trade initiated");
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true);
