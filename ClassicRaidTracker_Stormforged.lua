@@ -656,7 +656,7 @@ function doPRReply(playerName, sParams)
     local raid_select = nil;
     local filter = nil;
     local raidnum;
-    --MRT_Debug("Process Whisper: MRT_NumOFCurrentRaid: " ..MRT_NumOfCurrentRaid);
+    --MRT_Debug("Process Whisper: MRT_NumOfCurrentRaid: " ..MRT_NumOfCurrentRaid);
     if not(MRT_NumOfCurrentRaid) then
         raid_select = MRT_GUI_RaidLogTable:GetSelection();
         if not raid_select then
@@ -2318,8 +2318,8 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     MRT_Debug("MRT_AutoAddLootItem: adding to table");
     tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"], MRT_LootInfo);
     MRT_Debug("MRT_AutoAddLootItem: MRT_NumOfCurrentRaid: " ..MRT_NumOfCurrentRaid);
-    MRT_GUI_RaidAttendeesTableUpdate(MRT_NumOFCurrentRaid);
-    MRT_GUI_RaidDetailsTableUpdate(MRT_NumOFCurrentRaid);
+    MRT_GUI_RaidAttendeesTableUpdate(MRT_NumOfCurrentRaid);
+    MRT_GUI_RaidDetailsTableUpdate(MRT_NumOfCurrentRaid);
     if isMasterLooter() then 
         MRT_Debug("MRT_AutoAddLootItem: MasterLooter send message");
         -- send message to addon channel with new loot message
