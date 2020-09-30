@@ -1578,13 +1578,13 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
     local MRT_RaidInfo = {["Players"] = {}, ["Bosskills"] = {}, ["Loot"] = {}, ["DiffID"] = diffID, ["RaidZone"] = zoneName, ["RaidSize"] = raidSize, ["Realm"] = GetRealmName(), ["StartTime"] = currentTime};
     MRT_Debug(tostring(numRaidMembers).." raidmembers found. Processing RaidRoster...");
     --why?
-    if isMasterLootSet() then
+--[[     if isMasterLootSet() then
         if isMasterLooter() then
             MRT_ReadOnly = false
         else
             MRT_ReadOnly = true
         end
-    end
+    end ]]
     for i = 1, numRaidMembers do
         local playerName, _, playerSubGroup, playerLvl, playerClassL, playerClass, _, playerOnline = GetRaidRosterInfo(i);
         local UnitID = "raid"..tostring(i);
@@ -1954,12 +1954,13 @@ end
 function MRT_AddBosskill(bossname, man_diff, bossID, raidnum)
     local lRaidNum
     if (MRT_NumOfCurrentRaid) or (raidnum) then 
-        if not MRT_NumOFCurrentRaid then
+        if not MRT_NumOfCurrentRaid then
             lRaidNum = raidnum
         else
-            lRaidNum = MRT_NumOFCurrentRaid
+            lRaidNum = MRT_NumOfCurrentRaid
         end
     else 
+        MRT_Debug("MRT_AddBosskill: boss: "..bossname.. " no current raid and raidnum not passed in.");
         return; 
     end
     MRT_Debug("Adding bosskill to RaidLog[] - tracked boss: "..bossname);
@@ -2282,6 +2283,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
     end
     -- Quick&Dirty for trash drops before first boss kill
     if (MRT_NumOfLastBoss == nil) then
+        MRT_Debug("MRT_AutoAddLootItem: MRT_NumOfLastBoss: nil");
         MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N");
     end
     -- SF: set default values for looter.
@@ -2313,7 +2315,9 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         ["Note"] = dNote, -- itemNote
         ["OffSpec"] = offspec, --OffSpec costing
     };
+    MRT_Debug("MRT_AutoAddLootItem: adding to table");
     tinsert(MRT_RaidLog[MRT_NumOfCurrentRaid]["Loot"], MRT_LootInfo);
+    MRT_Debug("MRT_AutoAddLootItem: MRT_NumOfCurrentRaid: " ..MRT_NumOfCurrentRaid);
     MRT_GUI_RaidAttendeesTableUpdate(MRT_NumOFCurrentRaid);
     MRT_GUI_RaidDetailsTableUpdate(MRT_NumOFCurrentRaid);
     if isMasterLooter() then 
