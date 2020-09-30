@@ -1577,6 +1577,7 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
     local currentTime = MRT_GetCurrentTime();
     local MRT_RaidInfo = {["Players"] = {}, ["Bosskills"] = {}, ["Loot"] = {}, ["DiffID"] = diffID, ["RaidZone"] = zoneName, ["RaidSize"] = raidSize, ["Realm"] = GetRealmName(), ["StartTime"] = currentTime};
     MRT_Debug(tostring(numRaidMembers).." raidmembers found. Processing RaidRoster...");
+    --why?
     if isMasterLootSet() then
         if isMasterLooter() then
             MRT_ReadOnly = false
