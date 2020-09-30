@@ -314,7 +314,8 @@ function MRT_OnEvent(frame, event, ...)
             return;
         end;
         MRT_CheckZoneAndSizeStatus();
-       --[[  if isMasterLootSet() then
+        --this is old logic, I think.  We don't blanketly set MRT_ReadOnly based on ML anymore.
+        --[[  if isMasterLootSet() then
             --get master looter if masterlooter ~= player then set mode to readonly
             --MRT_ReadOnly = not isMasterLooter();
             if isMasterLooter() then
@@ -2129,6 +2130,7 @@ end
 
 function isMasterLooter()
     -- return true if master looter and player is the same
+    -- only use this for determining whether or not to send comms messages, don't use this for anything else.
     MRT_Debug("IsMasterLooter called")
     local ML = getMasterLooter();
     MRT_Debug("IsMasterLooter: ML = " ..ML)
