@@ -1142,6 +1142,13 @@ function MRT_GUI_LootAdd()
         local createdTrash = false;
         local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
         if (boss_select == nil) then
+            --if there is no current active raid, just add to last boss
+            if not MRT_NumOfCurrentRaid then
+                MRT_Debug("MRT_GUI_LootAdd: MRT_NumOfCurrentRaid is nill");    
+                MRT_GUI_RaidBosskillsTable:SetSelection(1);
+                boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
+                MRT_NumOfLastBoss = boss_select;
+            end 
             if (MRT_NumOfLastBoss == nil) or (MRT_NumOfLastBoss == 0) then
                 MRT_Debug("MRT_GUI_LootAdd: adding boss kill");
                 MRT_AddBosskill(MRT_L.Core["Trash Mob"], "N", nil, raidnum);
@@ -1443,6 +1450,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     local cost = "";
     local lootNote = "";
     local offspec = "";
+    local traded = "";
     local strMsg = "";
     if not msg then 
         itemLinkFromText = MRT_GUI_FourRowDialog_EB1:GetText();
@@ -1450,15 +1458,22 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
         cost = MRT_GUI_FourRowDialog_EB3:GetText();
         lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
         offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
+        traded = MRT_GUI_FourRowDialog_CBTraded:GetChecked();
     else
         itemLinkFromText, strMsg = getToken(msg, ";")
         looter, strMsg = getToken(strMsg, ";")
         cost, strMsg = getToken(strMsg,";")
         lootNote, strMsg = getToken(strMsg,";")
-        if strMsg =="false" then
+        offspec, strMsg = getToken(strMsg,";")
+        if offspec =="false" then
             offspec = false;
         else
             offspec = true;
+        end
+        if strMsg =="false" then	
+            traded = false;	
+        else	
+            traded = true;	
         end
     end
     
@@ -1489,7 +1504,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     --MRT_Debug("MRT_GUI_LootModifyAccept: clooter:strLen " ..strlen(clooter));
     --MRT_Debug("MRT_GUI_LootModifyAccept: not channel msg, do dirty check")
     if not msg then 
-        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked()) then
+        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
             local validPlayerName = verifyPlayer(clooter);
             if not validPlayerName then
                 StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
@@ -1516,6 +1531,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
         ["ItemColor"] = itemColor,
         ["BossNumber"] = bossnum,
         ["Looter"] = looter,
+        ["Traded"] = traded,
         ["DKPValue"] = cost,
         ["Note"] = lootNote,
         ["Offspec"] = offspec,
@@ -1580,7 +1596,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
                 ["RaidID"] = "1",
                 ["ID"] = MRT_Msg_ID,
                 ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
-                ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec),
+                ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec)..";"..tostring(traded),
                 ["EventID"] = "4",
             }
             MRT_SendAddonMessage(msg, "RAID");
@@ -1726,6 +1742,7 @@ function MRT_GetTradeableItems()
 
     --Get name of player with an open trade window
     local tradePartnerName = UnitName("NPC");
+    MRT_Debug("MRT_GetTradeableItems: tradePartnerName: " ..tradePartnerName);
     local itemsToTrade = {};
 
     -----------------------------------------------------------------
@@ -1733,12 +1750,12 @@ function MRT_GetTradeableItems()
     -----------------------------------------------------------------
 
     local raidnum;
-
+    
     -- check if a raid is selected
     if (MRT_GUI_RaidLogTable:GetSelection()) then
         raidnum = MRT_GUI_RaidLogTable:GetCell(MRT_GUI_RaidLogTableSelection, 1);
     end
-
+    --MRT_Debug("MRT_GetTradeableItems: raidnum: " ..raidnum)
     -- if there is no raid selected (ex. on launch, then return)
     if not raidnum then
         return; 
@@ -1747,7 +1764,9 @@ function MRT_GetTradeableItems()
     --MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
     local index = 1;
     for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
-
+        MRT_Debug("MRT_GetTradeableItems: i: " ..i);
+        MRT_Debug("MRT_GetTradeableItems: v[looter]: " ..v["Looter"]);
+        MRT_Debug("MRT_GetTradeableItems: v[traded]: " ..tostring(v["Traded"]));
         if v["Looter"] == tradePartnerName and v["Traded"] == false then
             itemsToTrade[index] = v["ItemName"];
             MRT_Debug(tradePartnerName.. " should receive "..itemsToTrade[index]);
@@ -1764,7 +1783,7 @@ function MRT_GUI_TradeLink()
 
     --disable animation once clicked
     stopEncouragingTrade();
-
+    MRT_Debug("MRT_GUI_TradeLink: Clicked!")
     --commit save if the loot dialog is visible.
     if MRT_GUI_FourRowDialog:IsVisible() then
         if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
@@ -1776,6 +1795,7 @@ function MRT_GUI_TradeLink()
             end
         end
     end;
+    MRT_Debug("MRT_GUI_TradeLink: passed dirty check calling gettradeable")
     --get the items the person is supposed to get
     local itemsToTrade = MRT_GetTradeableItems();
 
@@ -1785,7 +1805,7 @@ function MRT_GUI_TradeLink()
     for i in pairs(itemsToTrade) do
          local foundInBag, containerID, slotID = findItemInBag(itemsToTrade[i]);
          if foundInBag then
-            --MRT_Debug("Found item "..sName.." at"..container.. slot)
+            --MRT_Debug("MRT_GUI_TradeLink: Found item "..sName.." at"..containerID.. slotID)
             --Validate that the item is tradeable by looking at the loot timer
             local timeRemaining = GetContainerItemTradeTimeRemaining(containerID, slotID);
             if timeRemaining>0 then
@@ -2387,10 +2407,12 @@ function MRT_GUI_OnUpdateHandler()
             MRT_GUI_RaidDetailsTableUpdate(nil);
         end
     end
+    --we don't use the bosskillstable... can we comment this out?
+    
     if (bossnum ~= MRT_GUI_RaidBosskillsTableSelection) then
         MRT_GUI_RaidBosskillsTableSelection = bossnum;
         if (bossnum) then
-            MRT_GUI_BossDetailsTableUpdate(MRT_GUI_RaidBosskillsTable:GetCell(bossnum, 1))
+            --MRT_GUI_BossDetailsTableUpdate(MRT_GUI_RaidBosskillsTable:GetCell(bossnum, 1))
         else
             MRT_GUI_BossDetailsTableUpdate(nil);
         end
