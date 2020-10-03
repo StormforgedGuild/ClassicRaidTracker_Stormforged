@@ -56,6 +56,7 @@ local lastValue = nil;
 local lastNote = nil;
 local lastOS = nil;
 local lastTraded = nil;
+local lastLootItem = nil;
 local lootFilterHack = 0;
 local attendeeFilterHack = 0;
 local bAutoCompleteCreated = false;
@@ -230,14 +231,24 @@ end
 --  Helper Function to detect dirty dialog                   --
 ---------------------------------------------------------------
 
-function isDirty (strLooter, strValue, strNote, strOS, strTraded)
+function isDirty (strLooter, strValue, strNote, strOS, strTraded, strItemLink)
     --MRT_Debug("isDirty fired!");
-    if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) and (strOS == lastOS) and (strTraded == lastTraded) then
-        --MRT_Debug("isDirty = false");
-        return false;
+    if not strItemLink then 
+        if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) and (strOS == lastOS) and (strTraded == lastTraded) then
+            --MRT_Debug("isDirty = false");
+            return false;
+        else
+            --MRT_Debug("isDirty = true");
+            return true;
+        end
     else
-        --MRT_Debug("isDirty = true");
-        return true;
+        if (strLooter == lastLooter) and (strValue == lastValue) and (strNote == lastNote) and (strOS == lastOS) and (strTraded == lastTraded) and (strItemLink == lastLootItem) then
+            --MRT_Debug("isDirty = false");
+            return false;
+        else
+            --MRT_Debug("isDirty = true");
+            return true;
+        end
     end
 end
 
@@ -1388,6 +1399,7 @@ function MRT_GUI_LootModify()
     --MRT_Debug("MRT_GUI_LootModify: cleanLooter:before clean strlen "..strlen(cleanlooter));
     --MRT_GUI_FourRowDialog_EB2:SetText(cleanString(cleanlooter,true));
     lastLooter = MRT_GUI_FourRowDialog_EB2:GetText();
+    lastLootItem = MRT_GUI_FourRowDialog_EB1:GetText();
     --MRT_Debug("MRT_GUI_LootModify: lastLooter: afterclean "..lastLooter);
     --MRT_Debug("MRT_GUI_LootModify: lastLooter: afterclean strlen "..strlen(lastLooter));
     
@@ -1504,7 +1516,8 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     --MRT_Debug("MRT_GUI_LootModifyAccept: clooter:strLen " ..strlen(clooter));
     --MRT_Debug("MRT_GUI_LootModifyAccept: not channel msg, do dirty check")
     if not msg then 
-        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
+        if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(),MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked(), MRT_GUI_FourRowDialog_EB1:GetText()) then
+            MRT_Debug("MRT_GUI_LootModifyAccept: it's dirty");
             local validPlayerName = verifyPlayer(clooter);
             if not validPlayerName then
                 StaticPopupDialogs.MRT_GUI_ok.text = MRT_GUI_FourRowDialog_EB2:GetText().." is not in this raid.  Please choose a valid character."
@@ -1512,6 +1525,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
                 return true;
             end
         else
+            MRT_Debug("MRT_GUI_LootModifyAccept: not dirty");
             MRT_GUI_HideDialogs();
             return true;
         end
@@ -1537,6 +1551,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
         ["Offspec"] = offspec,
     }
     if (lootnum) then
+        MRT_Debug("MRT_GUI_LootModifyAccept: old loot");
         --MRT_Debug("MRT_GUI_LootModifyAccept:lootnum if ");
         if MRT_LootInfo["Offspec"] then
             --MRT_Debug("MRT_GUI_LootModifyAccept:Offspec = True");
@@ -1602,6 +1617,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
             MRT_SendAddonMessage(msg, "RAID");
         end
     else
+        MRT_Debug("MRT_GUI_LootModifyAccept: new loot");
         newloot = true;
         MRT_LootInfo["ItemCount"] = 1;
         MRT_LootInfo["Time"] = MRT_RaidLog[raidnum]["Bosskills"][bossnum]["Date"] + 15;
