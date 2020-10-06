@@ -2899,14 +2899,18 @@ function SetDoneState(looter, traded, itemName)
 
     local doneState = false;
 
+    if (looter == "unassigned") then
+           return false;
+    end
+
     --if it's assigned to disenchanted or bank... it's done
     if (looter == "disenchanted") or (looter == "bank") then
-        doneState=true;
+        return true;
     end
 
     --if it's been marked traded by the trade process.. it's done
     if traded then
-        doneState=true;
+        return true;
     end
 
     --if item is assigned to a player & not in your bag (or in your bag, but loot timer expired) set to done
