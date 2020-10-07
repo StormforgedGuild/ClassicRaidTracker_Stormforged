@@ -52,6 +52,12 @@ MRT_ChannelMsgRequestStore = nil;
 MRT_ReadOnly = false;
 MRT_ROPlayerPR = {};
 MRT_Msg_Request_ID = 1;
+MRT_LootBidding = false;
+MRT_TopBidders = {
+    ["PR"] = nil,
+    ["Players"] = {},
+    ["Type"] = nil,
+} 
 
 MsgEvents = {
     [1] = "Create Raid",
@@ -200,6 +206,7 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("MERCHANT_SHOW");
     frame:RegisterEvent("MERCHANT_UPDATE");
     frame:RegisterEvent("CHAT_MSG_ADDON");
+    frame:RegisterEvent("CHAT_MSG_RAID");
 end
 
 -------------------------
@@ -233,6 +240,14 @@ function MRT_OnEvent(frame, event, ...)
         end ]]
         --Check to see if there is an active raid.  if not, do nothing.
         ProcessWhisper(...);
+    --elseif(event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") or (event == "CHAT_MSG_RAID_WARNING") then
+    elseif (event == "CHAT_MSG_RAID") then
+        --handle raid chat
+        MRT_Debug("RaidMessage received!");
+        MRT_Debug("RaidMessage received: MRT_LootBidding: " ..tostring(MRT_LootBidding));
+        if MRT_LootBidding then
+            processLootRaidChat(...)
+        end
 
     elseif (event == "CHAT_MSG_MONSTER_YELL") then
         if (not MRT_Options["General_MasterEnable"]) then return end;
@@ -369,12 +384,134 @@ function MRT_OnEvent(frame, event, ...)
                 MRT_CheckZoneAndSizeStatus();
             end
         end);
-
     elseif(event == "PLAYER_REGEN_DISABLED") then
         wipe(MRT_ArrayBossID)
         --MRT_Debug("Tabelle gelöscht");
-
     end
+end
+
+function processLootRaidChat(text, playerName)
+    MRT_Debug("processLootRaidChat fired!");
+    local msg = text
+    local pName = stripRealmFromName(playerName);
+    local lRaidNum
+    local isABid, strBidType = isBid(msg)
+    local blnNewTop = false;
+    local playerPR = nil;
+
+    if isABid then
+        --MRT_Debug("processLootRaidChat: isabid");
+        --calc bid
+        --get raidnum to do modified PR
+        if (MRT_NumOfCurrentRaid) then 
+            lRaidNum = MRT_NumOfCurrentRaid
+        else
+            local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+            if raid_select then 
+                lRaidNum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+            else
+                MRT_Print("No Raid selected")
+                return
+            end 
+        end 
+        --check if top bidder type is set
+        if not MRT_TopBidders["Type"] then
+            MRT_Debug("processLootRaidChat: setting BidType: " ..strBidType);
+            MRT_TopBidders["Type"] = strBidType
+            MRT_Debug("processLootRaidChat: MRT_TopBidders[Type]: " ..MRT_TopBidders["Type"]);
+        else 
+            --check if top bidder is ms
+            if (MRT_TopBidders["Type"] == "ms") then
+                if strBidType == "os" then 
+                    --stop and return if new bid is os, but top bidder is ms
+                    return
+                end
+            else 
+                --MRT_TopBidders["Type"] == "os"
+                --Top bid is os, check to see if new bid is ms
+                if strBidType == "ms" then
+                    MRT_TopBidders["Type"] = "ms"
+                    blnNewTop = true;
+                end
+            end 
+        end
+        playerPR = tonumber(getModifiedPR(lRaidNum, pName));
+        
+        if #MRT_TopBidders["Players"] == 0 then
+            MRT_TopBidders["PR"] = playerPR
+            tinsert(MRT_TopBidders["Players"], pName);
+            blnNewTop = true
+        else
+            if blnNewTop then
+                MRT_TopBidders["PR"] = playerPR;
+                MRT_TopBidders["Players"] = {};
+                tinsert(MRT_TopBidders["Players"], pName)
+            else 
+                if playerPR > MRT_TopBidders["PR"] then
+                    MRT_TopBidders["PR"] = playerPR;
+                    MRT_TopBidders["Players"] = {};
+                    tinsert(MRT_TopBidders["Players"], pName);
+                    blnNewTop = true
+                elseif playerPR == MRT_TopBidders["PR"] then
+                    --need function to walk the player list quick and dirty hack for now.
+                    if #MRT_TopBidders["Players"] == 1 then 
+                        if pName == MRT_TopBidders["Players"][1] then 
+                            blnNewTop = false
+                        else
+                            tinsert(MRT_TopBidders["Players"], pName);
+                            blnNewTop = true
+                        end
+                    end 
+
+                end
+            end
+        end
+        if blnNewTop then 
+            AnnounceBidLeader();
+        end
+    end
+end
+
+function AnnounceBidLeader()
+    local messageType = "Raid"
+    local rwMessage
+    local strBidType 
+    
+    if MRT_TopBidders["Type"] == "os" then 
+        strBidType = "OffSpec"
+    else
+        strBidType = "MainSpec"
+    end
+    if #MRT_TopBidders["Players"] == 1 then 
+        rwMessage = string.format(MRT_L.GUI["BidLeaderMessage"], MRT_TopBidders["Players"][1], MRT_TopBidders["PR"], strBidType);
+    else
+        local sPlayers = ""
+        for i, v in ipairs(MRT_TopBidders["Players"]) do
+            if sPlayers == "" then 
+                sPlayers = v
+            else
+                sPlayers = sPlayers.. ", "..v;
+            end 
+        end
+        rwMessage = string.format(MRT_L.GUI["BidLeaderMessage"], sPlayers, MRT_TopBidders["PR"], strBidType);        
+    end
+    SendChatMessage(rwMessage, messageType);
+end 
+
+function isBid(text)
+    local bid = string.lower(text);
+    --if bid == os or ms do a thing
+    local intMSIndex = strfind(bid, "ms");
+    local intOSIndex = strfind(bid, "os");
+
+    if intMSIndex then
+        return true, "ms"
+    elseif intOSIndex then
+        return true, "os"
+    else
+        return false
+    end
+
 end
 
 function MarkAsTraded()

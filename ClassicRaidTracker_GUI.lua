@@ -1625,7 +1625,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
             MRT_SendAddonMessage(msg, "RAID");
         end
     else
-        MRT_Debug("MRT_GUI_LootModifyAccept: new loot");
+        --MRT_Debug("MRT_GUI_LootModifyAccept: new loot");
         newloot = true;
         MRT_LootInfo["ItemCount"] = 1;
         MRT_LootInfo["Time"] = MRT_RaidLog[raidnum]["Bosskills"][bossnum]["Date"] + 15;
@@ -1692,20 +1692,20 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     local raidnum_selected = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local boss_select = MRT_GUI_RaidBosskillsTable:GetSelection();
     if newloot then
-        MRT_Debug("MRT_GUI_Accept:new loot update the table");
+        --MRT_Debug("MRT_GUI_Accept:new loot update the table");
         MRT_GUI_BossLootTableUpdate(bossnum);
         return;
     end
     if (boss_select == nil) then
         if (raidnum_selected == raidnum) then
-            MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(nil,true)");
+            --MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(nil,true)");
             MRT_GUI_BossLootTableUpdate(nil, true);
         end
         return;
     end
     local bossnum_selected = MRT_GUI_RaidBosskillsTable:GetCell(boss_select, 1);
     if (raidnum_selected == raidnum and bossnum_selected == bossnum) then
-        MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(bossnum,true)");
+        --MRT_Debug("MRT_GUI_Accept:About to call MRT_GUI_BossLootTableUpdate(bossnum,true)");
         MRT_GUI_BossLootTableUpdate(bossnum, true);
     end
 
@@ -1735,14 +1735,18 @@ function MRT_GUI_LootRaidWinner()
     --local looter = string.upper(MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]);
     --local cost = MRT_GUI_BossLootTable:GetCell(loot_select, 5);
     -- old code local looter = string.upper(MRT_GUI_FourRowDialog_EB2:GetText());
-
+    if #MRT_TopBidders["Players"] == 1 then 
+        MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
+    end
     local looter= MRT_GUI_FourRowDialog_EB2:GetText();
     looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
 
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
     local lootName = MRT_GUI_FourRowDialog_EB1:GetText();
     local rwMessage;
-
+    if #MRT_TopBidders["Players"] == 1 then 
+        MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
+    end
     --"Congratz! %s receives %s for %sGP",   
     --local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
     if MRT_GUI_FourRowDialog_EB2:GetText()=="disenchanted" then 
@@ -1750,7 +1754,21 @@ function MRT_GUI_LootRaidWinner()
     else
         rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
     end
+        
     SendChatMessage(rwMessage, "Raid");
+    ResetBidding(false);
+end
+
+function ResetBidding(start)
+    MRT_Debug("ResetBidding: start: " ..tostring(start));
+    --start == true if starting false if ending
+    MRT_TopBidders = {
+        ["PR"] = nil,
+        ["Players"] = {},
+        ["Type"] = nil,
+    } 
+    MRT_LootBidding = start;
+    MRT_Debug("ResetBidding: MRT_LootBidding: " ..tostring(MRT_LootBidding));
 end
 
 function GetSelectedRaid()
@@ -2117,6 +2135,7 @@ function MRT_GUI_LootRaidAnnounce()
         SendChatMessage(rwMessage, "RAID_WARNING");
     end ]]
     LootAnnounce("RAID_WARNING", MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5))
+    ResetBidding(true);
 end
 
 
@@ -2944,11 +2963,11 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     -- check if a raid is selected
     if (MRT_GUI_RaidLogTable:GetSelection()) then
         raidnum = MRT_GUI_RaidLogTable:GetCell(MRT_GUI_RaidLogTableSelection, 1);
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: raidnum: " ..raidnum);
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: raidnum: " ..raidnum);
     end
     -- if a bossnum is given, just list loot of this boss
     if (bossnum) then
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
         local index = 1;
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             if (v["BossNumber"] == bossnum) then
@@ -2990,7 +3009,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
         MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_BossLootTitle"]);
     -- there is only a raidnum and no bossnum, list raid loot
     elseif (raidnum) then
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
         local index = 1;
 
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
@@ -3065,7 +3084,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     --    MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
     -- if either raidnum nor bossnum, show an empty table
     else
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: no raidnum or bossnum");
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: no raidnum or bossnum");
     --    MRT_GUIFrame_BossLootTitle:SetText(MRT_L.GUI["Tables_RaidLootTitle"]);
     end
     table.sort(MRT_GUI_BossLootTableData, function(a, b) return (a[3] < b[3]); end);
