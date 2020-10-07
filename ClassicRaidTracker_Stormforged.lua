@@ -207,6 +207,8 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("MERCHANT_UPDATE");
     frame:RegisterEvent("CHAT_MSG_ADDON");
     frame:RegisterEvent("CHAT_MSG_RAID");
+    frame:RegisterEvent("CHAT_MSG_RAID_LEADER"); 
+
 end
 
 -------------------------
@@ -241,7 +243,7 @@ function MRT_OnEvent(frame, event, ...)
         --Check to see if there is an active raid.  if not, do nothing.
         ProcessWhisper(...);
     --elseif(event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") or (event == "CHAT_MSG_RAID_WARNING") then
-    elseif (event == "CHAT_MSG_RAID") then
+    elseif (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") then
         --handle raid chat
         MRT_Debug("RaidMessage received!");
         MRT_Debug("RaidMessage received: MRT_LootBidding: " ..tostring(MRT_LootBidding));
