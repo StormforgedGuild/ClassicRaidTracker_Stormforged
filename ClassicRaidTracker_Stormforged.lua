@@ -57,6 +57,7 @@ MRT_TopBidders = {
     ["PR"] = nil,
     ["Players"] = {},
     ["Type"] = nil,
+    ["History"] = {},
 } 
 
 MsgEvents = {
@@ -207,8 +208,7 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("MERCHANT_UPDATE");
     frame:RegisterEvent("CHAT_MSG_ADDON");
     frame:RegisterEvent("CHAT_MSG_RAID");
-    frame:RegisterEvent("CHAT_MSG_RAID_LEADER"); 
-
+    frame:RegisterEvent("CHAT_MSG_RAID_LEADER");
 end
 
 -------------------------
@@ -245,9 +245,10 @@ function MRT_OnEvent(frame, event, ...)
     --elseif(event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") or (event == "CHAT_MSG_RAID_WARNING") then
     elseif (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") then
         --handle raid chat
-        MRT_Debug("RaidMessage received!");
+        --MRT_Debug("RaidMessage received!");
         MRT_Debug("RaidMessage received: MRT_LootBidding: " ..tostring(MRT_LootBidding));
         local sText = ...;
+        
         if MRT_LootBidding then
             local strIndex = strfind(sText, "New Highest");
             if not strIndex then
@@ -420,64 +421,205 @@ function processLootRaidChat(text, playerName)
                 return
             end 
         end 
-        --check if top bidder type is set
-        if not MRT_TopBidders["Type"] then
-            MRT_Debug("processLootRaidChat: setting BidType: " ..strBidType);
-            MRT_TopBidders["Type"] = strBidType
-            MRT_Debug("processLootRaidChat: MRT_TopBidders[Type]: " ..MRT_TopBidders["Type"]);
-        else 
-            --check if top bidder is ms
-            if (MRT_TopBidders["Type"] == "ms") then
-                if strBidType == "os" then 
-                    --stop and return if new bid is os, but top bidder is ms
-                    return
-                end
-            else 
-                --MRT_TopBidders["Type"] == "os"
-                --Top bid is os, check to see if new bid is ms
-                if strBidType == "ms" then
-                    MRT_TopBidders["Type"] = "ms"
-                    blnNewTop = true;
-                end
-            end 
-        end
         playerPR = tonumber(getModifiedPR(lRaidNum, pName));
-        
-        if #MRT_TopBidders["Players"] == 0 then
-            MRT_TopBidders["PR"] = playerPR
-            tinsert(MRT_TopBidders["Players"], pName);
-            blnNewTop = true
-        else
-            if blnNewTop then
-                MRT_TopBidders["PR"] = playerPR;
-                MRT_TopBidders["Players"] = {};
-                tinsert(MRT_TopBidders["Players"], pName)
-            else 
-                if playerPR > MRT_TopBidders["PR"] then
-                    MRT_TopBidders["PR"] = playerPR;
-                    MRT_TopBidders["Players"] = {};
-                    tinsert(MRT_TopBidders["Players"], pName);
-                    blnNewTop = true
-                elseif playerPR == MRT_TopBidders["PR"] then
-                    --need function to walk the player list quick and dirty hack for now.
-                    if #MRT_TopBidders["Players"] == 1 then 
-                        if pName == MRT_TopBidders["Players"][1] then 
-                            blnNewTop = false
-                        else
-                            tinsert(MRT_TopBidders["Players"], pName);
-                            blnNewTop = true
-                        end
-                    end 
-
-                end
+        local Bid = {
+            ["Player"] = pName,
+            ["PR"] = playerPR,
+            ["Type"] = strBidType,
+        }
+        if strBidType == "pass" then
+            --remove the bid from history and recalc top bidder
+            blnNewTop = UpdateBid(Bid, true)
+        else 
+            --if bidder doesn't exist, add to the list, if exists, update bid.
+            if isNewBidder(Bid) then
+                tinsert(MRT_TopBidders["History"], Bid)
+                blnNewTop = UpdateTopBidder(Bid)
+            else
+                MRT_Debug("processLootRaidChat: not new bidder: find and update" );
+                blnNewTop = UpdateBid(Bid)
             end
-        end
+        end 
         if blnNewTop then 
             AnnounceBidLeader();
         end
     end
 end
 
+function isNewBidder (bid)
+    if not MRT_TopBidders["History"] then
+        MRT_Debug("isNewBidder: isNewBidder: true" );
+        return true;
+    else
+        for i,v in pairs(MRT_TopBidders["History"]) do
+            if v["Player"] == bid["Player"] then
+                MRT_Debug("isNewBidder: isNewBidder: false" );
+                return false;
+            end
+        end 
+        MRT_Debug("isNewBidder: isNewBidder: true" );
+        return true;
+    end
+end
+
+--Use this function to update the bids in history and update the top bidder
+function UpdateBid(bid, remove)
+    MRT_Debug("UpdateBid called!");
+    local oldTopBid = {
+        ["PR"] = MRT_TopBidders["PR"],
+        ["Players"] = {},
+        ["Type"] = MRT_TopBidders["Type"],
+    }
+    for i, v in pairs(MRT_TopBidders["Players"]) do
+        tinsert(oldTopBid["Players"], v)
+    end
+    MRT_Debug("UpdateBid: #oldTopBid[Players]: " ..tostring(#oldTopBid["Players"]));
+    if not remove then 
+        for i,v in pairs(MRT_TopBidders["History"]) do
+            if v["Player"] == bid["Player"] then
+                v["Type"] = bid["Type"]
+                MRT_Debug("UpdateBid: MRT_TopBidders[History][i]: " ..MRT_TopBidders["History"][i]["Type"]);
+            end
+        end 
+    else
+        --call if someone passes
+        MRT_Debug("UpdateBid bidtype is pass");
+        for i,v in pairs(MRT_TopBidders["History"]) do
+            if v["Player"] == bid["Player"] then
+                MRT_Debug("UpdateBid: v:[Player]: "..v["Player"].. ", bid[Player]: " ..bid["Player"]);
+                MRT_Debug("UpdateBid: removing bid from history");
+                tremove(MRT_TopBidders["History"], i)
+                MRT_Debug("UpdateBid: #MRT_TopBidders[History]: " ..tostring(#MRT_TopBidders["History"]));
+            end
+        end 
+        if isPlayerTop(bid["Player"]) then
+            MRT_Debug("UpdateBid: player passing is top bidder, remove");
+            removePlayerTop(bid["Player"])
+            MRT_Debug("UpdateBid: after removePlayerTop: #oldTopBid[Players]: " ..tostring(#oldTopBid["Players"]));
+        end
+    end
+    --now update TopBidder
+    MRT_Debug("UpdateBid: updating TopBidder");
+    MRT_Debug("UpdateBid: #MRT_TopBidders[History]: " ..tostring(#MRT_TopBidders["History"]));
+    for i, v in pairs(MRT_TopBidders["History"]) do
+        MRT_Debug("UpdateBid: v[Player]: " ..v["Player"]);
+        UpdateTopBidder(v)
+    end
+    if (oldTopBid["PR"] == MRT_TopBidders["PR"]) and topBiddersMatch(oldTopBid["Players"], MRT_TopBidders["Players"]) and (oldTopBid["Type"] == MRT_TopBidders["Type"]) then
+        MRT_Debug("UpdateBid: oldTopBid match current top");
+        return false
+    else 
+        MRT_Debug("UpdateBid: oldTopBid doesn't match return true");
+        return true
+    end
+end
+--return if a player is in the top bidders list
+
+function topBiddersMatch (old, new)
+    MRT_Debug("TopBidderMatch Called!");
+    MRT_Debug("TopBidderMatch: #old: " ..tostring(#old).. ", #new: " ..tostring(#new));
+    if #old ~= #new then
+        return false
+    end
+    for i,v in ipairs(old) do
+        if old[i] ~= new[i] then
+            return false;
+        end
+    end
+    return true;
+end 
+function isPlayerTop(name)
+    MRT_Debug("isPlayerTop: MRT_TopBidders[Players]: " ..tostring(#MRT_TopBidders["Players"]));
+    
+    for i,v in pairs(MRT_TopBidders["Players"]) do
+        MRT_Debug("isPlayerTop: name: " ..name.. ", v: " ..v);
+        if name == v then
+            MRT_Debug("isPlayerTop: name matches in top player table");
+            return true
+        end
+    end
+    MRT_Debug("isPlayerTop: does not match top player, return false");
+    return false
+end
+
+function removePlayerTop(name)
+    MRT_Debug("removePlayerTop called!");
+    for i,v in pairs(MRT_TopBidders["Players"]) do
+        if name == v then
+            MRT_Debug("removePlayerTop: name: " ..name.. ", v: " ..v);
+            tremove(MRT_TopBidders["Players"], i);
+            MRT_Debug("removePlayerTop: #MRT_TopBidders[Players]: " ..tostring(#MRT_TopBidders["Players"]));
+            if #MRT_TopBidders["Players"] == 0 then 
+                MRT_Debug("removePlayerTop: resetting type and PR ");
+                MRT_TopBidders["Type"] = nil;
+                MRT_TopBidders["PR"] = 0;
+            end
+        end
+    end
+end 
+
+function UpdateTopBidder(bid)
+    local strBidType, playerPR, pName = bid["Type"], bid["PR"], bid["Player"]
+    MRT_Debug("UpdateTopBidder: strBidType: " ..strBidType.. ", playerPR: " ..tostring(playerPR)..", pName: " ..pName);
+    local blnNewTop = false;
+    --check if top bidder type is set
+    if not MRT_TopBidders["Type"] then
+        MRT_Debug("processLootRaidChat: setting BidType: " ..strBidType);
+        MRT_TopBidders["Type"] = strBidType
+        MRT_Debug("processLootRaidChat: MRT_TopBidders[Type]: " ..MRT_TopBidders["Type"]);
+    else 
+        --check if top bidder is ms
+        if (MRT_TopBidders["Type"] == "ms") then
+            if strBidType == "os" then 
+                MRT_Debug("UpdateTopBidder: new bid is os");
+                --stop and return if new bid is os, but top bidder is ms
+                if isPlayerTop(pName) then 
+                    MRT_Debug("UpdateTopBidder: old bid is ms, new bid is os, same player on top, so update.");
+                    MRT_TopBidders["Type"] = "os"    
+                    blnNewTop = true
+                else
+                    MRT_Debug("UpdateTopBidder: Players don't match.");
+                    return false
+                end 
+            end
+        else 
+            --MRT_TopBidders["Type"] == "os"
+            --Top bid is os, check to see if new bid is ms
+            if strBidType == "ms" then
+                MRT_TopBidders["Type"] = "ms"
+                blnNewTop = true;
+            end
+        end 
+    end
+     
+    if #MRT_TopBidders["Players"] == 0 then
+        MRT_TopBidders["PR"] = playerPR
+        tinsert(MRT_TopBidders["Players"], pName);
+        blnNewTop = true
+    else
+        if blnNewTop then
+            MRT_TopBidders["PR"] = playerPR;
+            MRT_TopBidders["Players"] = {};
+            tinsert(MRT_TopBidders["Players"], pName)
+        else 
+            if playerPR > MRT_TopBidders["PR"] then
+                MRT_TopBidders["PR"] = playerPR;
+                MRT_TopBidders["Players"] = {};
+                tinsert(MRT_TopBidders["Players"], pName);
+                blnNewTop = true
+            elseif playerPR == MRT_TopBidders["PR"] then
+                if isPlayerTop(pName) then 
+                    blnNewTop = false
+                else
+                    tinsert(MRT_TopBidders["Players"], pName);
+                    blnNewTop = true
+                end 
+
+            end
+        end
+    end
+    return blnNewTop;
+end 
 function AnnounceBidLeader()
     local messageType = "Raid"
     local rwMessage
@@ -488,18 +630,22 @@ function AnnounceBidLeader()
     else
         strBidType = "MainSpec"
     end
-    if #MRT_TopBidders["Players"] == 1 then 
-        rwMessage = string.format(MRT_L.GUI["BidLeaderMessage"], MRT_TopBidders["Players"][1], MRT_TopBidders["PR"], strBidType);
-    else
-        local sPlayers = ""
-        for i, v in ipairs(MRT_TopBidders["Players"]) do
-            if sPlayers == "" then 
-                sPlayers = v
-            else
-                sPlayers = sPlayers.. ", "..v;
-            end 
+    if MRT_TopBidders["Type"] then 
+        if #MRT_TopBidders["Players"] == 1 then 
+            rwMessage = string.format(MRT_L.GUI["BidLeaderMessage"], MRT_TopBidders["Players"][1], MRT_TopBidders["PR"], strBidType);
+        else
+            local sPlayers = ""
+            for i, v in ipairs(MRT_TopBidders["Players"]) do
+                if sPlayers == "" then 
+                    sPlayers = v
+                else
+                    sPlayers = sPlayers.. ", "..v;
+                end 
+            end
+            rwMessage = string.format(MRT_L.GUI["BidLeaderMessage"], sPlayers, MRT_TopBidders["PR"], strBidType);        
         end
-        rwMessage = string.format(MRT_L.GUI["BidLeaderMessage"], sPlayers, MRT_TopBidders["PR"], strBidType);        
+    else
+        rwMessage = "There is currently no bid leader."
     end
     SendChatMessage(rwMessage, messageType);
 end 
@@ -509,11 +655,16 @@ function isBid(text)
     --if bid == os or ms do a thing
     local intMSIndex = strfind(bid, "ms");
     local intOSIndex = strfind(bid, "os");
-
+    local intPass = strfind(bid, "pass")
+    if intMSIndex and intOSIndex then
+        return false;
+    end
     if intMSIndex then
         return true, "ms"
     elseif intOSIndex then
         return true, "os"
+    elseif intPass then
+        return true, "pass"
     else
         return false
     end

@@ -459,7 +459,12 @@ do
 		--MRT_Debug("ST:stringTimetonumberTime: sText" ..sText1);
 		if (cIndex) then MRT_Debug("ST:stringTimetonumberTime: cIndex" ..cIndex);end
 		if not cIndex then
-			return sText1;
+			local isNum = string.find(sText1, "%d")
+			if not isNum then 
+				return sText1;
+			else
+				return tonumber(sText1)
+			end
 		end
 		retVal1 = cStrTimetoInt(sText1,cIndex)
 		return retVal1;

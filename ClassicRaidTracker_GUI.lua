@@ -1766,6 +1766,7 @@ function ResetBidding(start)
         ["PR"] = nil,
         ["Players"] = {},
         ["Type"] = nil,
+        ["History"] = {},
     } 
     MRT_LootBidding = start;
     MRT_Debug("ResetBidding: MRT_LootBidding: " ..tostring(MRT_LootBidding));
