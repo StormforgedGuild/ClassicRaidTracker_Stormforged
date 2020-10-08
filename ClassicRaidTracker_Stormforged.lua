@@ -247,8 +247,12 @@ function MRT_OnEvent(frame, event, ...)
         --handle raid chat
         MRT_Debug("RaidMessage received!");
         MRT_Debug("RaidMessage received: MRT_LootBidding: " ..tostring(MRT_LootBidding));
+        local sText = ...;
         if MRT_LootBidding then
-            processLootRaidChat(...)
+            local strIndex = strfind(sText, "New Highest");
+            if not strIndex then
+                processLootRaidChat(...)
+            end
         end
 
     elseif (event == "CHAT_MSG_MONSTER_YELL") then
