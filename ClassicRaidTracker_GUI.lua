@@ -1468,11 +1468,12 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1:SetCursorPosition(1);
     MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
     MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetScript("OnEnter", function(self) 
+        
         local ttText
         if MRT_LootBidding then
             ttText = "Current highest bidder is "..GetTopBidders();
         else
-            ttText = "Annouce Winner"
+            ttText = MRT_GUI_LootRaidWinner(true)
         end
         --MRT_Debug("EB:OnEnter ttText: " ..ttText);
         MRT_GUI_SetPrioTT(self,ttText);
@@ -1756,7 +1757,7 @@ function isPlayer(PlayerName)
     return (PlayerName ~= "pug") or (PlayerName  ~= "bank") or (PlayerName ~= "unassigned") or (PlayerName ~= "disenchanted");
 end
 
-function MRT_GUI_LootRaidWinner()
+function MRT_GUI_LootRaidWinner(textonly)
     --MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1785,7 +1786,7 @@ function MRT_GUI_LootRaidWinner()
     local looter= MRT_GUI_FourRowDialog_EB2:GetText();
     if looter == "unassigned" then
         MRT_Print("Error!  Loot not assigned")
-        return;
+        return "loot unassigned!";
     else
         looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
     end 
@@ -1803,9 +1804,12 @@ function MRT_GUI_LootRaidWinner()
     else
         rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
     end
-        
-    SendChatMessage(rwMessage, "Raid");
-    ResetBidding(false);
+    if textonly then     
+       return rwMessage; 
+    else 
+        SendChatMessage(rwMessage, "Raid");
+        ResetBidding(false);
+    end
 end
 function UpdateGP()
     local LibSFGP = LibStub("LibSFGearPoints-1.0");
@@ -2148,7 +2152,7 @@ function MRT_GUI_LootRaidLink()
 end
 
 --messageType = "Raid", "RAID_WARNING"
-function LootAnnounce(messageType, loot, gp)
+function LootAnnounce(messageType, loot, gp, textonly)
     MRT_Debug("LootAnnouce:called!");
     local tTokens = LibSFGP:GetTokenLoot(loot);
     local rwMessage;
@@ -2225,6 +2229,7 @@ function MRT_GUI_LootRaidAnnounce()
     end ]]
     LootAnnounce("RAID_WARNING", MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5))
     ResetBidding(true, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
+    
 end
 
 

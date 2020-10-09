@@ -208,7 +208,7 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
     frame:RegisterEvent("TRADE_SHOW");
     frame:RegisterEvent("TRADE_REQUEST_CANCEL");
-    frame:RegisterEvent("TRADE_CLOSED");
+    --frame:RegisterEvent("TRADE_CLOSED");
     frame:RegisterEvent("BAG_UPDATE");
     frame:RegisterEvent("MERCHANT_SHOW");
     frame:RegisterEvent("MERCHANT_UPDATE");
@@ -252,7 +252,7 @@ function MRT_OnEvent(frame, event, ...)
     elseif (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") then
         --handle raid chat
         --MRT_Debug("RaidMessage received!");
-        MRT_Debug("RaidMessage received: MRT_LootBidding: " ..tostring(MRT_LootBidding));
+        --MRT_Debug("RaidMessage received: MRT_LootBidding: " ..tostring(MRT_LootBidding));
         local sText = ...;
         
         if MRT_LootBidding then
@@ -393,7 +393,7 @@ function MRT_OnEvent(frame, event, ...)
             MRT_Debug("Bag_Update: freeSlotsNow: " ..tostring(freeSlotsNow));
             MRT_Debug("Bag_Update: MRT_BagFreeSlots: " ..tostring(MRT_BagFreeSlots));
             if freeSlotsNow > MRT_BagFreeSlots then
-                MRT_Debug("Trade worked: Free slots is less update" );
+                MRT_Debug("Trade worked: Free slots is more update" );
                 stopEncouragingTrade();
                 MarkAsTraded();
             end
