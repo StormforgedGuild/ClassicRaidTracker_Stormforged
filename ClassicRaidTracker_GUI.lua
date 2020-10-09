@@ -1368,6 +1368,26 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
     MRT_GUI_FourRowDialog_EB2_Text:SetText(MRT_L.GUI["Looter"]);
     MRT_GUI_FourRowDialog_EB2:SetText(cleanString(MRT_GUI_BossLootTable:GetCell(loot_select, 4),true));
+    MRT_GUI_FourRowDialog_EB2:SetScript("OnTextChanged", function(self)
+        --MRT_Debug("MRT_GUI_LootModify: EB2:OnTextChanged Fired!");
+        if MRT_LootBidding then
+            --MRT_Debug("MRT_GUI_LootModify: Bidding!");
+            if MRT_TopBidders["Loot"] then
+                if MRT_GUI_FourRowDialog_EB2:GetText() ~= "unassigned" then
+                    --MRT_Debug("MRT_GUI_LootModify: Looter is not unassigned");
+                    if MRT_TopBidders["Loot"] == MRT_GUI_FourRowDialog_EB1:GetText() then
+                        --MRT_Debug("MRT_GUI_LootModify: Loot matches bidding loot");
+                        MRT_Print("Loot assignment changed")
+                        StopBidding();
+                    else
+                        --MRT_Debug("MRT_GUI_LootModify: Bidding loot and Loot text don't match");
+                    end
+                end
+            else
+                --MRT_Debug("MRT_GUI_LootModify: Bidding Loot doesn't exist");
+            end
+        end
+    end)
     --autocomplete here.
     if not bAutoCompleteCreated then
         MRT_Debug("MRT_GUI_LootModify: Creating autocomplete table");
@@ -1807,7 +1827,7 @@ function UpdateGP()
         --MRT_GUI_FourRowDialog_EB1:HighlightText(0,0);
     end 
 end
-function ResetBidding(start)
+function ResetBidding(start, loot)
     MRT_Debug("ResetBidding: start: " ..tostring(start));
     --start == true if starting false if ending
     MRT_TopBidders = {
@@ -1815,11 +1835,20 @@ function ResetBidding(start)
         ["Players"] = {},
         ["Type"] = nil,
         ["History"] = {},
+        ["Loot"] = loot,
     } 
     MRT_LootBidding = start;
     MRT_Debug("ResetBidding: MRT_LootBidding: " ..tostring(MRT_LootBidding));
+    if loot then 
+        MRT_Debug("ResetBidding: Loot: " ..MRT_TopBidders["Loot"]);
+    else
+        MRT_Debug("ResetBidding: Loot not passed in" );
+    end
 end
-
+function StopBidding()
+    MRT_Print("Stopping bids")
+    ResetBidding(false)
+end
 function GetSelectedRaid()
     local raidnum = nil;
     -- check if a raid is selected
@@ -2184,7 +2213,7 @@ function MRT_GUI_LootRaidAnnounce()
         SendChatMessage(rwMessage, "RAID_WARNING");
     end ]]
     LootAnnounce("RAID_WARNING", MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5))
-    ResetBidding(true);
+    ResetBidding(true, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
 end
 
 

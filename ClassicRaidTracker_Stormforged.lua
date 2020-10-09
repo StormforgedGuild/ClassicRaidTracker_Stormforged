@@ -58,6 +58,7 @@ MRT_TopBidders = {
     ["Players"] = {},
     ["Type"] = nil,
     ["History"] = {},
+    ["Loot"] = nil,
 } 
 
 MsgEvents = {
