@@ -1864,6 +1864,7 @@ function MRT_GetTradeableItems()
 
     --Get name of player with an open trade window
     local tradePartnerName = UnitName("NPC");
+    MRT_TradePartner = tradePartnerName;
     MRT_Debug("MRT_GetTradeableItems: tradePartnerName: " ..tradePartnerName);
     local itemsToTrade = {};
 
@@ -1891,6 +1892,7 @@ function MRT_GetTradeableItems()
         MRT_Debug("MRT_GetTradeableItems: v[traded]: " ..tostring(v["Traded"]));
         if v["Looter"] == tradePartnerName and v["Traded"] == false then
             itemsToTrade[index] = v["ItemName"];
+            tinsert(MRT_TradeItemsList,v["ItemName"]);
             MRT_Debug(tradePartnerName.. " should receive "..itemsToTrade[index]);
         end
         index = index + 1;
@@ -1906,6 +1908,8 @@ function MRT_GUI_TradeLink()
     --disable animation once clicked
     stopEncouragingTrade();
     MRT_Debug("MRT_GUI_TradeLink: Clicked!")
+    MRT_BagFreeSlots = GetBagFreeSlots()
+    MRT_TradeInitiated = true;
     --commit save if the loot dialog is visible.
     if MRT_GUI_FourRowDialog:IsVisible() then
         if isDirty(MRT_GUI_FourRowDialog_EB2:GetText(), MRT_GUI_FourRowDialog_EB3:GetText(), MRT_GUI_FourRowDialog_EB4:GetText(), MRT_GUI_FourRowDialog_CB1:GetChecked(), MRT_GUI_FourRowDialog_CBTraded:GetChecked()) then
@@ -1920,7 +1924,7 @@ function MRT_GUI_TradeLink()
     MRT_Debug("MRT_GUI_TradeLink: passed dirty check calling gettradeable")
     --get the items the person is supposed to get
     local itemsToTrade = MRT_GetTradeableItems();
-
+    
     -----------------------------------------------------------------
     --Find those items in my bag & trade them
     -----------------------------------------------------------------
@@ -2012,6 +2016,13 @@ function bagWFreeSlots(bag)
         end
     end
     return
+end
+function GetBagFreeSlots()
+    local intSlots = 0
+    for container = 0, 5 do
+        intSlots = intSlots + GetContainerNumFreeSlots(container)
+    end
+    return intSlots
 end
 --returns true/false, container, and slot numbers of the item found. 
 function findItemInBag(name)

@@ -59,7 +59,11 @@ MRT_TopBidders = {
     ["Type"] = nil,
     ["History"] = {},
     ["Loot"] = nil,
-} 
+}
+MRT_BagFreeSlots = 0;
+MRT_TradeInitiated = false;
+MRT_TradeItemsList = {};
+MRT_TradePartner = ""; 
 
 MsgEvents = {
     [1] = "Create Raid",
@@ -158,7 +162,7 @@ local MRT_AskCostQueue = {};
 local MRT_AskCostQueueRunning = nil;
 
 local MRT_UnknownRelogStatus = true;
-local MRT_TradePartner = "";
+
 
 local _, _, _, uiVersion = GetBuildInfo();
 
@@ -203,7 +207,8 @@ function MRT_MainFrame_OnLoad(frame)
     frame:RegisterEvent("RAID_ROSTER_UPDATE");
     frame:RegisterEvent("ZONE_CHANGED_NEW_AREA");
     frame:RegisterEvent("TRADE_SHOW");
-    frame:RegisterEvent("TRADE_ACCEPT_UPDATE");
+    frame:RegisterEvent("TRADE_REQUEST_CANCEL");
+    frame:RegisterEvent("TRADE_CLOSED");
     frame:RegisterEvent("BAG_UPDATE");
     frame:RegisterEvent("MERCHANT_SHOW");
     frame:RegisterEvent("MERCHANT_UPDATE");
@@ -354,17 +359,45 @@ function MRT_OnEvent(frame, event, ...)
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(true);
         encourageTrade();
         MessWArgh();
+    elseif (event == "TRADE_REQUEST_CANCEL") then
+        if MRT_GUIFrame:IsShown() then
+            MRT_Print("Trade Cancelled!")
+        end
+        --[[ MRT_Debug("Trade Closed");
+        MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
+        local freeSlotsNow = GetBagFreeSlots();
+        MRT_Debug("Trade Closed: freeSlotsNow: " ..tostring(freeSlotsNow));
+        MRT_Debug("Trade Closed: MRT_BagFreeSlots: " ..tostring(MRT_BagFreeSlots));
+        if freeSlotsNow == MRT_BagFreeSlots then
+            MRT_Debug("Trade Closed: Free slots same or greater" );
+            MRT_Print("Trade cancelled");
+        else
+            MRT_Debug("Trade Closed: Free slots is less update" );
+            stopEncouragingTrade();
+            MarkAsTraded();
+        end ]]
 
-    elseif (event == "TRADE_ACCEPT_UPDATE") then
-        MRT_Debug("Trade status changed");
+    --elseif (event == "TRADE_ACCEPT_UPDATE") then
+        --[[ MRT_Debug("Trade status changed");
         local playerTradeStatus, targetTradeStatus = ...
         if playerTradeStatus and targetTradeStatus then
           MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
           stopEncouragingTrade();
           MarkAsTraded();
-        end
+        end ]]
         
     elseif (event == "BAG_UPDATE") then
+        if MRT_TradeInitiated then 
+            local freeSlotsNow = GetBagFreeSlots();
+            MRT_Debug("Bag_Update: freeSlotsNow: " ..tostring(freeSlotsNow));
+            MRT_Debug("Bag_Update: MRT_BagFreeSlots: " ..tostring(MRT_BagFreeSlots));
+            if freeSlotsNow > MRT_BagFreeSlots then
+                MRT_Debug("Trade worked: Free slots is less update" );
+                stopEncouragingTrade();
+                MarkAsTraded();
+            end
+            MRT_TradeInitiated = false;
+        end
         MRT_GUI_BossLootTableUpdate(nil, true);
 
     elseif (event == "RAID_ROSTER_UPDATE") then
@@ -677,8 +710,8 @@ function MarkAsTraded()
     MRT_Debug("Checking for items to mark traded")
 
     --Get name of player with an open trade window
-    local tradePartnerName = UnitName("NPC");
-    local itemsToTrade = {};
+    --local tradePartnerName = UnitName("NPC");
+    --local itemsToTrade = {};
 
     -- check if a raid is selected
     local raidnum = GetSelectedRaid();
@@ -687,19 +720,19 @@ function MarkAsTraded()
     end
 
     --check for all the items that are being traded
-    for j=1, 7 do
-        local tradedItemName, texture, quantity, quality, isUsable, enchant =  GetTradePlayerItemInfo(j);
-
-        if tradedItemName then
-          MRT_Debug("Checking if this item should be marked traded: "..tradedItemName)
-        end
+    --for j=1, 7 do
+        --local tradedItemName, texture, quantity, quality, isUsable, enchant =  GetTradePlayerItemInfo(j);
+    for i2, v2 in pairs(MRT_TradeItemsList) do
+        --if tradedItemName then
+          --MRT_Debug("Checking if this item should be marked traded: "..tradedItemName)
+        --end
 
         --iterate through all the items in the raid log to see if it's an item that dropped being traded to it's new owner.
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
 
-            if v["Looter"] == tradePartnerName then
-                if tradedItemName == v["ItemName"] then
-                 MRT_Debug(tradePartnerName.. " has been traded "..tradedItemName);
+            if v["Looter"] == MRT_TradePartner then
+                if v2 == v["ItemName"] then
+                 MRT_Debug(MRT_TradePartner.. " has been traded "..v2);
                   v["Traded"] = true;
                 end
             end
@@ -707,7 +740,8 @@ function MarkAsTraded()
     end
 
     --Refresh the Loot UI
-
+    MRT_TradePartner = "";
+    MRT_TradeItemsList = {};
 end
 function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
     --if debugging, change ML in getMasterLooter()
