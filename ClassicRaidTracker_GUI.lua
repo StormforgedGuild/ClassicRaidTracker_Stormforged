@@ -1227,7 +1227,7 @@ function MRT_GUI_LootAdd()
         MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
         MRT_GUI_FourRowDialog_EB4:SetText("Loot added manually");
         MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
-        MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
+        MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() UpdateGP(); MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
         MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
         MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
         MRT_GUI_FourRowDialog:Show();
@@ -1498,7 +1498,9 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
     end
     
     --MRT_Debug("MRT_GUI_LootModifyAccept: itemLinkFromText: "..itemLinkFromText.." looter: "..looter.." cost: "..cost.." lootNote: "..lootNote.." offspec: "..tostring(offspec));
-    
+    if cost == "" or cost =="0" then
+        UpdateGP()
+    end
     local newloot = false;
     if (cost == "") then cost = 0; end
     cost = tonumber(cost);
@@ -1758,7 +1760,26 @@ function MRT_GUI_LootRaidWinner()
     SendChatMessage(rwMessage, "Raid");
     ResetBidding(false);
 end
-
+function UpdateGP()
+    local LibSFGP = LibStub("LibSFGearPoints-1.0");
+    local itemlink = MRT_GUI_FourRowDialog_EB1:GetText();
+    if (not itemlink) or (itemlink =="") then
+    --do nothing
+    else
+        gp1 = LibSFGP:GetValue(itemlink);
+        if (not gp1) then
+            MRT_GUI_FourRowDialog_EB3:SetText("0");
+        else
+            local GPtext = MRT_GUI_FourRowDialog_EB3:GetText();
+            if (GPtext == "") or (GPText == "0") then
+                MRT_GUI_FourRowDialog_EB3:SetText(gp1);
+            else
+                --GP already set, do nothing.
+            end 
+        end
+        --MRT_GUI_FourRowDialog_EB1:HighlightText(0,0);
+    end 
+end
 function ResetBidding(start)
     MRT_Debug("ResetBidding: start: " ..tostring(start));
     --start == true if starting false if ending
@@ -2994,7 +3015,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 else
                     classColor = "ff9d9d9d";
                     local class = getPlayerClass(v["Looter"]);   
-                    classColor = getClass8Color(class);      
+                    classColor = getClassColor(class);      
                     --MRT_Debug(classColor);
 
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|c"..classColor..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};

@@ -357,26 +357,7 @@
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
           <OnTabPressed>MRT_GUI_FourRowDialog_EB2:SetFocus();</OnTabPressed>
-          <OnEditFocusLost>
-            local LibSFGP = LibStub("LibSFGearPoints-1.0");
-            local itemlink = MRT_GUI_FourRowDialog_EB1:GetText();
-            if (not itemlink) or (itemlink =="") then
-            --do nothing
-            else
-              gp1 = LibSFGP:GetValue(itemlink);
-              if (not gp1) then
-                MRT_GUI_FourRowDialog_EB3:SetText("0");
-              else
-                local GPtext = MRT_GUI_FourRowDialog_EB3:GetText();
-                if (GPtext == "") or (GPText == "0") then
-                  MRT_GUI_FourRowDialog_EB3:SetText(gp1);
-                else
-                  --GP already set, do nothing.
-                end 
-              end
-              MRT_GUI_FourRowDialog_EB1:HighlightText(0,0);
-            end 
-          </OnEditFocusLost>
+          <OnEditFocusLost>UpdateGP()</OnEditFocusLost>
         </Scripts>
       </EditBox>
       <EditBox name="$parent_EB2" inherits="MRT_GUI_Editbox_Template">
@@ -387,6 +368,7 @@
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
           <OnTabPressed>MRT_GUI_FourRowDialog_EB3:SetFocus();</OnTabPressed>
+          <OnEditFocusLost>UpdateGP()</OnEditFocusLost>
         </Scripts>
       </EditBox>
       <EditBox name="$parent_EB3" inherits="MRT_GUI_Editbox_Template">
