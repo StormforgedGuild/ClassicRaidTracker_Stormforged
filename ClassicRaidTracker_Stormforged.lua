@@ -362,6 +362,7 @@ function MRT_OnEvent(frame, event, ...)
     elseif (event == "TRADE_REQUEST_CANCEL") then
         if MRT_GUIFrame:IsShown() then
             MRT_Print("Trade Cancelled!")
+            MRT_TradeInitiated = false;
         end
         --[[ MRT_Debug("Trade Closed");
         MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
