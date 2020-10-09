@@ -1447,10 +1447,27 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_EB1:SetAutoFocus(false);
     MRT_GUI_FourRowDialog_EB1:SetCursorPosition(1);
     MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
-
+    MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetScript("OnEnter", function(self) 
+        local ttText
+        if MRT_LootBidding then
+            ttText = "Current highest bidder is "..GetTopBidders();
+        else
+            ttText = "Annouce Winner"
+        end
+        --MRT_Debug("EB:OnEnter ttText: " ..ttText);
+        MRT_GUI_SetPrioTT(self,ttText);
+    end);
+    MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
     MRT_GUI_FourRowDialog_EB2:SetFocus();
     MRT_GUI_FourRowDialog:Show();
     --MRT_GUI_FourRowDialog_EB1:SetEnabled(false);
+end
+function GetTopBidders()
+    local retVal = ""
+    for i, v in pairs(MRT_TopBidders["Players"]) do
+        retVal = retVal ..v.. " ";
+    end
+    return retVal
 end
 
 function MRT_GUI_PlayerDropDownList_Toggle()
