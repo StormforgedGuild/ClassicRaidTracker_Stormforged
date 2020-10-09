@@ -1785,7 +1785,9 @@ function MRT_GUI_LootRaidWinner(textonly)
     end
     local looter= MRT_GUI_FourRowDialog_EB2:GetText();
     if looter == "unassigned" then
-        MRT_Print("Error!  Loot not assigned")
+        if not textonly then 
+            MRT_Print("Error! Loot not assigned")
+        end
         return "loot unassigned!";
     else
         looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
