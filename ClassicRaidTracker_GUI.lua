@@ -1756,9 +1756,19 @@ function MRT_GUI_LootRaidWinner()
     -- old code local looter = string.upper(MRT_GUI_FourRowDialog_EB2:GetText());
     if #MRT_TopBidders["Players"] == 1 then 
         MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
+    else
+        if #MRT_TopBidders["Players"] > 1 then
+            MRT_Print("There is a tie.  Roll off!  " ..GetTopBidders())
+            return
+        end
     end
     local looter= MRT_GUI_FourRowDialog_EB2:GetText();
-    looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
+    if looter == "unassigned" then
+        MRT_Print("Error!  Loot not assigned")
+        return;
+    else
+        looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
+    end 
 
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
     local lootName = MRT_GUI_FourRowDialog_EB1:GetText();
