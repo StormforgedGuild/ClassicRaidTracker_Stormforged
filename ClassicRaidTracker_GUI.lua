@@ -1476,18 +1476,36 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetScript("OnEnter", function(self) 
         
         local ttText
-        if MRT_LootBidding then
-            ttText = "Current highest bidder is "..GetTopBidders();
-        else
+        --if MRT_LootBidding then
+            --ttText = "Current highest bidder is "..GetTopBidders();
+        --else
             ttText = MRT_GUI_LootRaidWinner(true)
-        end
+        --end
         --MRT_Debug("EB:OnEnter ttText: " ..ttText);
         MRT_GUI_SetPrioTT(self,ttText);
     end);
     MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
     MRT_GUI_FourRowDialog_EB2:SetFocus();
     MRT_GUI_FourRowDialog:Show();
+    MRT_GUI_FourRowDialog_CB1:SetScript("OnClick", function(self) MRT_CB_Clicked(self); end);
+    --MRT_GUI_FourRowDialog_CB1:SetScript("OnUpdate", function(self) MRT_CB_Clicked(self); end);
     --MRT_GUI_FourRowDialog_EB1:SetEnabled(false);
+end
+function MRT_CB_Clicked(self)
+    local enable = self:GetChecked()
+    local cost;
+    self:SetChecked(enable and true or false)
+    if enable then
+        cost = MRT_GUI_FourRowDialog_EB3:GetText();
+        if cost ~= "" then
+            MRT_GUI_FourRowDialog_EB3:SetText(cost*.25);
+        end
+    else
+        cost = MRT_GUI_FourRowDialog_EB3:GetText();
+        if cost ~= "" then
+            MRT_GUI_FourRowDialog_EB3:SetText(cost/.25);
+        end
+    end
 end
 function GetTopBidders()
     local retVal = ""
@@ -1781,15 +1799,32 @@ function MRT_GUI_LootRaidWinner(textonly)
     --local looter = string.upper(MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]);
     --local cost = MRT_GUI_BossLootTable:GetCell(loot_select, 5);
     -- old code local looter = string.upper(MRT_GUI_FourRowDialog_EB2:GetText());
-    if #MRT_TopBidders["Players"] == 1 then 
-        MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
+    local looter;    
+    if #MRT_TopBidders["Players"] == 1 then
+        if not textonly then 
+            MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
+            if MRT_TopBidders["Type"] == "os" then
+                if not MRT_GUI_FourRowDialog_CB1:GetChecked() then 
+                    MRT_GUI_FourRowDialog_CB1:Click();
+                end
+                --MRT_GUI_FourRowDialog_CB1:SetChecked(true);
+            end
+        end
     else
         if #MRT_TopBidders["Players"] > 1 then
             MRT_Print("There is a tie.  Roll off!  " ..GetTopBidders())
             return
         end
     end
-    local looter= MRT_GUI_FourRowDialog_EB2:GetText();
+    if not textonly then 
+        looter = MRT_GUI_FourRowDialog_EB2:GetText();
+    else
+        if MRT_LootBidding then 
+            looter = MRT_TopBidders["Players"][1];
+        else
+            looter = MRT_GUI_FourRowDialog_EB2:GetText();
+        end
+    end
     if looter == "unassigned" then
         if not textonly then 
             MRT_Print("Error! Loot not assigned")
@@ -1798,13 +1833,20 @@ function MRT_GUI_LootRaidWinner(textonly)
     else
         looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
     end 
-
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
+    if textonly then 
+        local intCost = tonumber(cost)
+        if MRT_TopBidders["Type"] == "os" then
+            intCost = intCost * .25;
+            cost = tostring(intCost);
+        end
+    end
+    
     local lootName = MRT_GUI_FourRowDialog_EB1:GetText();
     local rwMessage;
-    if #MRT_TopBidders["Players"] == 1 then 
-        MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
-    end
+    --if #MRT_TopBidders["Players"] == 1 then 
+    --    MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
+    --end
     --"Congratz! %s receives %s for %sGP",   
     --local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
     if MRT_GUI_FourRowDialog_EB2:GetText()=="disenchanted" then 
@@ -1858,7 +1900,7 @@ function ResetBidding(start, loot)
     end
 end
 function StopBidding()
-    MRT_Print("Stopping bids")
+    --MRT_Print("Stopping bids")
     ResetBidding(false)
 end
 function GetSelectedRaid()
