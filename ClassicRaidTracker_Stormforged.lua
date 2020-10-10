@@ -949,16 +949,16 @@ local SupressMsg = {}
 function ProcessWhisper(text, playerName)
     --if text:gsub("^%s*(.-)%s*$", "%1") == AutoInviteSettings.AutoInviteKeyword then
     local stext = text:gsub("^%s*(.-)%s*$", "%1")
-    MRT_Debug("Process Whisper: stext: " ..stext);
+    --MRT_Debug("Process Whisper: stext: " ..stext);
     local prefix = strsub(stext, 1, 5)
     local nopunc
     local numstripped = 0;
     nopunc, numstripped = string.gsub(prefix,"%p", "")
-    MRT_Debug("Process Whisper: numstripped: " ..numstripped);
+    --MRT_Debug("Process Whisper: numstripped: " ..numstripped);
     local sCom = strsub(nopunc,1,4);
     local sParams = strsub(stext,6 + numstripped)
-    MRT_Debug("Process Whisper: sCom: " ..sCom);
-    MRT_Debug("Process Whisper: sParams: " ..sParams);
+    --MRT_Debug("Process Whisper: sCom: " ..sCom);
+    --MRT_Debug("Process Whisper: sParams: " ..sParams);
     if string.lower(sCom) == string.lower ("epgp") then
         --SendChatMessage("What!?", "WHISPER",nil ,playerName);
         if sParams == "?" then

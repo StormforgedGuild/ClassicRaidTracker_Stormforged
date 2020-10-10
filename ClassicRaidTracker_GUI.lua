@@ -656,8 +656,14 @@ end
   function encourageTrade()
 
     --don't encourage if there are no tradeable items for the player trying to trade
-    if not MRT_GetTradeableItems() then
+    local tradeableItems = MRT_GetTradeableItems();
+    
+    if not tradeableItems then
+        MRT_Debug("encourageTrade: nothing, don't encourage")
         return;
+    elseif #tradeableItems == 0 then
+        MRT_Debug("encourageTrade: tradeableitems is not null, but == 0, don't encourage")
+        return
     end
 
     MRT_GUIFrame_BossLoot_Trade_Button:SetNormalFontObject("GameFontGreen");
@@ -1877,7 +1883,9 @@ function MRT_GetTradeableItems()
     -----------------------------------------------------------------
     --Get list of items that person is the looter for in the loot list
     -----------------------------------------------------------------
-
+    if itemsToTrade then
+        MRT_Debug("MRT_GetTradeableItems: #itemsToTrade" ..tostring(#itemsToTrade))
+    end
     local raidnum;
     
     -- check if a raid is selected
@@ -1887,15 +1895,16 @@ function MRT_GetTradeableItems()
     --MRT_Debug("MRT_GetTradeableItems: raidnum: " ..raidnum)
     -- if there is no raid selected (ex. on launch, then return)
     if not raidnum then
+        MRT_Debug("MRT_GetTradeableItems: no raidnum")
         return; 
     end
 
     --MRT_Debug("MRT_GUI_BossLootTableUpdate: if bossnum condition");
     local index = 1;
     for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
-        MRT_Debug("MRT_GetTradeableItems: i: " ..i);
-        MRT_Debug("MRT_GetTradeableItems: v[looter]: " ..v["Looter"]);
-        MRT_Debug("MRT_GetTradeableItems: v[traded]: " ..tostring(v["Traded"]));
+        --MRT_Debug("MRT_GetTradeableItems: i: " ..i);
+        --MRT_Debug("MRT_GetTradeableItems: v[looter]: " ..v["Looter"]);
+        --MRT_Debug("MRT_GetTradeableItems: v[traded]: " ..tostring(v["Traded"]));
         if v["Looter"] == tradePartnerName and v["Traded"] == false then
             itemsToTrade[index] = v["ItemName"];
             tinsert(MRT_TradeItemsList,v["ItemName"]);
@@ -1903,7 +1912,9 @@ function MRT_GetTradeableItems()
         end
         index = index + 1;
     end
-
+    if itemsToTrade then
+        MRT_Debug("MRT_GetTradeableItems: #itemsToTrade" ..tostring(#itemsToTrade))
+    end
     return itemsToTrade;
 
 end
