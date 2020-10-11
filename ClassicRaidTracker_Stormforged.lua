@@ -483,7 +483,9 @@ function processLootRaidChat(text, playerName)
                 MRT_Debug("processLootRaidChat: not new bidder: find and update" );
                 blnNewTop = UpdateBid(Bid)
             end
-            SendChatMessage(Bid["Player"].. " bid "..msgType.. " PR is "..tostring(Bid["PR"]..".") , "Raid");
+            if not blnNewTop then 
+                SendChatMessage(Bid["Player"].. " bid "..msgType.. " PR is "..tostring(Bid["PR"]..".") , "Raid");
+            end
         end 
         if blnNewTop then 
             AnnounceBidLeader();
