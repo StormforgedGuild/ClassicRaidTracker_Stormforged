@@ -258,7 +258,9 @@ function MRT_OnEvent(frame, event, ...)
         if MRT_LootBidding then
             local strIndex = strfind(sText, "New Highest");
             if not strIndex then
-                processLootRaidChat(...)
+                if string.len(sText) < 6  then
+                    processLootRaidChat(...)
+                end
             end
         end
 
@@ -462,6 +464,12 @@ function processLootRaidChat(text, playerName)
             ["PR"] = playerPR,
             ["Type"] = strBidType,
         }
+        local msgType;
+        if Bid["Type"] == "ms" then
+            msgType = "MainSpec"
+        else
+            msgType = "OffSpec"
+        end
         if strBidType == "pass" then
             --remove the bid from history and recalc top bidder
             blnNewTop = UpdateBid(Bid, true)
@@ -470,10 +478,12 @@ function processLootRaidChat(text, playerName)
             if isNewBidder(Bid) then
                 tinsert(MRT_TopBidders["History"], Bid)
                 blnNewTop = UpdateTopBidder(Bid)
+                
             else
                 MRT_Debug("processLootRaidChat: not new bidder: find and update" );
                 blnNewTop = UpdateBid(Bid)
             end
+            SendChatMessage(Bid["Player"].. " bid "..msgType.. " PR is "..tostring(Bid["PR"]..".") , "Raid");
         end 
         if blnNewTop then 
             AnnounceBidLeader();
