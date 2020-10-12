@@ -486,9 +486,26 @@ function processLootRaidChat(text, playerName)
             if not blnNewTop then 
                 SendChatMessage(Bid["Player"].. " bid "..msgType.. " PR is "..tostring(Bid["PR"]..".") , "Raid");
             end
+            selectPlayer(Bid["Player"], lRaidNum)
         end 
         if blnNewTop then 
             AnnounceBidLeader();
+        end
+    end
+end
+function selectPlayer(name, raidnum)
+    local PlayerList = MRT_GUI_RaidAttendeesTableUpdate(raidnum)
+    local pName
+    local lName = string.lower(name)
+    if PlayerList then 
+        for i = 1, #PlayerList do
+            pName = cleanString(PlayerList[i][2]);
+            MRT_Debug("selecPlayer: Comparing pName: " ..pName.." and name: " ..lName)
+            if pName == lName then
+                MRT_Debug("selecPlayer: Player, "..lName.. " found! i: " ..i)
+                MRT_GUI_RaidAttendeesTable:SetSelection(i);
+                return;
+            end
         end
     end
 end

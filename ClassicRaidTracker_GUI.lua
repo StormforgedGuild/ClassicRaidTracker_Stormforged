@@ -1819,7 +1819,7 @@ function MRT_GUI_LootRaidWinner(textonly)
     if not textonly then 
         looter = MRT_GUI_FourRowDialog_EB2:GetText();
     else
-        if MRT_LootBidding then 
+        if MRT_LootBidding and #MRT_TopBidders["Players"] > 0 then 
             looter = MRT_TopBidders["Players"][1];
         else
             looter = MRT_GUI_FourRowDialog_EB2:GetText();
