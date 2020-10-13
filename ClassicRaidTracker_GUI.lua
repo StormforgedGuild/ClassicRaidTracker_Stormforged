@@ -1236,6 +1236,7 @@ function MRT_GUI_LootAdd()
         MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() UpdateGP(); MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
         MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
         MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
+        MRT_GUI_FourRowDialog_CBTraded:SetChecked(false);
         MRT_GUI_FourRowDialog:Show();
     else
         --update loot table
