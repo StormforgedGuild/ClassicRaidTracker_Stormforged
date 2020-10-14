@@ -447,17 +447,18 @@ function processLootRaidChat(text, playerName)
         --MRT_Debug("processLootRaidChat: isabid");
         --calc bid
         --get raidnum to do modified PR
-        if (MRT_NumOfCurrentRaid) then 
-            lRaidNum = MRT_NumOfCurrentRaid
+        --don't use current raid, only use currently selected raid.
+        --if (MRT_NumOfCurrentRaid) then 
+            --lRaidNum = MRT_NumOfCurrentRaid
+        --else
+        local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+        if raid_select then 
+            lRaidNum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
         else
-            local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-            if raid_select then 
-                lRaidNum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
-            else
-                MRT_Print("No Raid selected")
-                return
-            end 
+            MRT_Print("No Raid selected")
+            return
         end 
+        --end 
         playerPR = tonumber(getModifiedPR(lRaidNum, pName));
         local Bid = {
             ["Player"] = pName,

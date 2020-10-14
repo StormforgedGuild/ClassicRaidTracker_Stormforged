@@ -1827,10 +1827,12 @@ function MRT_GUI_LootRaidWinner(textonly)
         end
     end
     if looter == "unassigned" then
+        looter = "disenchanted"
         if not textonly then 
-            MRT_Print("Error! Loot not assigned")
+            if #MRT_TopBidders["Players"] == 0 then
+                MRT_GUI_FourRowDialog_EB2:SetText("disenchanted")
+            end
         end
-        return "loot unassigned!";
     else
         looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
     end 
@@ -1850,7 +1852,7 @@ function MRT_GUI_LootRaidWinner(textonly)
     --end
     --"Congratz! %s receives %s for %sGP",   
     --local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
-    if MRT_GUI_FourRowDialog_EB2:GetText()=="disenchanted" then 
+    if looter =="disenchanted" then 
         rwMessage = string.format("%s is being turned into {diamond}{diamond}{diamond}", lootName);
     else
         rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
