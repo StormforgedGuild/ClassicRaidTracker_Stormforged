@@ -72,6 +72,7 @@ MsgEvents = {
     [4] = "PR Imported"
 };
 MRT_MasterLooter = nil;
+MRT_RecMsg_Raid = {};
 
 local MRT_Defaults = {
     ["Options"] = {
@@ -447,7 +448,7 @@ function processLootRaidChat(text, playerName)
         --MRT_Debug("processLootRaidChat: isabid");
         --calc bid
         --get raidnum to do modified PR
-        --don't use current raid, only use currently selected raid.
+        --don't use current raid, only use currently selected raid.  This will prevent issues with bidding on a raid while another one is going on.
         --if (MRT_NumOfCurrentRaid) then 
             --lRaidNum = MRT_NumOfCurrentRaid
         --else
@@ -791,6 +792,10 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
     else
         local tbMsg = deserializeAddonMessage(msg);
         MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: tbMsg RaidID = "..tbMsg["RaidID"].. " ID: " ..tbMsg["ID"].. " Time: " ..tbMsg["Time"].. " Data: " .. tbMsg["Data"].. " EventID: " ..tbMsg["EventID"])
+        --We need to validate which raid this message belongs to.
+        --Scenarios we need to consider...
+        --1. Client has created a new raid, match ML's raid to this one.
+        --2. Client doesn't have an active raid, message recieved from ML, create new raid and map new messages to this raid
         if channel == "RAID" then
             MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: Inside raid message check")
             if not (MRT_ChannelMsgStore) then
@@ -895,7 +900,7 @@ function stripRealmFromName(playerName)
 end
 
 function addChannelMessageToStore(msg)
-    if isAddOnMessageInStore(msg) then
+    if not isAddOnMessageInStore(msg) then
         tinsert(MRT_ChannelMsgStore[msg["RaidID"]], msg);
     end
 end
@@ -2686,7 +2691,7 @@ function MRT_AutoAddLootItem(playerName, itemLink, itemCount)
         MRT_Debug("MRT_AutoAddLootItem: MasterLooter send message");
         -- send message to addon channel with new loot message
         local msg = {
-            ["RaidID"] = "1",
+            ["RaidID"] = MRT_NumOfCurrentRaid,
             ["ID"] = MRT_Msg_ID,
             ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
             ["Data"] = playerName..";"..itemLink..";"..itemCount,

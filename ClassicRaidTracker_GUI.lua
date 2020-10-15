@@ -966,7 +966,7 @@ function MRT_GUI_RaidAttendeeAdd()
         --update attendee PR
         --TODO: send whisper message to ML to update PR
         local msg = {
-            ["RaidID"] = "1",
+            ["RaidID"] = MRT_GUI_RaidLogTable:GetCell(raid_select, 1),
             ["ID"] = MRT_Msg_Request_ID,
             ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
             ["Data"] = "",
@@ -1681,7 +1681,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
                 MRT_MasterLooter = getMasterLooter();
             end
             local msg = {
-                ["RaidID"] = "1",
+                ["RaidID"] = raidnum,
                 ["ID"] = MRT_Msg_ID,
                 ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
                 ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec)..";"..tostring(traded),
@@ -1700,7 +1700,7 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
             MRT_Debug("MRT_GUI_LootModifyAccept: sending new loot msg");
             -- send message to addon channel with new loot message
             local msg = {
-                ["RaidID"] = "1",
+                ["RaidID"] = raidnum,
                 ["ID"] = MRT_Msg_ID,
                 ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
                 ["Data"] = MRT_LootInfo["Looter"]..";"..MRT_LootInfo["ItemLink"]..";".."1",
@@ -1834,7 +1834,9 @@ function MRT_GUI_LootRaidWinner(textonly)
             end
         end
     else
-        looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
+        if looter ~= "disenchanted" then 
+            looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
+        end
     end 
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
     if textonly then 
@@ -2021,7 +2023,9 @@ function MRT_GUI_TradeLink()
                 if itemAlreadyTraded == false then
                     --Place those items in the trade window
                     MRT_Debug("about to use item: "..containerID..slotID)
+                    MRT_Debug("MRT_GUI_TradeLInk: click on item")
                     UseContainerItem(containerID,slotID);
+                
                 end
             end
          end
