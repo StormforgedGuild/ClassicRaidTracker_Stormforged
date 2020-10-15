@@ -1923,6 +1923,10 @@ function MRT_GetTradeableItems()
 
     --Get name of player with an open trade window
     local tradePartnerName = UnitName("NPC");
+    if not tradePartnerName then 
+        MRT_Print("No one is trading")
+        return nil;
+    end
     MRT_TradePartner = tradePartnerName;
     MRT_Debug("MRT_GetTradeableItems: tradePartnerName: " ..tradePartnerName);
     local itemsToTrade = {};
@@ -1930,9 +1934,6 @@ function MRT_GetTradeableItems()
     -----------------------------------------------------------------
     --Get list of items that person is the looter for in the loot list
     -----------------------------------------------------------------
-    if itemsToTrade then
-        MRT_Debug("MRT_GetTradeableItems: #itemsToTrade" ..tostring(#itemsToTrade))
-    end
     local raidnum;
     
     -- check if a raid is selected
@@ -1958,9 +1959,6 @@ function MRT_GetTradeableItems()
             MRT_Debug(tradePartnerName.. " should receive "..itemsToTrade[index]);
         end
         index = index + 1;
-    end
-    if itemsToTrade then
-        MRT_Debug("MRT_GetTradeableItems: #itemsToTrade" ..tostring(#itemsToTrade))
     end
     return itemsToTrade;
 
@@ -1988,6 +1986,11 @@ function MRT_GUI_TradeLink()
     MRT_Debug("MRT_GUI_TradeLink: passed dirty check calling gettradeable")
     --get the items the person is supposed to get
     local itemsToTrade = MRT_GetTradeableItems();
+    if not itemsToTrade then 
+        --nothing to trade
+        MRT_Debug("MRT_GUI_TradeLink: nothing to trade")
+        return;
+    end
     
     -----------------------------------------------------------------
     --Find those items in my bag & trade them
@@ -2022,14 +2025,49 @@ function MRT_GUI_TradeLink()
    
                 if itemAlreadyTraded == false then
                     --Place those items in the trade window
-                    MRT_Debug("about to use item: "..containerID..slotID)
+                    MRT_Debug("about to use item: "..containerID.." "..slotID)
                     MRT_Debug("MRT_GUI_TradeLInk: click on item")
-                    UseContainerItem(containerID,slotID);
-                
+                    local intMax = 0;
+                    local iCountBefore = GetNumberOfItemsInTrade()
+                    local iCountAfter = 0;
+                    while intMax < 10 do
+                        MRT_Debug("MRT_GUI_TradeLInk: in while loop")
+                        MRT_Debug("MRT_GUI_TradeLInk: about to click item: intMax: " ..tostring(intMax).. " iCountBefore: " ..tostring(iCountBefore).. " iCountAfter: " ..tostring(iCountAfter))
+                        UseContainerItem(containerID,slotID);
+                        iCountAfter = GetNumberOfItemsInTrade();
+                        if not iCountAfter then
+                            --returned nil trade window might be gone.. return
+                            return;
+                        end
+                        MRT_Debug("MRT_GUI_TradeLInk: Clicked item: iCountAfter: " ..tostring(iCountAfter))
+                        if (iCountAfter < iCountBefore) then 
+                            MRT_Debug("MRT_GUI_TradeLInk: iCountAfter < iCountBefore: increment and try again")
+                            intMax = intMax + 1    
+                        else
+                            MRT_Debug("MRT_GUI_TradeLInk: iCountAfter = or > iCountBefore: set intMax to 5 to exit loop")
+                            intMax = 10;
+                        end 
+                    end 
                 end
             end
          end
     end
+end
+
+function GetNumberOfItemsInTrade()
+    local tradePartnerName = UnitName("NPC");
+    if not tradePartnerName then 
+        MRT_Print("No one is trading")
+        return nil;
+    end
+    local intCount = 0
+    for j=1, 7 do
+        local name, texture, quantity, quality, isUsable, enchant =  GetTradePlayerItemInfo(j);
+        if (name) then 
+            intCount = intCount + 1
+        end
+    end
+    return intCount
 end
 local messwArghCounter = 1
 local messwArghCounter1 = 0
@@ -2118,8 +2156,9 @@ end
 function GetContainerItemTradeTimeRemaining(container, slot)
 	tooltipForParsing:SetOwner(UIParent, "ANCHOR_NONE") -- This lines clear the current content of tooltip and set its position off-screen
 	tooltipForParsing:SetBagItem(container, slot) -- Set the tooltip content and show it, should hide the tooltip before function ends
-	if not tooltipForParsing:NumLines() or tooltipForParsing:NumLines() == 0 then
-		return 0
+    if not tooltipForParsing:NumLines() or tooltipForParsing:NumLines() == 0 then
+        MRT_Debug("GetContainerItemTradeTimeRemaining: first chance return")
+        return 0
 	end
 
 	local bindTradeTimeRemainingPattern = escapePatternSymbols(BIND_TRADE_TIME_REMAINING):gsub("%%%%s", "%(%.%+%)") -- PT locale contains "-", must escape that.
@@ -2158,20 +2197,26 @@ function GetContainerItemTradeTimeRemaining(container, slot)
 				end
 				for sec=59, 1, -1 do -- time<60s, format: "59 s", "1 s"
 					local time = CompleteFormatSimpleStringWithPluralRule(INT_SPELL_DURATION_SEC, sec)
-					if time == timeText then
+                    if time == timeText then
+                        MRT_Debug("GetContainerItemTradeTimeRemaining: second chance return")
 						return sec
 					end
 				end
 				-- As of Patch 7.3.2(Build 25497), the parser have been tested for all 11 in-game languages when time < 1h and time > 1h. Shouldn't reach here.
-				-- If it reaches here, there are some parsing issues. Let's return 2h.
+                -- If it reaches here, there are some parsing issues. Let's return 2h.
+                MRT_Debug("GetContainerItemTradeTimeRemaining: third chance return")
 				return 7200
 			end
 		end
 	end
 	tooltipForParsing:Hide()
-	if bounded then
+    if bounded then
+        MRT_Debug("GetContainerItemTradeTimeRemaining: fourth chance return")
+        --tooltipForParsing:Hide()
 		return 0
-	else
+    else
+        MRT_Debug("GetContainerItemTradeTimeRemaining: fifth chance return")
+        --tooltipForParsing:Hide()
 		return math.huge
 	end
 end
