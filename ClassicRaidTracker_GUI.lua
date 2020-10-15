@@ -2040,12 +2040,13 @@ function MRT_GUI_TradeLink()
                             return;
                         end
                         MRT_Debug("MRT_GUI_TradeLInk: Clicked item: iCountAfter: " ..tostring(iCountAfter))
-                        if (iCountAfter < iCountBefore) then 
-                            MRT_Debug("MRT_GUI_TradeLInk: iCountAfter < iCountBefore: increment and try again")
-                            intMax = intMax + 1    
-                        else
-                            MRT_Debug("MRT_GUI_TradeLInk: iCountAfter = or > iCountBefore: set intMax to 5 to exit loop")
+                        if (iCountAfter > iCountBefore) then 
+                            MRT_Debug("MRT_GUI_TradeLInk: iCountAfter > iCountBefore: set intMax to 5 to exit loop")
                             intMax = 10;
+                        else
+                            MRT_Debug("MRT_GUI_TradeLInk: iCountAfter < = iCountBefore: increment and try again")
+                            intMax = intMax + 1    
+                            
                         end 
                     end 
                 end
