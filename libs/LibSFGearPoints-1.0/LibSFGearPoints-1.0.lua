@@ -932,7 +932,7 @@ function lib:GetMSOnly(item)
       return SF_FULL_ITEM_DATA[i]["MS_Only"] == 1;
     end
   end
-  return "not found"
+  return -1
 end
 
 local SF_TOKEN_DATA = {
