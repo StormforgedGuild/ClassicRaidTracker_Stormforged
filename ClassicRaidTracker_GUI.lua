@@ -1516,8 +1516,9 @@ function MRT_GUI_LootModify()
         MRT_GUI_SetPrioTT(self,ttText);
     end);
     MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
-    MRT_GUI_FourRowDialog_EB2:SetFocus();
+    --MRT_GUI_FourRowDialog_EB2:SetFocus();
     MRT_GUI_FourRowDialog:Show();
+    MRT_GUI_FourRowDialog_EB2:SetFocus();
     MRT_GUI_FourRowDialog_CB1:SetScript("OnClick", function(self) MRT_CB_Clicked(self); end);
     --MRT_GUI_FourRowDialog_CB1:SetScript("OnUpdate", function(self) MRT_CB_Clicked(self); end);
     --MRT_GUI_FourRowDialog_EB1:SetEnabled(false);
