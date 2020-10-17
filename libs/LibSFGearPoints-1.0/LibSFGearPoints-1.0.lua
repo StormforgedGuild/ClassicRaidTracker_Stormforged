@@ -922,6 +922,19 @@ function lib:GetPrio(item)
   return "not found"
 end
 
+function lib:GetMSOnly(item)
+  local itemName, itemLink, rarity, level, _, _, _, _, equipLoc = GetItemInfo(item)
+  --MRT_Debug("LibSFGearPoitns: GetPrio"); 
+  for i = 1, table.maxn(SF_FULL_ITEM_DATA) do
+    local sitemName = SF_FULL_ITEM_DATA[i]["Item"]
+    --MRT_Debug("getPrio: sitemName: " ..sitemName.. "itemName: " ..itemName); 
+    if sitemName == itemName then
+      return SF_FULL_ITEM_DATA[i]["MS_Only"]
+    end
+  end
+  return "not found"
+end
+
 local SF_TOKEN_DATA = {
   --Token list
   ["Vek'lor's Diadem"] = {21387, 21360, 21353, 21366},

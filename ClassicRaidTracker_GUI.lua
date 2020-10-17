@@ -319,8 +319,10 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLoot_RaidLink_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_Modify_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetText("Bid");
     MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidLink_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_BossLoot_RaidWin_Button:SetText("Win");
+    MRT_GUIFrame_BossLoot_RaidWin_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidAnnounce_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_Trade_Button:SetText("Trade");
-    MRT_GUIFrame_BossLoot_Trade_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidAnnounce_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_BossLoot_Trade_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidWin_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
 
     MRT_GUI_BossLootTable = ScrollingTable:CreateST(MRT_BossLootTableColDef, 12, 32, nil, MRT_GUIFrame);           -- ItemId should be squared - so use 30x30 -> 30 pixels high
@@ -2231,6 +2233,13 @@ function CompleteFormatSimpleStringWithPluralRule(str, count)
 	end
 end
 
+function MRT_GUI_LootRaidWin()
+
+    -- ALEX TODO
+
+end
+
+
 function MRT_GUI_LootRaidLink()
     --MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
@@ -2269,7 +2278,11 @@ function LootAnnounce(messageType, loot, gp, textonly)
         rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], loot, gp);
         SendChatMessage(rwMessage, messageType);
     elseif messageType == "RAID_WARNING" then
-        rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], loot, gp);
+        if LibSFGP:GetMSOnly(loot) ==1 then
+            rwMessage = string.format(MRT_L.GUI["RaidAnnounceMSOnlyMessage"], loot, gp);
+        else
+            rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], loot, gp);
+        end
         SendChatMessage(rwMessage, messageType);
     else
         return;

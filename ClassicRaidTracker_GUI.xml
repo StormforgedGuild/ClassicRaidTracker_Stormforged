@@ -622,7 +622,7 @@
         </Scripts>
       </Button>
       <Button name="$parent_BossLoot_Modify_Button" inherits="MRT_GUI_SMALL_Button_Template">
-        <Size x="60" y="22"/>
+        <Size x="54" y="22"/>
         <Scripts>
           <OnClick>MRT_GUI_LootModify();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Loot_Modify");</OnEnter>
@@ -637,7 +637,7 @@
         </Scripts>
       </Button>
       <Button name="$parent_BossLoot_RaidAnnounce_Button" inherits="MRT_GUI_SMALL_Button_Template">
-        <Size x="60" y="22"/>
+        <Size x="54" y="22"/>
         <Scripts>
           <OnClick>MRT_GUI_LootRaidAnnounce();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Loot_RaidAnnounce");</OnEnter>
@@ -645,7 +645,15 @@
         </Scripts>
       </Button>
       <Button name="$parent_BossLoot_RaidLink_Button" inherits="MRT_GUI_SMALL_Button_Template">
-         <Size x="60" y="22"/>
+         <Size x="54" y="22"/>
+        <Scripts>
+          <OnClick>MRT_GUI_LootRaidWin();</OnClick>
+          <OnEnter>MRT_GUI_SetTT(self, "Loot_RaidLink");</OnEnter>
+          <OnLeave>MRT_GUI_HideTT();</OnLeave>
+        </Scripts>
+      </Button>
+      <Button name="$parent_BossLoot_RaidWin_Button" inherits="MRT_GUI_SMALL_Button_Template">
+         <Size x="54" y="22"/>
         <Scripts>
           <OnClick>MRT_GUI_LootRaidLink();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Loot_RaidLink");</OnEnter>
@@ -653,7 +661,7 @@
         </Scripts>
       </Button>
        <Button name="$parent_BossLoot_Trade_Button" inherits="MRT_GUI_SMALL_Button_Template">
-         <Size x="60" y="22"/>
+         <Size x="54" y="22"/>
         <Scripts>
           <OnClick>MRT_GUI_TradeLink();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Loot_TradeLink");</OnEnter>
@@ -672,7 +680,7 @@
       </EditBox>
 
       <EditBox name="$parent_BossLoot_Filter" inherits="InputBoxTemplate" virtual="true" historyLines="0" enableKeyboard="true" enableMouse="true" letters="400">
-        <Size x="100" y="32"/>
+        <Size x="70" y="32"/>
         <FontString inherits="ChatFontNormal"/>
          <Scripts>
           <OnTextChanged>MRT_GUI_BossLootFilter();</OnTextChanged>
