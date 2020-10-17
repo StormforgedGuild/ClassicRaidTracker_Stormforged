@@ -325,7 +325,7 @@ function MRT_GUI_ParseValues()
         local ttText
         
         if MRT_LootBidding or MRT_GUI_FourRowDialog:IsShown() then
-            ttText = MRT_GUI_LootRaidWinner(true)
+            ttText = MRT_GUI_LootRaidWinner(true, true)
         else
             ttText = "Announce winner of loot - Currently no winner, start bidding or open loot dialog";
         end
@@ -1493,7 +1493,7 @@ function MRT_GUI_LootModify()
         --if MRT_LootBidding then
             --ttText = "Current highest bidder is "..GetTopBidders();
         --else
-            ttText = MRT_GUI_LootRaidWinner(true)
+            ttText = MRT_GUI_LootRaidWinner(true, true)
         --end
         --MRT_Debug("EB:OnEnter ttText: " ..ttText);
         MRT_GUI_SetPrioTT(self,ttText);
@@ -1819,7 +1819,7 @@ function MRT_GUI_LootRaidWin()
     --if dialog open, keep it open
 
 end
-function MRT_GUI_LootRaidWinner(textonly)
+function MRT_GUI_LootRaidWinner(textonly, tooltipFormat)
     --MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1863,6 +1863,7 @@ function MRT_GUI_LootRaidWinner(textonly)
             looter = MRT_GUI_FourRowDialog_EB2:GetText();
         end
     end
+
     if looter == "unassigned" then
         looter = "disenchanted"
         if not textonly then 
@@ -1872,7 +1873,9 @@ function MRT_GUI_LootRaidWinner(textonly)
         end
     else
         if looter ~= "disenchanted" then 
-            looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
+            if not tooltipFormat then
+                 looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
+            end
         end
     end 
     local cost = MRT_GUI_FourRowDialog_EB3:GetText();
@@ -1892,9 +1895,13 @@ function MRT_GUI_LootRaidWinner(textonly)
     --"Congratz! %s receives %s for %sGP",   
     --local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
     if looter =="disenchanted" then 
-        rwMessage = string.format("%s is being turned into {diamond}{diamond}{diamond}", lootName);
+        rwMessage = string.format("%s is being DISENCHANTED", lootName);
     else
-        rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
+        if tooltipFormat then
+          rwMessage = string.format(MRT_L.GUI["RaidWinToolTip"], looter, lootName, cost);
+        else
+          rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
+        end
     end
     if textonly then     
        return rwMessage; 
