@@ -321,6 +321,17 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLoot_RaidAnnounce_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidLink_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_RaidWin_Button:SetText("Win");
     MRT_GUIFrame_BossLoot_RaidWin_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidAnnounce_Button, "RIGHT", 0, 0);
+    MRT_GUIFrame_BossLoot_RaidWin_Button:SetScript("OnEnter", function(self) 
+        local ttText
+        
+        if MRT_LootBidding or MRT_GUI_FourRowDialog:IsShown() then
+            ttText = MRT_GUI_LootRaidWinner(true)
+        else
+            ttText = "Announce winner of loot - Currently no winner, start bidding or open loot dialog";
+        end
+        MRT_GUI_SetPrioTT(self,ttText);
+    end);
+    MRT_GUIFrame_BossLoot_RaidWin_Button:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end); 
     MRT_GUIFrame_BossLoot_Trade_Button:SetText("Trade");
     MRT_GUIFrame_BossLoot_Trade_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidWin_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
@@ -1528,7 +1539,7 @@ function MRT_GUI_PlayerDropDownList_Toggle()
     end
 end
 
-function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg)
+function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg, keepopen)
     MRT_Debug("MRT_GUI_LootModifyAccept:Called!");
     local itemLinkFromText = "";
     local looter = "";
@@ -1783,7 +1794,31 @@ end
 function isPlayer(PlayerName)
     return (PlayerName ~= "pug") or (PlayerName  ~= "bank") or (PlayerName ~= "unassigned") or (PlayerName ~= "disenchanted");
 end
+function MRT_GUI_LootRaidWin()
+    --If ModifyLoot dialog is not open, active but don't show.
+    if not MRT_GUI_FourRowDialog:IsShown() then 
+        MRT_GUI_LootModify();
+    end
+    MRT_GUI_LootRaidWinner();
+    
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    if (raid_select == nil) then
+        MRT_Print(MRT_L.GUI["No raid selected"]);
+        return;
+    end
+    local loot_select = MRT_GUI_BossLootTable:GetSelection();
+    if (loot_select == nil) then
+        MRT_Print(MRT_L.GUI["No loot selected"]);
+        return;
+    end
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
+    
+    MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, nil, MRT_GUI_FourRowDialog:IsShown())
+    --if dialog open, keep it open
 
+end
 function MRT_GUI_LootRaidWinner(textonly)
     --MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
@@ -2232,13 +2267,6 @@ function CompleteFormatSimpleStringWithPluralRule(str, count)
 		return text:gsub("|4(.+):(.+);", "%2")
 	end
 end
-
-function MRT_GUI_LootRaidWin()
-
-    -- ALEX TODO
-
-end
-
 
 function MRT_GUI_LootRaidLink()
     --MRT_GUI_HideDialogs();

@@ -647,7 +647,7 @@
       <Button name="$parent_BossLoot_RaidLink_Button" inherits="MRT_GUI_SMALL_Button_Template">
          <Size x="54" y="22"/>
         <Scripts>
-          <OnClick>MRT_GUI_LootRaidWin();</OnClick>
+          <OnClick>MRT_GUI_LootRaidLink();</OnClick>
           <OnEnter>MRT_GUI_SetTT(self, "Loot_RaidLink");</OnEnter>
           <OnLeave>MRT_GUI_HideTT();</OnLeave>
         </Scripts>
@@ -655,9 +655,7 @@
       <Button name="$parent_BossLoot_RaidWin_Button" inherits="MRT_GUI_SMALL_Button_Template">
          <Size x="54" y="22"/>
         <Scripts>
-          <OnClick>MRT_GUI_LootRaidLink();</OnClick>
-          <OnEnter>MRT_GUI_SetTT(self, "Loot_RaidLink");</OnEnter>
-          <OnLeave>MRT_GUI_HideTT();</OnLeave>
+          <OnClick>MRT_GUI_LootRaidWin();</OnClick>
         </Scripts>
       </Button>
        <Button name="$parent_BossLoot_Trade_Button" inherits="MRT_GUI_SMALL_Button_Template">
