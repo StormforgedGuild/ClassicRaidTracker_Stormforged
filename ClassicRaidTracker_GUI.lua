@@ -1243,8 +1243,11 @@ function MRT_GUI_LootAdd()
         MRT_GUI_FourRowDialog_EB2:SetText("unassigned");
         MRT_GUI_FourRowDialog_EB3_Text:SetText(MRT_L.GUI["Value"]);
         MRT_GUI_FourRowDialog_EB3:SetText("");                         --setting default to zero so that we won't get errors with OS
-        MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
-        MRT_GUI_FourRowDialog_EB4:SetText("Loot added manually");
+        --MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
+        --MRT_GUI_FourRowDialog_EB4:SetText("Loot added manually");
+        MRT_GUI_FourRowDialog_EB4_Text:SetText("Prio to: ");
+        MRT_GUI_FourRowDialog_EB4:SetText(LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText()));
+        MRT_GUI_FourRowDialog_EB4:SetEnabled(false);
         MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
         MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() UpdateGP(); MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
         MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
@@ -1320,8 +1323,8 @@ function RemoveAutoComplete(editbox)
     MRT_Debug("LEB:RemoveAutoComplete:removing buttonCount");
 	editbox.buttonCount = nil;
 end
-function MRT_GUI_LootModify()
 
+function MRT_GUI_LootModify()
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1380,8 +1383,19 @@ function MRT_GUI_LootModify()
     MRT_GUI_FourRowDialog_Title:SetText(MRT_L.GUI["Modify loot data"]);
     MRT_GUI_FourRowDialog_EB1_Text:SetText(MRT_L.GUI["Itemlink"]);
     MRT_GUI_FourRowDialog_EB1:SetText(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
-    MRT_GUI_FourRowDialog_EB1:SetScript("OnEnter", function(self) 
+    --[[ MRT_GUI_FourRowDialog_EB1:SetScript("OnEnter", function(self) 
         local ttText = "Prio to: " ..LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText());
+        --MRT_Debug("EB:OnEnter ttText: " ..ttText);
+        MRT_GUI_SetPrioTT(self,ttText);
+    end);
+ ]]
+    MRT_GUI_FourRowDialog_EB1:SetScript("OnEnter", function(self)
+        local ttText = ""
+        if (lootnote == nil or lootnote == "" or lootnote == " ") then
+            ttText = ""
+        else
+            ttText = lootnote;
+        end 
         --MRT_Debug("EB:OnEnter ttText: " ..ttText);
         MRT_GUI_SetPrioTT(self,ttText);
     end);
@@ -1473,12 +1487,15 @@ function MRT_GUI_LootModify()
     --end
     lastValue = MRT_GUI_FourRowDialog_EB3:GetText();
     --MRT_Debug("MRT_GUI_LootModify: lastValue: "..lastValue);
-    MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
+    --MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
+    MRT_GUI_FourRowDialog_EB4_Text:SetText("Prio to: ");
+    MRT_GUI_FourRowDialog_EB4:SetText(LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText()));
+    MRT_GUI_FourRowDialog_EB4:SetEnabled(false);
     if (lootnote == nil or lootnote == "" or lootnote == " ") then
-        MRT_GUI_FourRowDialog_EB4:SetText("");
+        --MRT_GUI_FourRowDialog_EB4:SetText("");
         lastNote = "";
     else
-        MRT_GUI_FourRowDialog_EB4:SetText(lootnote);
+        --MRT_GUI_FourRowDialog_EB4:SetText(lootnote);
         lastNote = lootnote;
     end
     MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.Core["MB_Ok"]);
@@ -1552,7 +1569,8 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg, keepopen)
         itemLinkFromText = MRT_GUI_FourRowDialog_EB1:GetText();
         looter = MRT_GUI_FourRowDialog_EB2:GetText();
         cost = MRT_GUI_FourRowDialog_EB3:GetText();
-        lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
+        --lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
+        lootNote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"]
         offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
         traded = MRT_GUI_FourRowDialog_CBTraded:GetChecked();
     else
