@@ -1490,7 +1490,7 @@ function MRT_GUI_LootModify()
     --MRT_GUI_FourRowDialog_EB4_Text:SetText(MRT_L.GUI["Note"]);
     MRT_GUI_FourRowDialog_EB4_Text:SetText("Prio to: ");
     MRT_GUI_FourRowDialog_EB4:SetText(LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText()));
-    MRT_GUI_FourRowDialog_EB4:SetEnabled(false);
+    MRT_GUI_FourRowDialog_EB4:SetEnabled(true);
     if (lootnote == nil or lootnote == "" or lootnote == " ") then
         --MRT_GUI_FourRowDialog_EB4:SetText("");
         lastNote = "";
