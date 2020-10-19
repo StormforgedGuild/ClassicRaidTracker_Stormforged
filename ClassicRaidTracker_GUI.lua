@@ -1303,24 +1303,24 @@ function cleanFormatString(strText, keepCase)
 end
 
 function RemoveAutoComplete(editbox)
-	MRT_Debug("LEB:RemoveAutoComplete called");
+	--MRT_Debug("LEB:RemoveAutoComplete called");
 
-    MRT_Debug("LEB:RemoveAutoComplete:removing onTabPressed");
-    MRT_GUI_FourRowDialog_EB2:SetScript("OnEnter", nil);
+    --MRT_Debug("LEB:RemoveAutoComplete:removing onTabPressed");
+    editbox:SetScript("OnEnter", nil);
 	editbox:SetScript("OnTabPressed", function (editbox) MRT_GUI_FourRowDialog_EB3:SetFocus(); end)
-	MRT_Debug("LEB:RemoveAutoComplete:removing onEnterPressed");
+	--MRT_Debug("LEB:RemoveAutoComplete:removing onEnterPressed");
 	editbox:SetScript("OnEnterPressed", nil)
-	MRT_Debug("LEB:RemoveAutoComplete:removing onTextChanged");
+	--MRT_Debug("LEB:RemoveAutoComplete:removing onTextChanged");
 	editbox:SetScript("OnTextChanged", nil)
-	MRT_Debug("LEB:RemoveAutoComplete:removing OnChar");
+	--MRT_Debug("LEB:RemoveAutoComplete:removing OnChar");
 	editbox:SetScript("OnChar", nil)
-	MRT_Debug("LEB:RemoveAutoComplete:removing OnEditFocusLost");
+	--MRT_Debug("LEB:RemoveAutoComplete:removing OnEditFocusLost");
 	editbox:SetScript("OnEditFocusLost", nil)
-	MRT_Debug("LEB:RemoveAutoComplete:removing OnEscapePressed");
+	--MRT_Debug("LEB:RemoveAutoComplete:removing OnEscapePressed");
 	editbox:SetScript("OnEscapePressed", function (editbox) MRT_GUI_HideDialogs() end);
-	MRT_Debug("LEB:RemoveAutoComplete:removing valueList");
+	--MRT_Debug("LEB:RemoveAutoComplete:removing valueList");
 	editbox.valueList = {}
-    MRT_Debug("LEB:RemoveAutoComplete:removing buttonCount");
+    --MRT_Debug("LEB:RemoveAutoComplete:removing buttonCount");
 	editbox.buttonCount = nil;
 end
 
@@ -1337,13 +1337,16 @@ function MRT_GUI_LootModify()
         return;
     end
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    --change to always remove and add.
     if lastRaidNum ~= raidnum then
         lastRaidNum = raidnum;
-        if bAutoCompleteCreated then
-            RemoveAutoComplete(MRT_GUI_FourRowDialog_EB2);
-            bAutoCompleteCreated = false;
-        end
+        --if bAutoCompleteCreated then
+        --    RemoveAutoComplete(MRT_GUI_FourRowDialog_EB2);
+        --    bAutoCompleteCreated = false;
+        --end
     end 
+    RemoveAutoComplete(MRT_GUI_FourRowDialog_EB2);
+    --bAutoCompleteCreated = false;
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     lastloot_select = loot_select;
     lastLootNum = lootnum;
@@ -1421,34 +1424,35 @@ function MRT_GUI_LootModify()
                 --MRT_Debug("MRT_GUI_LootModify: Bidding Loot doesn't exist");
             end
         end
+        --return false;
     end)
     --autocomplete here.
-    if not bAutoCompleteCreated then
-        MRT_Debug("MRT_GUI_LootModify: Creating autocomplete table");
-        local valueList = {}
-        local maxButtonCount = 20;
-        --[[ --this is the playerdb imp
-        local realm = GetRealmName();
-        MRT_Debug("MRT_GUI_LootModify: realm: "..realm);
-        for i, v in pairs(MRT_PlayerDB[realm]) do
-            MRT_Debug("MRT_GUI_LootModify: first for loop");
-            tinsert(valueList,1,i)
-        end
-        for i1, v1 in ipairs(valueList) do
-            MRT_Debug("MRT_GUI_LootModify: v: " ..v1);
-        end
-        MRT_Debug("MRT_GUI_LootModify: for loops over ");
-        tinsert(valueList, 1, "disenchanted");
-        tinsert(valueList, 1, "bank" );
-        tinsert(valueList, 1, "unassigned");
-        tinsert(valueList, 1, "pug" ); ]]
-        --Raid list imp
-        for i, v in ipairs(MRT_RaidPlayerList) do
-            tinsert(valueList, 1, v[1])
-        end
-        SetupAutoComplete(MRT_GUI_FourRowDialog_EB2, valueList, maxButtonCount);
-        bAutoCompleteCreated = true;
+    --if not bAutoCompleteCreated then
+    MRT_Debug("MRT_GUI_LootModify: Creating autocomplete table");
+    local valueList = {}
+    local maxButtonCount = 20;
+    --[[ --this is the playerdb imp
+    local realm = GetRealmName();
+    MRT_Debug("MRT_GUI_LootModify: realm: "..realm);
+    for i, v in pairs(MRT_PlayerDB[realm]) do
+        MRT_Debug("MRT_GUI_LootModify: first for loop");
+        tinsert(valueList,1,i)
     end
+    for i1, v1 in ipairs(valueList) do
+        MRT_Debug("MRT_GUI_LootModify: v: " ..v1);
+    end
+    MRT_Debug("MRT_GUI_LootModify: for loops over ");
+    tinsert(valueList, 1, "disenchanted");
+    tinsert(valueList, 1, "bank" );
+    tinsert(valueList, 1, "unassigned");
+    tinsert(valueList, 1, "pug" ); ]]
+    --Raid list imp
+    for i, v in ipairs(MRT_RaidPlayerList) do
+        tinsert(valueList, 1, v[1])
+    end
+    SetupAutoComplete(MRT_GUI_FourRowDialog_EB2, valueList, maxButtonCount);
+        --bAutoCompleteCreated = true;
+    --end
 
     --MRT_GUI_FourRowDialog_EB2:SetText(MRT_GUI_BossLootTable:GetCell(loot_select, 4));
     local cleanlooter = MRT_GUI_BossLootTable:GetCell(loot_select, 4)
@@ -1523,6 +1527,7 @@ function MRT_GUI_LootModify()
     --MRT_GUI_FourRowDialog_CB1:SetScript("OnUpdate", function(self) MRT_CB_Clicked(self); end);
     --MRT_GUI_FourRowDialog_EB1:SetEnabled(false);
 end
+
 function MRT_CB_Clicked(self)
     local enable = self:GetChecked()
     local cost;
