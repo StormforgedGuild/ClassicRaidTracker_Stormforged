@@ -2515,6 +2515,9 @@ function MRT_SendAddonMessage(msg, channel, target)
             MRT_ChannelMsgStore = {};
             MRT_ChannelMsgStore[msg["RaidID"]] = {};
         end
+        if not MRT_ChannelMsgStore[msg["RaidID"]] then
+            MRT_ChannelMsgStore[msg["RaidID"]] = {};
+        end
         tinsert(MRT_ChannelMsgStore[msg["RaidID"]], msg)
 
         C_ChatInfo.SendAddonMessage("SFRT", strMsg, channel);
