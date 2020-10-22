@@ -36,7 +36,7 @@ local LibSFGP = LibStub("LibSFGearPoints-1.0");
 LibSFGP:CacheTokenItemInfo();
 local ag -- import reminder animationgroup
 local agTrade -- trade reminder animationgroup
-
+local agBidding -- bidding animation
 local MRT_GUI_RaidLogTableSelection = nil;
 local MRT_GUI_RaidBosskillsTableSelection = nil;
 local MRT_ExternalLootNotifier = {};
@@ -640,7 +640,7 @@ function ImportReminder()
 
 end
 
- function encourageImport()
+function encourageImport()
     MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontGreen");
   
     local FadeOut = ag:CreateAnimation("Alpha");
@@ -659,14 +659,14 @@ end
   
     ag:SetLooping("Repeat")
     ag:Play();
-  end
+end
   
-  function stopEncouragingImport()
-      MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontWhite");
-      ag:Stop();
-  end
+function stopEncouragingImport()
+    MRT_GUIFrame_Import_PR_Button:SetNormalFontObject("GameFontWhite");
+    ag:Stop();
+end
 
-  function encourageTrade()
+function encourageTrade()
 
     --don't encourage if there are no tradeable items for the player trying to trade
     local tradeableItems = MRT_GetTradeableItems();
@@ -697,12 +697,44 @@ end
   
     agTrade:SetLooping("Repeat")
     agTrade:Play();
-  end
+end
   
-  function stopEncouragingTrade()
+function stopEncouragingTrade()
     MRT_GUIFrame_BossLoot_Trade_Button:SetNormalFontObject("GameFontWhite");
     agTrade:Stop();
-  end
+end
+
+-- function animateButton
+-- generic function to do button animations.
+-- Params
+--  button - button to animate
+--  AG - animation group
+--  bStart - boolean flag to start or stop
+function animateButton(button, AG, bStart)
+    if bStart then 
+        button:SetNormalFontObject("GameFontGreen");
+    
+        local FadeOut = AG:CreateAnimation("Alpha");
+        FadeOut:SetToAlpha(.25);
+        FadeOut:SetFromAlpha(1);
+        FadeOut:SetDuration(1);
+        FadeOut:SetOrder(1);
+        FadeOut:SetSmoothing("OUT")
+    
+        local FadeIn = AG:CreateAnimation("Alpha");
+        FadeIn:SetToAlpha(1);
+        FadeIn:SetFromAlpha(.25);
+        FadeIn:SetDuration(1);
+        FadeOut:SetOrder(2);
+        FadeIn:SetSmoothing("OUT")
+    
+        AG:SetLooping("Repeat")
+        AG:Play();
+    else 
+        button:SetNormalFontObject("GameFontWhite");
+        AG:Stop();
+    end
+end
 
 ----------------------
 --  Button handler  --
@@ -1249,7 +1281,7 @@ function MRT_GUI_LootAdd()
         MRT_GUI_FourRowDialog_EB4:SetText(LibSFGP:GetPrio(MRT_GUI_FourRowDialog_EB1:GetText()));
         MRT_GUI_FourRowDialog_EB4:SetEnabled(false);
         MRT_GUI_FourRowDialog_OKButton:SetText(MRT_L.GUI["Button_Add"]);
-        MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() UpdateGP(); MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
+        MRT_GUI_FourRowDialog_OKButton:SetScript("OnClick", function() MRT_GUI_FourRowDialog_EB3:SetText(UpdateGP(MRT_GUI_FourRowDialog_EB1:GetText(), MRT_GUI_FourRowDialog_EB3:GetText())); MRT_GUI_LootModifyAccept(raidnum, bossnum, nil); end);
         MRT_GUI_FourRowDialog_CancelButton:SetText(MRT_L.Core["MB_Cancel"]);
         MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetText(MRT_L.Core["MB_Win"]);
         MRT_GUI_FourRowDialog_CBTraded:SetChecked(false);
@@ -1324,7 +1356,7 @@ function RemoveAutoComplete(editbox)
 	editbox.buttonCount = nil;
 end
 
-function MRT_GUI_LootModify()
+function MRT_GUI_LootModify(hide)
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1414,7 +1446,7 @@ function MRT_GUI_LootModify()
                     --MRT_Debug("MRT_GUI_LootModify: Looter is not unassigned");
                     if MRT_TopBidders["Loot"] == MRT_GUI_FourRowDialog_EB1:GetText() then
                         --MRT_Debug("MRT_GUI_LootModify: Loot matches bidding loot");
-                        MRT_Print("Loot assignment changed")
+                        MRT_Print("Loot assignment changed.  Bidding is closed")
                         StopBidding();
                     else
                         --MRT_Debug("MRT_GUI_LootModify: Bidding loot and Loot text don't match");
@@ -1521,7 +1553,9 @@ function MRT_GUI_LootModify()
     end);
     MRT_GUI_FourRowDialog_AnnounceWinnerButton:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end);        
     --MRT_GUI_FourRowDialog_EB2:SetFocus();
-    MRT_GUI_FourRowDialog:Show();
+    if not hide then 
+        MRT_GUI_FourRowDialog:Show();
+    end
     MRT_GUI_FourRowDialog_EB2:SetFocus();
     MRT_GUI_FourRowDialog_CB1:SetScript("OnClick", function(self) MRT_CB_Clicked(self); end);
     --MRT_GUI_FourRowDialog_CB1:SetScript("OnUpdate", function(self) MRT_CB_Clicked(self); end);
@@ -1576,7 +1610,11 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg, keepopen)
         looter = MRT_GUI_FourRowDialog_EB2:GetText();
         cost = MRT_GUI_FourRowDialog_EB3:GetText();
         --lootNote = MRT_GUI_FourRowDialog_EB4:GetText();
-        lootNote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"]
+        if not MRT_RaidLog[raidnum]["Loot"][lootnum]then 
+            lootNote = ""
+        else
+            lootNote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"]
+        end
         offspec = MRT_GUI_FourRowDialog_CB1:GetChecked();
         traded = MRT_GUI_FourRowDialog_CBTraded:GetChecked();
     else
@@ -1599,12 +1637,13 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg, keepopen)
     
     --MRT_Debug("MRT_GUI_LootModifyAccept: itemLinkFromText: "..itemLinkFromText.." looter: "..looter.." cost: "..cost.." lootNote: "..lootNote.." offspec: "..tostring(offspec));
     if cost == "" or cost =="0" then
-        UpdateGP()
+        MRT_GUI_FourRowDialog_EB3:SetText(UpdateGP(MRT_GUI_FourRowDialog_EB1:GetText(), MRT_GUI_FourRowDialog_EB3:GetText()))
     end
+
     local newloot = false;
     if (cost == "") then cost = 0; end
     cost = tonumber(cost);
-    if (lootNote == nil or lootNote == "" or lootNote == " ") then lootNote = nil; end
+    if (lootNote == nil or lootNote == "" or lootNote == " ") then lootNote = ""; end
     -- sanity-check values here - especially the itemlink / looter is free text / cost has to be a number
     local itemName, itemLink, itemId, itemString, itemRarity, itemColor, _, _, _, _, _, _, _, _ = MRT_GetDetailedItemInformation(itemLinkFromText);
     if itemColor then 
@@ -1814,12 +1853,13 @@ function MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, msg, keepopen)
 end
 
 --This function returns whether or not a name is a reserved name, pug, bank, unassigned, disenchanted
-
 function isPlayer(PlayerName)
     return (PlayerName ~= "pug") or (PlayerName  ~= "bank") or (PlayerName ~= "unassigned") or (PlayerName ~= "disenchanted");
 end
+
 function MRT_GUI_LootRaidWin()
     --If ModifyLoot dialog is not open, active but don't show.
+    --Using the lootmodify dialog is problematic... bypass the dialog... 
     if not MRT_GUI_FourRowDialog:IsShown() then 
         MRT_GUI_LootModify();
     end
@@ -1839,11 +1879,14 @@ function MRT_GUI_LootRaidWin()
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
     
-    MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, nil, MRT_GUI_FourRowDialog:IsShown())
     --if dialog open, keep it open
-
+    MRT_GUI_LootModifyAccept(raidnum, bossnum, lootnum, nil, MRT_GUI_FourRowDialog:IsShown())
 end
+
+
+
 function MRT_GUI_LootRaidWinner(textonly, tooltipFormat)
+    --refactor this so that we don't use the lootmodify dialog for textonly and tooltip stuff.
     --MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
@@ -1934,21 +1977,26 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat)
         ResetBidding(false);
     end
 end
-function UpdateGP()
+
+function UpdateGP(itemlink, GPtext)
     local LibSFGP = LibStub("LibSFGearPoints-1.0");
-    local itemlink = MRT_GUI_FourRowDialog_EB1:GetText();
+    local gp1
+    --local itemlink = MRT_GUI_FourRowDialog_EB1:GetText();
     if (not itemlink) or (itemlink =="") then
     --do nothing
+        return "0"
     else
         gp1 = LibSFGP:GetValue(itemlink);
         if (not gp1) then
-            MRT_GUI_FourRowDialog_EB3:SetText("0");
+            --MRT_GUI_FourRowDialog_EB3:SetText("0");
+            return "0"
         else
-            local GPtext = MRT_GUI_FourRowDialog_EB3:GetText();
             if (GPtext == "") or (GPText == "0") then
-                MRT_GUI_FourRowDialog_EB3:SetText(gp1);
+                return gp1
+                --MRT_GUI_FourRowDialog_EB3:SetText(gp1);
             else
                 --GP already set, do nothing.
+                return GPtext
             end 
         end
         --MRT_GUI_FourRowDialog_EB1:HighlightText(0,0);
@@ -2409,6 +2457,7 @@ function MRT_GUI_LootRaidAnnounce()
     end ]]
     LootAnnounce("RAID_WARNING", MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5))
     ResetBidding(true, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
+    MRT_GUI_LootModify(true);
     
 end
 

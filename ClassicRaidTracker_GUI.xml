@@ -357,7 +357,7 @@
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
           <OnTabPressed>MRT_GUI_FourRowDialog_EB2:SetFocus();</OnTabPressed>
-          <OnEditFocusLost>UpdateGP()</OnEditFocusLost>
+          <OnEditFocusLost>MRT_GUI_FourRowDialog_EB3:SetText(UpdateGP(MRT_GUI_FourRowDialog_EB1:GetText(), MRT_GUI_FourRowDialog_EB3:GetText()))</OnEditFocusLost>
         </Scripts>
       </EditBox>
       <EditBox name="$parent_EB2" inherits="MRT_GUI_Editbox_Template">
@@ -368,7 +368,7 @@
         <Scripts>
           <OnEscapePressed>MRT_GUI_HideDialogs();</OnEscapePressed>
           <OnTabPressed>MRT_GUI_FourRowDialog_EB3:SetFocus();</OnTabPressed>
-          <OnEditFocusLost>UpdateGP()</OnEditFocusLost>
+          <OnEditFocusLost>MRT_GUI_FourRowDialog_EB3:SetText(UpdateGP(MRT_GUI_FourRowDialog_EB1:GetText(), MRT_GUI_FourRowDialog_EB3:GetText()));</OnEditFocusLost>
         </Scripts>
       </EditBox>
       <EditBox name="$parent_EB3" inherits="MRT_GUI_Editbox_Template">
