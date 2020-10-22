@@ -1356,6 +1356,126 @@ function RemoveAutoComplete(editbox)
 	editbox.buttonCount = nil;
 end
 
+function MRT_GUI_doWinner()
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    if (raid_select == nil) then
+        MRT_Print(MRT_L.GUI["No raid selected"]);
+        return;
+    end
+    --raid must be selected.
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    local itemLinkFromText = "";
+    local looter = "";
+    local cost = "";
+    local lootNote = "";
+    local offspec = "";
+    local traded = "";
+    local strMsg = "";
+    --find the lootnum, from link?
+    --
+    local lootnum = getLootNumber(raidnum, MRT_TopBidders["Loot"])
+    GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
+
+    if lootnum ~= -1 and MRT_LootBidding then 
+        local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
+        local lootnote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"];
+        local lootoffspec = MRT_RaidLog[raidnum]["Loot"][lootnum]["Offspec"];
+        local lootTraded = MRT_RaidLog[raidnum]["Loot"][lootnum]["Traded"];
+        cost = MRT_RaidLog[raidnum]["Loot"][lootnum]["DKPValue"]
+        MRT_Debug("MRT_GUI_doWinner: cost: " ..cost);
+        looter = MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]
+        --local itemName, itemLink, itemId, itemString, itemRarity, itemColor, _, _, _, _, _, _, _, _ = MRT_GetDetailedItemInformation(itemLinkFromText);
+        local MRT_LootInfo = {
+            ["ItemLink"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"],
+            ["ItemString"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemSting"],
+            ["ItemId"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemId"],
+            ["ItemName"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemName"],
+            ["ItemColor"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemColor"],
+            ["BossNumber"] = bossnum,
+            ["Looter"] = looter,
+            ["Traded"] = traded,
+            ["DKPValue"] = cost,
+            ["Note"] = lootNote,
+            ["Offspec"] = lootoffspec,
+        }
+        local newlootinfo = MRT_GUI_LootRaidWinner(nil, nil, true, MRT_LootInfo)
+        MRT_Debug("MRT_GUI_doWinner: newlootinfo[looter]: " ..newlootinfo["Looter"])
+        MRT_Debug("MRT_GUI_doWinner: newlootinfo[dkpvalue]: " ..newlootinfo["DKPValue"])
+        local oldLootDB = MRT_RaidLog[raidnum]["Loot"][lootnum];
+    
+        -- create a copy of the old loot data for the api
+        local oldItemInfoTable = {}
+        for key, val in pairs(oldLootDB) do
+            oldItemInfoTable[key] = val;
+            --MRT_Debug("MRT_GUI_LootModifyAccept: val: " ..tostring(val))
+        end
+        MRT_LootInfo["ItemCount"] = oldLootDB["ItemCount"];
+        MRT_LootInfo["Time"] = oldLootDB["Time"];
+        
+        MRT_RaidLog[raidnum]["Loot"][lootnum] = newlootinfo;
+        -- notify registered, external functions
+        if (#MRT_ExternalLootNotifier > 0) then
+            local itemInfo = {};
+            for key, val in pairs(MRT_RaidLog[raidnum]["Loot"][lootnum]) do
+                itemInfo[key] = val;
+            end
+            if (oldItemInfoTable.Looter == "bank") then
+                oldItemInfoTable.Action = MRT_LOOTACTION_BANK;
+            elseif (oldItemInfoTable.Looter == "disenchanted") then
+                oldItemInfoTable.Action = MRT_LOOTACTION_DISENCHANT;
+            elseif (oldItemInfoTable.Looter == "_deleted_") then
+                oldItemInfoTable.Action = MRT_LOOTACTION_DELETE;
+            else
+                oldItemInfoTable.Action = MRT_LOOTACTION_NORMAL;
+            end
+            if (itemInfo.Looter == "bank") then
+                itemInfo.Action = MRT_LOOTACTION_BANK;
+            elseif (itemInfo.Looter == "disenchanted") then
+                itemInfo.Action = MRT_LOOTACTION_DISENCHANT;
+            elseif (itemInfo.Looter == "_deleted_") then
+                itemInfo.Action = MRT_LOOTACTION_DELETE;
+            else
+                itemInfo.Action = MRT_LOOTACTION_NORMAL;
+            end
+            for i, val in ipairs(MRT_ExternalLootNotifier) do
+                pcall(val, itemInfo, MRT_NOTIFYSOURCE_EDIT_GUI, raidnum, lootnum, oldItemInfoTable);
+            end
+        end
+        if isMasterLooter() then 
+            MRT_Debug("MRT_GUI_doWinner: sending Loot Updated msg");
+            -- send message to addon channel with new loot message
+            if not MRT_MasterLooter then
+                MRT_MasterLooter = getMasterLooter();
+            end
+            looter = MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]
+            cost = MRT_RaidLog[raidnum]["Loot"][lootnum]["DKPValue"]
+            local msg = {
+                ["RaidID"] = raidnum,
+                ["ID"] = MRT_Msg_ID,
+                ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+                ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec)..";"..tostring(traded),
+                ["EventID"] = "4",
+            }
+            MRT_SendAddonMessage(msg, "RAID");
+        end
+        MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
+    else
+        MRT_Print("MRT_GUI_doWinner: error on lootnum or not bidding");
+        return
+    end
+end
+
+function getLootNumber(raidnum, itemlink)
+    MRT_Debug("getLootNumber: Called");
+
+    for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
+        if v["ItemLink"] == itemlink then
+            return i
+        end
+    end
+    return -1;
+end
+
 function MRT_GUI_LootModify(hide)
     MRT_GUI_HideDialogs();
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
@@ -1861,10 +1981,12 @@ function MRT_GUI_LootRaidWin()
     --If ModifyLoot dialog is not open, active but don't show.
     --Using the lootmodify dialog is problematic... bypass the dialog... 
     if not MRT_GUI_FourRowDialog:IsShown() then 
-        MRT_GUI_LootModify();
+        MRT_GUI_LootModify(true);
     end
-    MRT_GUI_LootRaidWinner();
-    
+    local errCode = MRT_GUI_LootRaidWinner();
+    if errCode == -1 then
+        return
+    end
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
         MRT_Print(MRT_L.GUI["No raid selected"]);
@@ -1885,18 +2007,19 @@ end
 
 
 
-function MRT_GUI_LootRaidWinner(textonly, tooltipFormat)
+function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogitem)
     --refactor this so that we don't use the lootmodify dialog for textonly and tooltip stuff.
     --MRT_GUI_HideDialogs();
+    
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
     if (raid_select == nil) then
         MRT_Print(MRT_L.GUI["No raid selected"]);
-        return;
+        return -1;
     end
     local loot_select = MRT_GUI_BossLootTable:GetSelection();
     if (loot_select == nil) then
         MRT_Print(MRT_L.GUI["No loot selected"]);
-        return;
+        return -1;
     end
     --local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     --local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
@@ -1907,27 +2030,48 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat)
     local looter;    
     if #MRT_TopBidders["Players"] == 1 then
         if not textonly then 
-            MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
+            if not byPassDialog then 
+                MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
+            end
             if MRT_TopBidders["Type"] == "os" then
-                if not MRT_GUI_FourRowDialog_CB1:GetChecked() then 
-                    MRT_GUI_FourRowDialog_CB1:Click();
+                if not byPassDialog then 
+                    if not MRT_GUI_FourRowDialog_CB1:GetChecked() then 
+                        MRT_GUI_FourRowDialog_CB1:Click();
+                    end
+                else
+                    local intCost = tonumber(raidlogitem["DKPValue"])
+                    intCost = intCost * .25;
+                    cost = tostring(intCost);
+                    raidlogitem["Offspec"] = true
+                    raidlogitem["DKPValue"] = cost
                 end
-                --MRT_GUI_FourRowDialog_CB1:SetChecked(true);
             end
         end
     else
         if #MRT_TopBidders["Players"] > 1 then
             MRT_Print("There is a tie.  Roll off!  " ..GetTopBidders())
-            return
+            return -1;
         end
     end
-    if not textonly then 
-        looter = MRT_GUI_FourRowDialog_EB2:GetText();
+    if not textonly then
+        if not byPassDialog then  
+            looter = MRT_GUI_FourRowDialog_EB2:GetText();
+        else
+            if MRT_TopBidders["Players"][1] then 
+                looter = MRT_TopBidders["Players"][1];
+            else 
+                looter = "unassigned"
+            end
+        end
     else
         if MRT_LootBidding and #MRT_TopBidders["Players"] > 0 then 
             looter = MRT_TopBidders["Players"][1];
         else
-            looter = MRT_GUI_FourRowDialog_EB2:GetText();
+            if not byPassDialog then 
+                looter = MRT_GUI_FourRowDialog_EB2:GetText();
+            else
+                looter = "unassigned"
+            end
         end
     end
 
@@ -1935,17 +2079,30 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat)
         looter = "disenchanted"
         if not textonly then 
             if #MRT_TopBidders["Players"] == 0 then
-                MRT_GUI_FourRowDialog_EB2:SetText("disenchanted")
+                if not byPassDialog then 
+                    MRT_GUI_FourRowDialog_EB2:SetText("disenchanted")
+                else
+                    raidlogitem["Looter"] = "disenchanted"
+                end
             end
         end
     else
         if looter ~= "disenchanted" then 
+            if raidlogitem then 
+                raidlogitem["Looter"] = looter;
+            end
             if not tooltipFormat then
                  looter = "{star}"..cleanString(looter):gsub("^%l", string.upper).."{star}";
             end
         end
     end 
-    local cost = MRT_GUI_FourRowDialog_EB3:GetText();
+    local cost;
+    if not byPassDialog then 
+        cost = MRT_GUI_FourRowDialog_EB3:GetText();
+    else
+        cost = raidlogitem["DKPValue"]
+    end
+    MRT_Debug("MRT_GUI_LootRaidWinner cost: " ..cost)
     if textonly then 
         local intCost = tonumber(cost)
         if MRT_TopBidders["Type"] == "os" then
@@ -1954,13 +2111,21 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat)
         end
     end
     
-    local lootName = MRT_GUI_FourRowDialog_EB1:GetText();
+    local lootName 
+    if not byPassDialog then 
+        lootName = MRT_GUI_FourRowDialog_EB1:GetText();
+    else
+        --TODO do something with lootname
+        lootName = raidlogitem["ItemName"]
+    end
+    MRT_Debug("MRT_GUI_LootRaidWinner lootName: " ..lootName)
     local rwMessage;
     --if #MRT_TopBidders["Players"] == 1 then 
     --    MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
     --end
     --"Congratz! %s receives %s for %sGP",   
     --local rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], cost);
+
     if looter =="disenchanted" then 
         rwMessage = string.format("%s is being DISENCHANTED", lootName);
     else
@@ -1975,6 +2140,7 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat)
     else 
         SendChatMessage(rwMessage, "Raid");
         ResetBidding(false);
+        return raidlogitem
     end
 end
 

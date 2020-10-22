@@ -655,7 +655,8 @@
       <Button name="$parent_BossLoot_RaidWin_Button" inherits="MRT_GUI_SMALL_Button_Template">
          <Size x="54" y="22"/>
         <Scripts>
-          <OnClick>MRT_GUI_LootRaidWin();</OnClick>
+          <!-- <OnClick>MRT_GUI_LootRaidWin();</OnClick> -->
+          <OnClick>MRT_GUI_doWinner();</OnClick>
         </Scripts>
       </Button>
        <Button name="$parent_BossLoot_Trade_Button" inherits="MRT_GUI_SMALL_Button_Template">
