@@ -2093,7 +2093,7 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogit
             if MRT_TopBidders["Players"][1] then 
                 looter = MRT_TopBidders["Players"][1];
             else 
-                looter = "unassigned"
+                looter = raidlogitem["Looter"]
             end
         end
     else
@@ -2103,7 +2103,7 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogit
             if not byPassDialog then 
                 looter = MRT_GUI_FourRowDialog_EB2:GetText();
             else
-                looter = "unassigned"
+                looter = raidlogitem["Looter"]
             end
         end
     end
