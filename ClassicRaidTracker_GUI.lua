@@ -2165,9 +2165,7 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogit
         if tooltipFormat then
         rwMessage = string.format("%s is being DISENCHANTED", lootName);
         else
-
-           -- TODO MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]
-            rwMessage = string.format("%s is being turned into {diamond}{diamond}{diamond}", raidlogitem["ItemLink"]);
+            rwMessage = string.format("%s is being turned into {diamond}{diamond}{diamond}", lootName);
 
         end
     else
@@ -2175,7 +2173,7 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogit
             rwMessage = string.format(MRT_L.GUI["RaidWinToolTip"], looter, lootName, cost);
             MRT_Debug("MRT_GUI_LootRaidWinner rwMessage: " ..rwMessage)
         else
-          rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, raidlogitem["ItemLink"], cost);
+          rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
         end
     end
     if textonly then     
