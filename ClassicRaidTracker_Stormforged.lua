@@ -822,7 +822,9 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                 local bossnum, strData = getToken(tbMsg["Data"], ";");
                 local lootnum, strData = getToken(strData, ";");
                 local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                if raid_select then 
+                    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                end
                 if not MRT_NumOfCurrentRaid then
                     strRaidNum = raidnum
                 else
@@ -839,7 +841,9 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                 ProcessROPlayerPR(strData);
                 --testing use get current raid.
                 local raid_select = MRT_GUI_RaidLogTable:GetSelection();
-                local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                if raid_select then 
+                    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+                end
                 if not MRT_NumOfCurrentRaid then
                     strRaidNum = raidnum
                 else
@@ -906,11 +910,13 @@ function addChannelMessageToStore(msg)
 end
 
 function isAddOnMessageInStore(msg)
-    for i,v in pairs(MRT_ChannelMsgStore[msg["RaidID"]]) do
-        if v["ID"] == msg["ID"] then
-            return true
-        end
-    end 
+    if MRT_ChannelMsgStore[msg["RaidID"]] then 
+        for i,v in pairs(MRT_ChannelMsgStore[msg["RaidID"]]) do
+            if v["ID"] == msg["ID"] then
+                return true
+            end
+        end 
+    end
     return false
 end
 

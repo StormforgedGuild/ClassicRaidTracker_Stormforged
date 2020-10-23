@@ -126,6 +126,14 @@ end
 
 --write function that sends attendee PR to channel on import
 function SendPRMsg(attendeetable, channel, target)
+
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    if (raid_select == nil) then
+        raidnum = MRT_NumOfCurrentRaid
+    end
+    --raid must be selected.
+    
+    local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local strChannel
     local strID
     local strEventID
@@ -148,7 +156,7 @@ function SendPRMsg(attendeetable, channel, target)
                     strEventID = "1"
                 end  
                 local msg = {
-                    ["RaidID"] = "1",
+                    ["RaidID"] = raidnum,
                     ["ID"] = strID,
                     ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
                     ["Data"] = strData,
@@ -173,7 +181,7 @@ function SendPRMsg(attendeetable, channel, target)
             strEventID = "1"
         end 
         local msg = {
-            ["RaidID"] = "1",
+            ["RaidID"] = raidnum,
             ["ID"] = strID,
             ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
             ["Data"] = strData,

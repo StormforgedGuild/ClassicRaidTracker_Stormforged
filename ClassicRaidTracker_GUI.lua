@@ -1470,7 +1470,7 @@ function MRT_GUI_doWinner(textonly)
                     ["RaidID"] = raidnum,
                     ["ID"] = MRT_Msg_ID,
                     ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
-                    ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec)..";"..tostring(traded),
+                    ["Data"] = bossnum..";"..lootnum..";"..newlootinfo["ItemLink"]..";"..looter..";"..newlootinfo["DKPValue"]..";"..lootNote..";"..tostring(newlootinfo["Offspec"])..";"..tostring(newlootinfo["Traded"]),
                     ["EventID"] = "4",
                 }
                 MRT_SendAddonMessage(msg, "RAID");
@@ -2578,7 +2578,7 @@ function LootAnnounce(messageType, loot, gp, textonly)
         rwMessage = string.format(MRT_L.GUI["RaidLinkMessage"], loot, gp);
         SendChatMessage(rwMessage, messageType);
     elseif messageType == "RAID_WARNING" then
-        if LibSFGP:GetMSOnly(loot) ==1 then
+        if LibSFGP:GetMSOnly(loot) then
             rwMessage = string.format(MRT_L.GUI["RaidAnnounceMSOnlyMessage"], loot, gp);
         else
             rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], loot, gp);
@@ -2635,23 +2635,17 @@ function MRT_GUI_LootRaidAnnounce()
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     local lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
-    --[[ local loot = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"];
-    -- GetToken now returns a string table... need to write a function to parse and build smaller messages.
-    local strTokens = LibSFGP:GetTokenLoot(loot);
-    local rwMessage;
-    --local rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
-    rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessage"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5));
-    SendChatMessage(rwMessage, "RAID_WARNING");
-    if strTokens~="" then
     
-        MRT_Debug("strTokens: " ..strTokens)
-        rwMessage = string.format(MRT_L.GUI["RaidAnnounceMessageToken"], MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], strTokens);
-        SendChatMessage(rwMessage, "RAID_WARNING");
-    end ]]
     LootAnnounce("RAID_WARNING", MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5))
     ResetBidding(true, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
-    MRT_GUI_LootModify(true);
+    if MRT_GUI_FourRowDialog:IsShown() then 
+        MRT_GUI_LootModify();
+    else
+        MRT_GUI_LootModify(true);
+    end
     
+    --change button status RaidAnnounce_Button
+
 end
 
 
