@@ -2151,7 +2151,7 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogit
         lootName = MRT_GUI_FourRowDialog_EB1:GetText();
     else
         --TODO do something with lootname
-        lootName = raidlogitem["ItemName"]
+        lootName = raidlogitem["ItemLink"]
     end
     MRT_Debug("MRT_GUI_LootRaidWinner lootName: " ..lootName)
     local rwMessage;
