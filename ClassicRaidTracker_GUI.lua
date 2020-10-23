@@ -701,15 +701,30 @@ function stopEncouragingTrade()
     agTrade:Stop();
 end
 
+--AnimateBidButton - function to let ML know that bid is in progress
+-- start - true/false, true starts, false stops
+function AnimateBidButton(start)
+    if not agBidding then
+        agBidding = MRT_GUIFrame_BossLoot_RaidWin_Button:CreateAnimationGroup();
+    end
+    animateButton(MRT_GUIFrame_BossLoot_RaidWin_Button, agBidding, start, "GameFontRed" )
+end
+
 -- function animateButton
 -- generic function to do button animations.
 -- Params
 --  button - button to animate
 --  AG - animation group
 --  bStart - boolean flag to start or stop
-function animateButton(button, AG, bStart)
+function animateButton(button, AG, bStart, color)
+    
+    if color then 
+        strColor = color
+    else
+        strColor = "GameFontGreen"
+    end
     if bStart then 
-        button:SetNormalFontObject("GameFontGreen");
+        button:SetNormalFontObject(strColor);
     
         local FadeOut = AG:CreateAnimation("Alpha");
         FadeOut:SetToAlpha(.25);
@@ -2206,6 +2221,7 @@ function ResetBidding(start, loot)
         ["Loot"] = loot,
     } 
     MRT_LootBidding = start;
+    AnimateBidButton(start);
     MRT_Debug("ResetBidding: MRT_LootBidding: " ..tostring(MRT_LootBidding));
     if loot then 
         MRT_Debug("ResetBidding: Loot: " ..MRT_TopBidders["Loot"]);
@@ -2643,10 +2659,8 @@ function MRT_GUI_LootRaidAnnounce()
     else
         MRT_GUI_LootModify(true);
     end
-    
-    --change button status RaidAnnounce_Button
-
 end
+
 
 
 function MRT_GUI_LootDelete()
