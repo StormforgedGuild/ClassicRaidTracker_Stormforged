@@ -323,12 +323,9 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLoot_RaidWin_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidAnnounce_Button, "RIGHT", 0, 0);
     MRT_GUIFrame_BossLoot_RaidWin_Button:SetScript("OnEnter", function(self) 
         local ttText
-        
-        if MRT_LootBidding or MRT_GUI_FourRowDialog:IsShown() then
-            ttText = MRT_GUI_LootRaidWinner(true, true)
-        else
-            ttText = "Announce winner of loot - Currently no winner, start bidding or open loot dialog";
-        end
+        --if MRT_LootBidding then
+            ttText = MRT_GUI_doWinner(true)
+        --end
         MRT_GUI_SetPrioTT(self,ttText);
     end);
     MRT_GUIFrame_BossLoot_RaidWin_Button:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end); 
@@ -1356,14 +1353,31 @@ function RemoveAutoComplete(editbox)
 	editbox.buttonCount = nil;
 end
 
-function MRT_GUI_doWinner()
+function MRT_GUI_doWinner(textonly)
     local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    local lootnum;
+    local loot_select = MRT_GUI_BossLootTable:GetSelection();
     if (raid_select == nil) then
         MRT_Print(MRT_L.GUI["No raid selected"]);
         return;
     end
     --raid must be selected.
+    
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    if MRT_LootBidding then 
+        lootnum = getLootNumber(raidnum, MRT_TopBidders["Loot"])
+        GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
+    else
+        if (loot_select == nil) then
+            if textonly then 
+                return "Select Loot first"
+            else
+                MRT_Print(MRT_L.GUI["There is no bidding started and no loot selected"]);
+            end
+            return;
+        end
+        lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
+    end 
     local itemLinkFromText = "";
     local looter = "";
     local cost = "";
@@ -1371,12 +1385,11 @@ function MRT_GUI_doWinner()
     local offspec = "";
     local traded = "";
     local strMsg = "";
+    
     --find the lootnum, from link?
     --
-    local lootnum = getLootNumber(raidnum, MRT_TopBidders["Loot"])
-    GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
-
-    if lootnum ~= -1 and MRT_LootBidding then 
+    
+    if lootnum ~= -1 then 
         local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
         local lootnote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"];
         local lootoffspec = MRT_RaidLog[raidnum]["Loot"][lootnum]["Offspec"];
@@ -1398,67 +1411,72 @@ function MRT_GUI_doWinner()
             ["Note"] = lootNote,
             ["Offspec"] = lootoffspec,
         }
-        local newlootinfo = MRT_GUI_LootRaidWinner(nil, nil, true, MRT_LootInfo)
-        MRT_Debug("MRT_GUI_doWinner: newlootinfo[looter]: " ..newlootinfo["Looter"])
-        MRT_Debug("MRT_GUI_doWinner: newlootinfo[dkpvalue]: " ..newlootinfo["DKPValue"])
-        local oldLootDB = MRT_RaidLog[raidnum]["Loot"][lootnum];
-    
-        -- create a copy of the old loot data for the api
-        local oldItemInfoTable = {}
-        for key, val in pairs(oldLootDB) do
-            oldItemInfoTable[key] = val;
-            --MRT_Debug("MRT_GUI_LootModifyAccept: val: " ..tostring(val))
-        end
-        MRT_LootInfo["ItemCount"] = oldLootDB["ItemCount"];
-        MRT_LootInfo["Time"] = oldLootDB["Time"];
+        if textonly then 
+            MRT_Debug("MRT_GUI_doWinner: doing tooltip");
+            return MRT_GUI_LootRaidWinner(true, true, true, MRT_LootInfo)
+        else
+            local newlootinfo = MRT_GUI_LootRaidWinner(nil, nil, true, MRT_LootInfo)
+            MRT_Debug("MRT_GUI_doWinner: newlootinfo[looter]: " ..newlootinfo["Looter"])
+            MRT_Debug("MRT_GUI_doWinner: newlootinfo[dkpvalue]: " ..newlootinfo["DKPValue"])
+            local oldLootDB = MRT_RaidLog[raidnum]["Loot"][lootnum];
         
-        MRT_RaidLog[raidnum]["Loot"][lootnum] = newlootinfo;
-        -- notify registered, external functions
-        if (#MRT_ExternalLootNotifier > 0) then
-            local itemInfo = {};
-            for key, val in pairs(MRT_RaidLog[raidnum]["Loot"][lootnum]) do
-                itemInfo[key] = val;
+            -- create a copy of the old loot data for the api
+            local oldItemInfoTable = {}
+            for key, val in pairs(oldLootDB) do
+                oldItemInfoTable[key] = val;
+                --MRT_Debug("MRT_GUI_LootModifyAccept: val: " ..tostring(val))
             end
-            if (oldItemInfoTable.Looter == "bank") then
-                oldItemInfoTable.Action = MRT_LOOTACTION_BANK;
-            elseif (oldItemInfoTable.Looter == "disenchanted") then
-                oldItemInfoTable.Action = MRT_LOOTACTION_DISENCHANT;
-            elseif (oldItemInfoTable.Looter == "_deleted_") then
-                oldItemInfoTable.Action = MRT_LOOTACTION_DELETE;
-            else
-                oldItemInfoTable.Action = MRT_LOOTACTION_NORMAL;
+            MRT_LootInfo["ItemCount"] = oldLootDB["ItemCount"];
+            MRT_LootInfo["Time"] = oldLootDB["Time"];
+            
+            MRT_RaidLog[raidnum]["Loot"][lootnum] = newlootinfo;
+            -- notify registered, external functions
+            if (#MRT_ExternalLootNotifier > 0) then
+                local itemInfo = {};
+                for key, val in pairs(MRT_RaidLog[raidnum]["Loot"][lootnum]) do
+                    itemInfo[key] = val;
+                end
+                if (oldItemInfoTable.Looter == "bank") then
+                    oldItemInfoTable.Action = MRT_LOOTACTION_BANK;
+                elseif (oldItemInfoTable.Looter == "disenchanted") then
+                    oldItemInfoTable.Action = MRT_LOOTACTION_DISENCHANT;
+                elseif (oldItemInfoTable.Looter == "_deleted_") then
+                    oldItemInfoTable.Action = MRT_LOOTACTION_DELETE;
+                else
+                    oldItemInfoTable.Action = MRT_LOOTACTION_NORMAL;
+                end
+                if (itemInfo.Looter == "bank") then
+                    itemInfo.Action = MRT_LOOTACTION_BANK;
+                elseif (itemInfo.Looter == "disenchanted") then
+                    itemInfo.Action = MRT_LOOTACTION_DISENCHANT;
+                elseif (itemInfo.Looter == "_deleted_") then
+                    itemInfo.Action = MRT_LOOTACTION_DELETE;
+                else
+                    itemInfo.Action = MRT_LOOTACTION_NORMAL;
+                end
+                for i, val in ipairs(MRT_ExternalLootNotifier) do
+                    pcall(val, itemInfo, MRT_NOTIFYSOURCE_EDIT_GUI, raidnum, lootnum, oldItemInfoTable);
+                end
             end
-            if (itemInfo.Looter == "bank") then
-                itemInfo.Action = MRT_LOOTACTION_BANK;
-            elseif (itemInfo.Looter == "disenchanted") then
-                itemInfo.Action = MRT_LOOTACTION_DISENCHANT;
-            elseif (itemInfo.Looter == "_deleted_") then
-                itemInfo.Action = MRT_LOOTACTION_DELETE;
-            else
-                itemInfo.Action = MRT_LOOTACTION_NORMAL;
+            if isMasterLooter() then 
+                MRT_Debug("MRT_GUI_doWinner: sending Loot Updated msg");
+                -- send message to addon channel with new loot message
+                if not MRT_MasterLooter then
+                    MRT_MasterLooter = getMasterLooter();
+                end
+                looter = MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]
+                cost = MRT_RaidLog[raidnum]["Loot"][lootnum]["DKPValue"]
+                local msg = {
+                    ["RaidID"] = raidnum,
+                    ["ID"] = MRT_Msg_ID,
+                    ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
+                    ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec)..";"..tostring(traded),
+                    ["EventID"] = "4",
+                }
+                MRT_SendAddonMessage(msg, "RAID");
             end
-            for i, val in ipairs(MRT_ExternalLootNotifier) do
-                pcall(val, itemInfo, MRT_NOTIFYSOURCE_EDIT_GUI, raidnum, lootnum, oldItemInfoTable);
-            end
+            MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
         end
-        if isMasterLooter() then 
-            MRT_Debug("MRT_GUI_doWinner: sending Loot Updated msg");
-            -- send message to addon channel with new loot message
-            if not MRT_MasterLooter then
-                MRT_MasterLooter = getMasterLooter();
-            end
-            looter = MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]
-            cost = MRT_RaidLog[raidnum]["Loot"][lootnum]["DKPValue"]
-            local msg = {
-                ["RaidID"] = raidnum,
-                ["ID"] = MRT_Msg_ID,
-                ["Time"] = MRT_MakeEQDKP_TimeShort(MRT_GetCurrentTime()),
-                ["Data"] = bossnum..";"..lootnum..";"..itemLink..";"..looter..";"..cost..";"..lootNote..";"..tostring(offspec)..";"..tostring(traded),
-                ["EventID"] = "4",
-            }
-            MRT_SendAddonMessage(msg, "RAID");
-        end
-        MRT_GUI_RaidDetailsTableUpdate(raidnum,true);
     else
         MRT_Print("MRT_GUI_doWinner: error on lootnum or not bidding");
         return
@@ -2103,12 +2121,14 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogit
         cost = raidlogitem["DKPValue"]
     end
     MRT_Debug("MRT_GUI_LootRaidWinner cost: " ..cost)
-    if textonly then 
+    if textonly then
         local intCost = tonumber(cost)
-        if MRT_TopBidders["Type"] == "os" then
-            intCost = intCost * .25;
-            cost = tostring(intCost);
-        end
+        if MRT_LootBidding then 
+            if MRT_TopBidders["Type"] == "os" then
+                intCost = intCost * .25;
+                cost = tostring(intCost);
+            end
+        end 
     end
     
     local lootName 
@@ -2135,13 +2155,15 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogit
         end
     else
         if tooltipFormat then
-          rwMessage = string.format(MRT_L.GUI["RaidWinToolTip"], looter, lootName, cost);
+            rwMessage = string.format(MRT_L.GUI["RaidWinToolTip"], looter, lootName, cost);
+            MRT_Debug("MRT_GUI_LootRaidWinner rwMessage: " ..rwMessage)
         else
           rwMessage = string.format(MRT_L.GUI["RaidWinMessage"], looter, lootName, cost);
         end
     end
     if textonly then     
-       return rwMessage; 
+        MRT_Debug("MRT_GUI_LootRaidWinner textonly: rwMessage: " ..rwMessage)
+        return rwMessage; 
     else 
         SendChatMessage(rwMessage, "Raid");
         ResetBidding(false);
