@@ -1380,8 +1380,10 @@ function MRT_GUI_doWinner(textonly)
     
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
     
-    if MRT_LootBidding then 
-        lootnum = getLootNumber(raidnum, MRT_TopBidders["Loot"])
+    if MRT_LootBidding then
+        --store lootnum instead of getting.. there could be duplicate items.
+        --lootnum = getLootNumber(raidnum, MRT_TopBidders["Loot"])
+        lootnum = MRT_TopBidders["Lootnum"] 
     else
         if (loot_select == nil) then
             if textonly then 
@@ -1501,6 +1503,7 @@ function MRT_GUI_doWinner(textonly)
     end
 end
 
+---delete this function after verifying
 function getLootNumber(raidnum, itemlink)
     MRT_Debug("getLootNumber: Called");
 
@@ -2213,7 +2216,7 @@ function UpdateGP(itemlink, GPtext)
         --MRT_GUI_FourRowDialog_EB1:HighlightText(0,0);
     end 
 end
-function ResetBidding(start, loot)
+function ResetBidding(start, loot, lootnum)
     MRT_Debug("ResetBidding: start: " ..tostring(start));
     --start == true if starting false if ending
     MRT_TopBidders = {
@@ -2222,6 +2225,7 @@ function ResetBidding(start, loot)
         ["Type"] = nil,
         ["History"] = {},
         ["Loot"] = loot,
+        ["Lootnum"] = lootnum,
     } 
     MRT_LootBidding = start;
     AnimateBidButton(start);
@@ -2663,7 +2667,7 @@ function MRT_GUI_LootRaidAnnounce()
     local bossnum = MRT_RaidLog[raidnum]["Loot"][lootnum]["BossNumber"];
     
     LootAnnounce("RAID_WARNING", MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], MRT_GUI_BossLootTable:GetCell(loot_select, 5))
-    ResetBidding(true, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
+    ResetBidding(true, MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"], lootnum);
     if MRT_GUI_FourRowDialog:IsShown() then 
         MRT_GUI_LootModify();
     else

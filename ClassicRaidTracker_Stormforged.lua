@@ -59,6 +59,7 @@ MRT_TopBidders = {
     ["Type"] = nil,
     ["History"] = {},
     ["Loot"] = nil,
+    ["Lootnum"] = nil,
 }
 MRT_BagFreeSlots = 0;
 MRT_TradeInitiated = false;
@@ -812,6 +813,7 @@ function MRT_CHAT_MSG_ADDON_Handler(msg, channel, sender, target)
                 local itemLink, itemCount = getToken(strData, ";");
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: playerName: "..playerName.. " itemLink: "..itemLink)
                 MRT_Debug("MRT_CHAT_MSG_ADDON_Handler: playerName: itemCount: " ..itemCount)
+                GetItemInfo(itemLink); --cache iteminfo
                 MRT_AutoAddLootItem(playerName, itemLink, itemCount);
                 MRT_GUI_BossDetailsTableUpdate();
             end
@@ -904,6 +906,9 @@ function stripRealmFromName(playerName)
 end
 
 function addChannelMessageToStore(msg)
+    if not MRT_ChannelMsgStore[msg["RaidID"]] then
+        MRT_ChannelMsgStore[msg["RaidID"]] = {};
+    end
     if not isAddOnMessageInStore(msg) then
         tinsert(MRT_ChannelMsgStore[msg["RaidID"]], msg);
     end
