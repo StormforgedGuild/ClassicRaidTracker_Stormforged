@@ -1379,9 +1379,9 @@ function MRT_GUI_doWinner(textonly)
     --raid must be selected.
     
     local raidnum = MRT_GUI_RaidLogTable:GetCell(raid_select, 1);
+    
     if MRT_LootBidding then 
         lootnum = getLootNumber(raidnum, MRT_TopBidders["Loot"])
-        GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     else
         if (loot_select == nil) then
             if textonly then 
@@ -1393,12 +1393,13 @@ function MRT_GUI_doWinner(textonly)
         end
         lootnum = MRT_GUI_BossLootTable:GetCell(loot_select, 1);
     end 
+    GetItemInfo(MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"]);
     local itemLinkFromText = "";
     local looter = "";
     local cost = "";
     local lootNote = "";
     local offspec = "";
-    local traded = "";
+    local traded = false;
     local strMsg = "";
     
     --find the lootnum, from link?
@@ -1409,16 +1410,18 @@ function MRT_GUI_doWinner(textonly)
         local lootnote = MRT_RaidLog[raidnum]["Loot"][lootnum]["Note"];
         local lootoffspec = MRT_RaidLog[raidnum]["Loot"][lootnum]["Offspec"];
         local lootTraded = MRT_RaidLog[raidnum]["Loot"][lootnum]["Traded"];
+        local lItemLink = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"];
         cost = MRT_RaidLog[raidnum]["Loot"][lootnum]["DKPValue"]
         MRT_Debug("MRT_GUI_doWinner: cost: " ..cost);
         looter = MRT_RaidLog[raidnum]["Loot"][lootnum]["Looter"]
-        --local itemName, itemLink, itemId, itemString, itemRarity, itemColor, _, _, _, _, _, _, _, _ = MRT_GetDetailedItemInformation(itemLinkFromText);
+        local itemName, itemLink, itemId, itemString, itemRarity, itemColor, _, _, _, _, _, _, _, _ = MRT_GetDetailedItemInformation(lItemLink);
+        MRT_Debug("MRT_GUI_doWinner: itemLink: " ..itemLink);
         local MRT_LootInfo = {
-            ["ItemLink"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemLink"],
-            ["ItemString"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemSting"],
-            ["ItemId"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemId"],
-            ["ItemName"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemName"],
-            ["ItemColor"] = MRT_RaidLog[raidnum]["Loot"][lootnum]["ItemColor"],
+            ["ItemLink"] = itemLink,
+            ["ItemString"] = itemString,
+            ["ItemId"] = itemId,
+            ["ItemName"] = itemName,
+            ["ItemColor"] = itemColor,
             ["BossNumber"] = bossnum,
             ["Looter"] = looter,
             ["Traded"] = traded,
@@ -2153,7 +2156,7 @@ function MRT_GUI_LootRaidWinner(textonly, tooltipFormat, byPassDialog, raidlogit
         --TODO do something with lootname
         lootName = raidlogitem["ItemLink"]
     end
-    MRT_Debug("MRT_GUI_LootRaidWinner lootName: " ..lootName)
+    --MRT_Debug("MRT_GUI_LootRaidWinner lootName: " ..lootName)
     local rwMessage;
     --if #MRT_TopBidders["Players"] == 1 then 
     --    MRT_GUI_FourRowDialog_EB2:SetText(MRT_TopBidders["Players"][1])
