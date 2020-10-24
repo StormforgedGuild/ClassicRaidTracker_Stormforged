@@ -2292,8 +2292,15 @@ function MRT_GetTradeableItems()
 
 end
 
---puts all items the person with the trade window is supposed to receive in their trade window.
 function MRT_GUI_TradeLink()
+
+    MRT_GUI_TradeItems();
+    MRT_GUI_TradeItems();
+
+end
+
+--puts all items the person with the trade window is supposed to receive in their trade window.
+function MRT_GUI_TradeItems()
 
     --disable animation once clicked
     stopEncouragingTrade();
