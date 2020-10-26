@@ -641,20 +641,32 @@ function UpdateTopBidder(bid)
                 MRT_Debug("UpdateTopBidder: new bid is os");
                 --stop and return if new bid is os, but top bidder is ms
                 if isPlayerTop(pName) then 
+                    --TODO there is a bug where if the person swaps from MS to OS it doesn't recheck the folks further
                     MRT_Debug("UpdateTopBidder: old bid is ms, new bid is os, same player on top, so update.");
                     MRT_TopBidders["Type"] = "os"    
-                    blnNewTop = true
                 else
-                    MRT_Debug("UpdateTopBidder: Players don't match.");
-                    return false
+                    --Added case where it's a OS bid of non 0 PR against a MS zero bid. New raiders never trump existing.
+                    if (playerPR > 0) and (MRT_TopBidders["PR"] == 0) then
+                       MRT_Debug("Non zero OS bid trumps 0 MS.");
+                       MRT_TopBidders["Type"] = "os" 
+                       blnNewTop = true;
+                    else
+                        return false
+                    end
                 end 
             end
         else 
             --MRT_TopBidders["Type"] == "os"
             --Top bid is os, check to see if new bid is ms
-            if strBidType == "ms" then
-                MRT_TopBidders["Type"] = "ms"
-                blnNewTop = true;
+            if (strBidType == "ms") then
+             --Added case where it's a MS bid of 0 PR against an OS non zero bid. New raiders never trump existing.
+             if  (playerPR > 0) and (MRT_TopBidders["PR"] ~= 0) then
+                    MRT_TopBidders["Type"] = "ms"
+                    blnNewTop = true;
+                else
+                    MRT_Debug("UpdateTopBidder: MS bid of zero doesn't beat non-zero OS bid.");
+                    return false
+                end
             end
         end 
     end
