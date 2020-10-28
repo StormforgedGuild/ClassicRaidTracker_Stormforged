@@ -2409,6 +2409,7 @@ function GetNumberOfItemsInTrade()
     end
     return intCount
 end
+
 local messwArghCounter = 1
 local messwArghCounter1 = 0
 function MessWArgh() 
@@ -2648,6 +2649,9 @@ function LootAnnounce(messageType, loot, gp, textonly)
             SendChatMessage(rwMessage, "Raid");
         end
     end
+    --explain prio
+    local lootprio = LibSFGP:GetPrio(loot)
+    SendChatMessage("Loot Priority: " ..lootprio, "Raid")
 end
 
 function MRT_GUI_LootRaidAnnounce()
