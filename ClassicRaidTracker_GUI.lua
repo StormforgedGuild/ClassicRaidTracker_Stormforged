@@ -2651,6 +2651,9 @@ function LootAnnounce(messageType, loot, gp, textonly)
     end
     --explain prio
     local lootprio = LibSFGP:GetPrio(loot)
+    if lootprio == "" or lootprio == nil then 
+        lootprio = "None"
+    end
     SendChatMessage("Loot Priority: " ..lootprio, "Raid")
 end
 
