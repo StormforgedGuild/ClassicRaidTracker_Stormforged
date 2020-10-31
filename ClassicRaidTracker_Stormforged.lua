@@ -660,7 +660,7 @@ function UpdateTopBidder(bid)
             --Top bid is os, check to see if new bid is ms
             if (strBidType == "ms") then
              --Added case where it's a MS bid of 0 PR against an OS non zero bid. New raiders never trump existing.
-             if  (playerPR > 0) and (MRT_TopBidders["PR"] ~= 0) then
+             if  playerPR > 0 then
                     MRT_TopBidders["Type"] = "ms"
                     blnNewTop = true;
                 else
@@ -769,12 +769,10 @@ function MarkAsTraded()
         --local tradedItemName, texture, quantity, quality, isUsable, enchant =  GetTradePlayerItemInfo(j);
     for i2, v2 in pairs(MRT_TradeItemsList) do
         --if tradedItemName then
-          --MRT_Debug("Checking if this item should be marked traded: "..tradedItemName)
+          --MRT_Debug("Checking if this item should be marked traded: "..tradedItemName
         --end
-
         --iterate through all the items in the raid log to see if it's an item that dropped being traded to it's new owner.
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
-
             if v["Looter"] == MRT_TradePartner then
                 if v2 == v["ItemName"] then
                  MRT_Debug(MRT_TradePartner.. " has been traded "..v2);
