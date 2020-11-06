@@ -478,11 +478,13 @@ function processLootRaidChat(text, playerName)
             blnNewTop = UpdateBid(Bid, true)
         else 
             --if bid is os, but msonly then kick it out
+            MRT_Debug("processLootRaidChat: checking if os and msonly" );
             if strBidType == "os" and LibSFGP:GetMSOnly(MRT_TopBidders["Loot"]) then 
-                --can't bid os on ms, do some error message here and return
+                --can't bid os on msonly item, do some error message here and return
                 SendChatMessage(Bid["Player"].. " bid "..msgType.. ".  OS bid is not allowed on this item.  Bid rejected"  , "Raid");
                 return;
             else
+                MRT_Debug("processLootRaidChat: not msonly" );
                 --if bidder doesn't exist, add to the list, if exists, update bid.
                 if isNewBidder(Bid) then
                     tinsert(MRT_TopBidders["History"], Bid)
@@ -644,13 +646,20 @@ function UpdateTopBidder(bid)
     else 
         --check if top bidder is ms
         if (MRT_TopBidders["Type"] == "ms") then
+            MRT_Debug("UpdateTopBidder: TopBidders'type' == ms");
             if strBidType == "os" then 
                 MRT_Debug("UpdateTopBidder: new bid is os");
                 --stop and return if new bid is os, but top bidder is ms
                 if isPlayerTop(pName) then 
                     --TODO there is a bug where if the person swaps from MS to OS it doesn't recheck the folks further
+                    --check history... if ms exists, then new top bidder, if not, proceed.
                     MRT_Debug("UpdateTopBidder: old bid is ms, new bid is os, same player on top, so update.");
-                    MRT_TopBidders["Type"] = "os"    
+                    if MSinBidHistory() then 
+                        blnNewTop = true;
+                    else
+                        MRT_TopBidders["Type"] = "os"
+                        blnNewTop = true;    
+                    end 
                 else
                     --Added case where it's a OS bid of non 0 PR against a MS zero bid. New raiders never trump existing.
                     if (playerPR > 0) and (MRT_TopBidders["PR"] == 0) then
@@ -661,6 +670,8 @@ function UpdateTopBidder(bid)
                         return false
                     end
                 end 
+            else
+                blnNewTop = true;
             end
         else 
             --MRT_TopBidders["Type"] == "os"
@@ -706,6 +717,16 @@ function UpdateTopBidder(bid)
     end
     return blnNewTop;
 end 
+function MSinBidHistory()
+    local found = false
+    for i,v in pairs(MRT_TopBidders["History"]) do
+        if v["Type"] == "ms" then
+            MRT_Debug("MSinBidHistory: ms bid found" );
+            found = true;
+        end
+    end 
+    return found;
+end
 function AnnounceBidLeader()
     local messageType = "Raid"
     local rwMessage
