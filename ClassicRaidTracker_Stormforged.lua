@@ -477,19 +477,26 @@ function processLootRaidChat(text, playerName)
             --remove the bid from history and recalc top bidder
             blnNewTop = UpdateBid(Bid, true)
         else 
-            --if bidder doesn't exist, add to the list, if exists, update bid.
-            if isNewBidder(Bid) then
-                tinsert(MRT_TopBidders["History"], Bid)
-                blnNewTop = UpdateTopBidder(Bid)
-                
+            --if bid is os, but msonly then kick it out
+            if strBidType == "os" and LibSFGP:GetMSOnly(MRT_TopBidders["Loot"]) then 
+                --can't bid os on ms, do some error message here and return
+                SendChatMessage(Bid["Player"].. " bid "..msgType.. ".  OS bid is not allowed on this item.  Bid rejected"  , "Raid");
+                return;
             else
-                MRT_Debug("processLootRaidChat: not new bidder: find and update" );
-                blnNewTop = UpdateBid(Bid)
+                --if bidder doesn't exist, add to the list, if exists, update bid.
+                if isNewBidder(Bid) then
+                    tinsert(MRT_TopBidders["History"], Bid)
+                    blnNewTop = UpdateTopBidder(Bid)
+                    
+                else
+                    MRT_Debug("processLootRaidChat: not new bidder: find and update" );
+                    blnNewTop = UpdateBid(Bid)
+                end
+                if not blnNewTop then 
+                    SendChatMessage(Bid["Player"].. " bid "..msgType.. " PR is "..tostring(Bid["PR"]..".") , "Raid");
+                end
+                selectPlayer(Bid["Player"], lRaidNum)
             end
-            if not blnNewTop then 
-                SendChatMessage(Bid["Player"].. " bid "..msgType.. " PR is "..tostring(Bid["PR"]..".") , "Raid");
-            end
-            selectPlayer(Bid["Player"], lRaidNum)
         end 
         if blnNewTop then 
             AnnounceBidLeader();
