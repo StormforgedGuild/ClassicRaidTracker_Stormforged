@@ -555,8 +555,15 @@ function UpdateBid(bid, remove)
             if v["Player"] == bid["Player"] then
                 v["Type"] = bid["Type"]
                 MRT_Debug("UpdateBid: MRT_TopBidders[History][i]: " ..MRT_TopBidders["History"][i]["Type"]);
+                --if bid changed, and topplayer is bidder, then remove the top player.
+                if isPlayerTop(bid["Player"]) then
+                    MRT_Debug("UpdateBid: player passing is top bidder, remove");
+                    removePlayerTop(bid["Player"])
+                    MRT_Debug("UpdateBid: after removePlayerTop: #oldTopBid[Players]: " ..tostring(#oldTopBid["Players"]));
+                end 
             end
-        end 
+            
+        end
     else
         --call if someone passes
         MRT_Debug("UpdateBid bidtype is pass");
@@ -579,7 +586,9 @@ function UpdateBid(bid, remove)
     MRT_Debug("UpdateBid: #MRT_TopBidders[History]: " ..tostring(#MRT_TopBidders["History"]));
     for i, v in pairs(MRT_TopBidders["History"]) do
         MRT_Debug("UpdateBid: v[Player]: " ..v["Player"]);
-        UpdateTopBidder(v)
+        local topbidderupdated = false
+        topbidderupdated = UpdateTopBidder(v)
+        MRT_Debug("UpdateBid: tobidderupdated: " ..tostring(topbidderupdated));
     end
     if (oldTopBid["PR"] == MRT_TopBidders["PR"]) and topBiddersMatch(oldTopBid["Players"], MRT_TopBidders["Players"]) and (oldTopBid["Type"] == MRT_TopBidders["Type"]) then
         MRT_Debug("UpdateBid: oldTopBid match current top");
@@ -670,8 +679,6 @@ function UpdateTopBidder(bid)
                         return false
                     end
                 end 
-            else
-                blnNewTop = true;
             end
         else 
             --MRT_TopBidders["Type"] == "os"
@@ -699,19 +706,29 @@ function UpdateTopBidder(bid)
             MRT_TopBidders["Players"] = {};
             tinsert(MRT_TopBidders["Players"], pName)
         else 
-            if playerPR > MRT_TopBidders["PR"] then
+            MRT_Debug("UpdateTopBidder: bid['Type']: "..bid["Type"].. " MRT_TopBIdders['Type']: " ..MRT_TopBidders["Type"]);
+            if bid["Type"] == "ms" and MRT_TopBidders["Type"] == "os" then
+                MRT_Debug("UpdateTopBidder: Special case called!");
                 MRT_TopBidders["PR"] = playerPR;
                 MRT_TopBidders["Players"] = {};
-                tinsert(MRT_TopBidders["Players"], pName);
+                tinsert(MRT_TopBidders["Players"], pName)
                 blnNewTop = true
-            elseif playerPR == MRT_TopBidders["PR"] then
-                if isPlayerTop(pName) then 
-                    blnNewTop = false
-                else
+            else 
+                if playerPR > MRT_TopBidders["PR"] then
+                    MRT_TopBidders["PR"] = playerPR;
+                    MRT_TopBidders["Players"] = {};
                     tinsert(MRT_TopBidders["Players"], pName);
                     blnNewTop = true
-                end 
-
+                elseif playerPR == MRT_TopBidders["PR"] then
+                    if isPlayerTop(pName) then 
+                        blnNewTop = false
+                    else
+                        tinsert(MRT_TopBidders["Players"], pName);
+                        blnNewTop = true
+                    end 
+                else
+                    blnNewTop = false
+                end
             end
         end
     end
