@@ -3556,7 +3556,16 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
     elseif (raidnum) then
         --MRT_Debug("MRT_GUI_BossLootTableUpdate: elseif raidnum condition");
         local index = 1;
-
+        local checkFilter
+        local hasFilter = filter
+        checkFilter = MRT_GUIFrame_BossLoot_Filter:GetText();
+        MRT_Debug("MRT_GUI_BossLootTableUpdate: checkFilter: " ..checkFilter);
+        if checkFilter == "" or checkFilter == nil then 
+            hasFilter = false
+        else 
+            hasFilter = true
+        end
+         
         for i, v in ipairs(MRT_RaidLog[raidnum]["Loot"]) do
             --MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", v["Looter"], v["DKPValue"], v["ItemLink"], v["Note"]};
             -- SF: if unassigned, make it red.
@@ -3574,7 +3583,8 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
             --SetDoneState
             local doneState = SetDoneState(v["Looter"], v["Traded"], v["ItemName"])
 
-            if not filter then
+            if not hasFilter then
+                MRT_Debug("MRT_GUI_BossLootTableUpdate: hasFilter: " ..tostring(hasFilter) .." false, so do regular stuff");
                 if v["Looter"] == "unassigned" then
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                 else 
@@ -3582,10 +3592,11 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 end 
                 index = index + 1;
             else
-                local checkFilter = filter;
+                MRT_Debug("MRT_GUI_BossLootTableUpdate: hasFilter: " ..tostring(hasFilter) .." true, so filter list");
+                --[[ local checkFilter = filter;
                 if not checkFilter then
                     checkFilter = MRT_GUIFrame_BossLoot_Filter:GetText();
-                end
+                end  ]]
                 -- need function here to return true if there are classes to filter
                 --local strFilter, isSpecialFilter = parseFilter4Special(checkFilter); 
                 local strFilter, isSpecialFilter = parseFilter4Classes(checkFilter);
@@ -3610,8 +3621,8 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                         index = index + 1;
                     end
                 else -- if not special filter, do the normal thing 
-                    indexofsub1 = substr(v["ItemName"], filter);
-                    indexofsub2 = substr(v["Looter"], filter);
+                    indexofsub1 = substr(v["ItemName"], checkFilter);
+                    indexofsub2 = substr(v["Looter"], checkFilter);
                     if not indexofsub1 and not indexofsub2 then
                         --skip
                     else
