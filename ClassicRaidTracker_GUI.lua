@@ -3559,7 +3559,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
         local checkFilter
         local hasFilter = filter
         checkFilter = MRT_GUIFrame_BossLoot_Filter:GetText();
-        MRT_Debug("MRT_GUI_BossLootTableUpdate: checkFilter: " ..checkFilter);
+        --MRT_Debug("MRT_GUI_BossLootTableUpdate: checkFilter: " ..checkFilter);
         if checkFilter == "" or checkFilter == nil then 
             hasFilter = false
         else 
@@ -3584,7 +3584,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
             local doneState = SetDoneState(v["Looter"], v["Traded"], v["ItemName"])
 
             if not hasFilter then
-                MRT_Debug("MRT_GUI_BossLootTableUpdate: hasFilter: " ..tostring(hasFilter) .." false, so do regular stuff");
+                --MRT_Debug("MRT_GUI_BossLootTableUpdate: hasFilter: " ..tostring(hasFilter) .." false, so do regular stuff");
                 if v["Looter"] == "unassigned" then
                     MRT_GUI_BossLootTableData[index] = {i, v["ItemId"], "|c"..v["ItemColor"]..v["ItemName"].."|r", "|cffff0000"..v["Looter"], v["DKPValue"], v["ItemLink"], lootTime, doneState};
                 else 
@@ -3592,7 +3592,7 @@ function MRT_GUI_BossLootTableUpdate(bossnum, skipsort, filter)
                 end 
                 index = index + 1;
             else
-                MRT_Debug("MRT_GUI_BossLootTableUpdate: hasFilter: " ..tostring(hasFilter) .." true, so filter list");
+                --MRT_Debug("MRT_GUI_BossLootTableUpdate: hasFilter: " ..tostring(hasFilter) .." true, so filter list");
                 --[[ local checkFilter = filter;
                 if not checkFilter then
                     checkFilter = MRT_GUIFrame_BossLoot_Filter:GetText();
