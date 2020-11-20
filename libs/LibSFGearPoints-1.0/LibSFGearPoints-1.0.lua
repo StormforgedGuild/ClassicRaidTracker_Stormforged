@@ -386,7 +386,7 @@ local SF_FULL_ITEM_DATA =
   [350]={["Item"]="Robes of the Triumvirate",["GP"]=391,["MS_Only"]=1,["Bid_Priority"]="Soaker"},
   [351]={["Item"]="Ternary Mantle",["GP"]=3750,["MS_Only"]=0,["Bid_Priority"]="Healer"},
   [352]={["Item"]="Triad Girdle",["GP"]=2500,["MS_Only"]=0,["Bid_Priority"]="Any"},
-  [353]={["Item"]="Gloves the Redeemed Prophecy",["GP"]=250,["MS_Only"]=0,["Bid_Priority"]="Any"},
+  [353]={["Item"]="Gloves of the Redeemed Prophecy",["GP"]=250,["MS_Only"]=0,["Bid_Priority"]="Any"},
   [354]={["Item"]="Angelista's Charm",["GP"]=2500,["MS_Only"]=0,["Bid_Priority"]="Healer"},
   [355]={["Item"]="Boots of the Fallen Hero",["GP"]=3750,["MS_Only"]=0,["Bid_Priority"]="Warrior"},
   [356]={["Item"]="Gloves of Ebru",["GP"]=1250,["MS_Only"]=0,["Bid_Priority"]="Any"},
