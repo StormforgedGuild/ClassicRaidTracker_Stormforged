@@ -532,7 +532,7 @@ local SF_FULL_ITEM_DATA =
   [496]={["Item"]="Desecrated Legplates",["GP"]=6250,["MS_Only"]=nil,["Bid_Priority"]="Rogue / Tank"},
   [497]={["Item"]="Desecrated Shoulderpads",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Holy Priest / Mage / Warlock"},
   [498]={["Item"]="Desecrated Spaulders",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Holy Paladin / Hunter / Restoration Druid"},
-  [499]={["Item"]="Desecrated Pauldrons",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Holy Priest / Mage / Warlock"},
+  [499]={["Item"]="Desecrated Pauldrons",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Rogue / Tank"},
   [500]={["Item"]="Desecrated Robe",["GP"]=6250,["MS_Only"]=nil,["Bid_Priority"]="Holy Priest / Mage / Warlock"},
   [501]={["Item"]="Desecrated Tunic",["GP"]=6250,["MS_Only"]=nil,["Bid_Priority"]="Holy Paladin / Hunter / Restoration Druid"},
   [502]={["Item"]="Desecrated Breastplate",["GP"]=6250,["MS_Only"]=nil,["Bid_Priority"]="Rogue / Tank"},
