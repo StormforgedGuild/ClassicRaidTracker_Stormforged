@@ -489,7 +489,7 @@ local SF_FULL_ITEM_DATA =
   [453]={["Item"]="Necro-Knight's Garb",["GP"]=2500,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [454]={["Item"]="Ring of the Eternal Flame",["GP"]=4000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [455]={["Item"]="Spaulders of the Grand Crusader",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Retribution Paladin"},
-  [456]={["Item"]="Stygian Buckler",["GP"]=6000,["MS_Only"]=nil,["Bid_Priority"]="Tank"},
+  [456]={["Item"]="Stygian Buckler",["GP"]=2000,["MS_Only"]=1,["Bid_Priority"]="Any"},
   [457]={["Item"]="Claw of the Frost Wyrm",["GP"]=12000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [458]={["Item"]="Cloak of the Necropolis",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [459]={["Item"]="Eye of the Dead",["GP"]=18000,["MS_Only"]=nil,["Bid_Priority"]="Healer"},
