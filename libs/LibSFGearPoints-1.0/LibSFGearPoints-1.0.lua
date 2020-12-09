@@ -454,7 +454,7 @@ local SF_FULL_ITEM_DATA =
   [418]={["Item"]="Might of Menethil",["GP"]=32000,["MS_Only"]=nil,["Bid_Priority"]="Melee DPS"},
   [419]={["Item"]="Nerubian Slavemaker",["GP"]=32000,["MS_Only"]=nil,["Bid_Priority"]="Hunter"},
   [420]={["Item"]="Shield of Condemnation",["GP"]=6000,["MS_Only"]=nil,["Bid_Priority"]="Holy Paladin"},
-  [421]={["Item"]="Soulseeker",["GP"]=12000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
+  [421]={["Item"]="Soulseeker",["GP"]=20000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [422]={["Item"]="Stormrage's Talisman of Seething",["GP"]=6000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [423]={["Item"]="The Hungering Cold",["GP"]=20000,["MS_Only"]=nil,["Bid_Priority"]="Melee DPS / Tank"},
   [424]={["Item"]="The Phylactery of Kel'Thuzad",["GP"]=12000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS / Physical DPS"},
