@@ -32,7 +32,7 @@ local SF_FULL_ITEM_DATA =
 --go to https://thdoan.github.io/mr-data-converter/ and paste the excel sheet into the top
 --choose the lua - array table
 --copy and paste below and override what is there.
---Updated 11/29/2020
+--Updated 12/9/2020
 {
   [1]={["Item"]="Arcanist Boots",["GP"]=500,["MS_Only"]=1,["Bid_Priority"]="Mage"},
   [2]={["Item"]="Cenarion Boots",["GP"]=500,["MS_Only"]=0,["Bid_Priority"]="Druid"},
