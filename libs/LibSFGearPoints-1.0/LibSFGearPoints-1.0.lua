@@ -523,7 +523,7 @@ local SF_FULL_ITEM_DATA =
   [487]={["Item"]="Desecrated Waistguard",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Rogue / Tank"},
   [488]={["Item"]="Desecrated Gloves",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Holy Priest / Mage / Warlock"},
   [489]={["Item"]="Desecrated Handguards",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Holy Paladin / Hunter / Restoration Druid"},
-  [490]={["Item"]="Desecrated Guantlets",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Rogue / Tank"},
+  [490]={["Item"]="Desecrated Gauntlets",["GP"]=5000,["MS_Only"]=nil,["Bid_Priority"]="Rogue / Tank"},
   [491]={["Item"]="Desecrated Circlet",["GP"]=6250,["MS_Only"]=nil,["Bid_Priority"]="Holy Priest / Mage / Warlock"},
   [492]={["Item"]="Desecrated Headpiece",["GP"]=6250,["MS_Only"]=nil,["Bid_Priority"]="Holy Paladin / Hunter / Restoration Druid"},
   [493]={["Item"]="Desecrated Helmet",["GP"]=6250,["MS_Only"]=nil,["Bid_Priority"]="Rogue / Tank"},
@@ -1039,11 +1039,11 @@ function getGP(itemName, new)
     --MRT_Debug("getGP: get old way"); 
     return SF_ITEM_DATA[itemName]
   else
-    --MRT_Debug("getGP: get new way"); 
+    MRT_Debug("getGP: get new way"); 
     --use the new way
     for i = 1, table.maxn(SF_FULL_ITEM_DATA) do
       local sitemName = SF_FULL_ITEM_DATA[i]["Item"]
-      --MRT_Debug("getGP: sitemName: " ..sitemName); 
+      MRT_Debug("getGP: sitemName: " ..sitemName); 
       if sitemName == itemName then
         return SF_FULL_ITEM_DATA[i]["GP"]
       end
@@ -1099,7 +1099,7 @@ local SF_TOKEN_DATA = {
   ["Desecrated Waistguard"] = {22482, 22422},
   ["Desecrated Gloves"] = {22501, 22517, 22509},
   ["Desecrated Handguards"] = {22441, 22493, 22426},
-  ["Desecrated Guantlets"] = {22481, 22421},
+  ["Desecrated Gauntlets"] = {22481, 22421},
   ["Desecrated Circlet"] = {22514, 22498, 22506},
   ["Desecrated Headpiece"] = {22438, 22490, 22428},
   ["Desecrated Helmet"] = {22478, 22418},
