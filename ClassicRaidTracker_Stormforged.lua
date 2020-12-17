@@ -82,7 +82,7 @@ local MRT_Defaults = {
         ["General_OptionsVersion"] = 13,                                            -- OptionsVersion - Counter, which increases after a new option has been added - if new option is added, then increase counter and add to update options function
         ["General_DebugEnabled"] = false,                                           --
         ["General_SlashCmdHandler"] = "storm",                                      --
-        ["General_PrunnRaidLog"] = false,                                           -- Prunning - shall old be deleted after a certain amount of time
+        ["General_PrunnRaidLog"] = true,                                           -- Prunning - shall old be deleted after a certain amount of time
         ["General_PrunningTime"] = 90,                                              -- Prunning time, after log shall be deleted (days)
         ["General_ShowMinimapIcon"] = true,                                        --
         ["Attendance_GuildAttendanceCheckEnabled"] = false,                         --
@@ -1947,7 +1947,7 @@ function MRT_CheckZoneAndSizeStatus()
         -- At this point, we should have something that should be tracked.
         -- If there is no active raid, just start one
         if (not MRT_NumOfCurrentRaid) then
-            MRT_Debug("no current raid, create one");
+            MRT_Debug("MRT_CheckZoneAndSizeStatus:no current raid, create one");
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
             --SF: Use Short Name if it's Classic
             if not MRT_LegacyRaidZonesClassic[areaID] then
@@ -1958,8 +1958,9 @@ function MRT_CheckZoneAndSizeStatus()
             return;
         end
         -- There is an active raid, check if diffID changed, if yes, start a new raid
+        MRT_Debug("MRT_CheckZoneAndSizeStatus: Active Raid, check diffID");
         if (MRT_RaidLog[MRT_NumOfCurrentRaid]["DiffID"] ~= diffID) then
-            MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
+            MRT_Debug("MRT_CheckZoneAndSizeStatus: Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
             --SF: Use Short Name if it's Classic
             if not MRT_LegacyRaidZonesClassic[areaID] then
                 MRT_CreateNewRaid(localInstanceInfoName, maxPlayers, diffID);
@@ -1967,8 +1968,11 @@ function MRT_CheckZoneAndSizeStatus()
                 MRT_CreateNewRaid(MRT_LegacyRaidShortName[areaID], maxPlayers, diffID);
             end
             return;
+        else
+            MRT_Debug("MRT_CheckZoneAndSizeStatus: diffIDs are equal, we should not create a new raid if one is active - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
         end
         -- If instance changed, check to see if it's the same zone name.  If not, create.  If so do nothing.
+        MRT_Debug("MRT_CheckZoneAndSizeStatus: Active Raid, RaidZone check if same zone, do nothing otherwise create a new raid");
         if (MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= MRT_LegacyRaidShortName[areaID]) then
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
             --SF: Use Short Name if it's Classic
@@ -1978,11 +1982,14 @@ function MRT_CheckZoneAndSizeStatus()
                 MRT_CreateNewRaid(MRT_LegacyRaidShortName[areaID], maxPlayers, diffID);
             end
             return;
+        else
+            MRT_Debug("MRT_CheckZoneAndSizeStatus: Zone matches, we should do nothing. Name="..MRT_LegacyRaidShortName[areaID].. " MRT_RaidLog[MRT_NumOfCurrentRaid][RaidZone]: " ..MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"]);
         end
         -- diffID not changed. If instance changed, check if auto create on new instance is on.
         -- need to no do this 
         --if ((MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= localInstanceInfoName) and MRT_Options["Tracking_CreateNewRaidOnNewZone"]) then
-        if ((MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= localInstanceInfoName) and false) then
+        --we should never do this.. commenting out all the code.
+ --[[        if ((MRT_RaidLog[MRT_NumOfCurrentRaid]["RaidZone"] ~= localInstanceInfoName) and false) then
             MRT_Debug("Start tracking a new instance - Name="..localInstanceInfoName.." / maxPlayers="..maxPlayers.." / diffID="..diffID);
             --SF: Use Short Name if it's Classic
             if not MRT_LegacyRaidZonesClassic[areaID] then
@@ -1991,7 +1998,7 @@ function MRT_CheckZoneAndSizeStatus()
                 MRT_CreateNewRaid(MRT_LegacyRaidShortName[areaID], maxPlayers, diffID);
             end
             return;
-        end
+        end ]]
     else
         MRT_Debug("This instance is not on the tracking list.");
     end
@@ -2001,7 +2008,13 @@ function MRT_CreateNewRaid(zoneName, raidSize, diffID)
     assert(zoneName, "Invalid argument: zoneName is nil.")
     assert(raidSize, "Invalid argument: raidSize is nil.")
     assert(diffID, "Invalid argument: diffID is nil.")
-    if (MRT_NumOfCurrentRaid) then MRT_EndActiveRaid(); end
+    --don't create new raid if one exists
+    --oldcode: if (MRT_NumOfCurrentRaid) then MRT_EndActiveRaid(); end
+    if (MRT_NumOfCurrentRaid) then 
+        MRT_Debug("MRT_CreateNewRaid: Trying to create a new raid when one is already running.");
+        assert(diffID, "Active raid, please end current raid to create a new one.")
+        return;
+    end
     local numRaidMembers = MRT_GetNumRaidMembers();
     local realm = GetRealmName();
     if (numRaidMembers == 0) then return; end
@@ -2174,6 +2187,7 @@ end
 function MRT_RaidRosterUpdate(frame)
     if (not MRT_NumOfCurrentRaid) then return; end
     if (not MRT_IsInRaid()) then
+        MRT_Debug("MRT_RaidRosterUpdate: Not in Raid ending active raid");
         MRT_EndActiveRaid();
         return;
     end
