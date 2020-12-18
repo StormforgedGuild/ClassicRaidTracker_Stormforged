@@ -1039,11 +1039,11 @@ function getGP(itemName, new)
     --MRT_Debug("getGP: get old way"); 
     return SF_ITEM_DATA[itemName]
   else
-    MRT_Debug("getGP: get new way"); 
+    --MRT_Debug("getGP: get new way"); 
     --use the new way
     for i = 1, table.maxn(SF_FULL_ITEM_DATA) do
       local sitemName = SF_FULL_ITEM_DATA[i]["Item"]
-      MRT_Debug("getGP: sitemName: " ..sitemName); 
+      --MRT_Debug("getGP: sitemName: " ..sitemName); 
       if sitemName == itemName then
         return SF_FULL_ITEM_DATA[i]["GP"]
       end
