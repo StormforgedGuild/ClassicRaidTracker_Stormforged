@@ -3376,7 +3376,7 @@ function getModifiedPR(raidnum, PlayerName)
         end
         intpEP = tonumber(pEP);
     --  MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
-        intpGP = tonumber(pGP) + 5000;
+        intpGP = tonumber(pGP) + 7000;
         --MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
         for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
             if v["Looter"] == PlayerName then
