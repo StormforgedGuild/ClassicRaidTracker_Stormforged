@@ -331,8 +331,8 @@ function MRT_GUI_ParseValues()
     MRT_GUIFrame_BossLoot_RaidWin_Button:SetScript("OnLeave", function(self) MRT_GUI_HideTT(); end); 
     MRT_GUIFrame_BossLoot_Trade_Button:SetText("Trade");
     MRT_GUIFrame_BossLoot_Trade_Button:SetPoint("LEFT", MRT_GUIFrame_BossLoot_RaidWin_Button, "RIGHT", 0, 0);
-    MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);
-
+    --set to false was default.
+    --MRT_GUIFrame_BossLoot_Trade_Button:SetEnabled(false);        
     MRT_GUI_BossLootTable = ScrollingTable:CreateST(MRT_BossLootTableColDef, 12, 32, nil, MRT_GUIFrame);           -- ItemId should be squared - so use 30x30 -> 30 pixels high
     MRT_GUI_BossLootTable.head:SetHeight(15);                                                                     -- Manually correct the height of the header (standard is rowHight - 30 pix would be different from others tables around and looks ugly)
     MRT_GUI_BossLootTable.frame:SetPoint("TOPLEFT", MRT_GUIFrame_BossLoot_Filter, "BOTTOMLEFT", -5, -20);
@@ -2297,10 +2297,44 @@ function MRT_GetTradeableItems()
 end
 
 function MRT_GUI_TradeLink()
+    --if trade showing do regular, else follow and open trade.
+    local tradePartnerName = UnitName("NPC");
+    if not tradePartnerName then 
+        local PName = cleanString(GetLootPlayer(),true)
+        if (PName ~= -1) then
+           doFollowTrade(PName)
+        else
+            MRT_Print(MRT_L.GUI["No loot selected"]);
+            return -1;
+        end
+    else 
+        MRT_GUI_TradeItems();
+        MRT_GUI_TradeItems();
+    end
+    
+end
 
-    MRT_GUI_TradeItems();
-    MRT_GUI_TradeItems();
+function doFollowTrade(playerName)
+    MRT_Debug("doFollowTrade: playerName: "..playerName)
+    FollowUnit(playerName);
+    InitiateTrade(playerName);
+end
+--use this function to get player to trade with
 
+function GetLootPlayer()
+    local raid_select = MRT_GUI_RaidLogTable:GetSelection();
+    if (raid_select == nil) then
+        MRT_Print(MRT_L.GUI["No raid selected"]);
+        return -1;
+    end
+    local loot_select = MRT_GUI_BossLootTable:GetSelection();
+    if (loot_select == nil) then
+        MRT_Print(MRT_L.GUI["No loot selected"]);
+        return -1;
+    end
+    local playerName = MRT_GUI_BossLootTable:GetCell(loot_select, 4);
+    MRT_Debug("GetLootPlayer: playerName: " ..playerName)
+    return playerName
 end
 
 --puts all items the person with the trade window is supposed to receive in their trade window.
