@@ -12,7 +12,7 @@
 			<OnArrowPressed function="EditBoxAutoComplete_OnArrowPressed"/>
 		</Scripts>
 	</EditBox>
-	<Button name="EditBoxAutoCompleteButtonTemplate" virtual="true" inherits"BackdropTemplate">
+	<Button name="EditBoxAutoCompleteButtonTemplate" virtual="true" inherits="BackdropTemplate">
 		<Size>
 			<AbsDimension x="120" y="14"/>
 		</Size>
@@ -29,7 +29,7 @@
 		<HighlightTexture inherits="UIPanelButtonHighlightTexture"/>
 	</Button>
 	<!-- <Frame name="EditBoxAutoCompleteBox" parent="UIParent" hidden="true" frameStrata="HIGH" frameLevel="5" toplevel="true"> -->
-	<Frame name="EditBoxAutoCompleteBox" parent="UIParent" hidden="true" inherits"BackdropTemplate">
+	<Frame name="EditBoxAutoCompleteBox" parent="UIParent" hidden="true" inherits="BackdropTemplate">
 		<Size>
 			<AbsDimension x="5" y="5"/>
 		</Size>
