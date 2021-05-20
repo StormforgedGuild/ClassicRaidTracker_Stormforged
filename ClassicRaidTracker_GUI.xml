@@ -480,12 +480,11 @@
     <Anchors>
       <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent"/>
     </Anchors>
-<!--     <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
       <BackgroundInsets left="11" right="12" top="12" bottom="11"/>
       <TileSize val="32"/>
       <EdgeSize val="32"/>
-    </Backdrop>
- -->    
+    </Backdrop>    
     <Layers>
       <Layer level="ARTWORK">
         <Texture name="$parent_HeaderTexture" file="Interface\DialogFrame\UI-DialogBox-Header">

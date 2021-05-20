@@ -455,6 +455,19 @@ function MRT_GUI_ParseValues()
     MRT_GUI_FourRowDialog_CB1:SetHitRectInsets(0, 0, 0, 0)
     MRT_GUI_FourRowDialog_CBTraded:SetHitRectInsets(0, 0, 0, 0)
     MRT_GUI_FourRowDialog_CBTraded:Disable();
+    MRT_GUIFrame:SetBackdrop({
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        tileSize=32,
+        edgeSize=24,
+        tile=true,
+        insets={
+            top=6,
+            bottom=6,
+            right=6,
+            left=6,
+        },
+    })
 
 end
 
