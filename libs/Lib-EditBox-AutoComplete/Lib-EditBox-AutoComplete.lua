@@ -179,13 +179,15 @@ end
 
 function EditBoxAutoComplete_HideIfAttachedTo(parent)
 	local self = EditBoxAutoCompleteBox;
-	if ( self.parent == parent ) then
-		if( self.parentArrows ) then
-			parent:SetAltArrowKeyMode(self.parentArrows);
-			self.parentArrows = nil;
+	if (self) then 
+		if ( self.parent == parent ) then
+			if( self.parentArrows ) then
+				parent:SetAltArrowKeyMode(self.parentArrows);
+				self.parentArrows = nil;
+			end
+			self.parent = nil;
+			self:Hide();
 		end
-		self.parent = nil;
-		self:Hide();
 	end
 end
 

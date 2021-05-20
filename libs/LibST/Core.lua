@@ -116,7 +116,7 @@ do
 		for i = 1, num do
 			local row = self.rows[i];
 			if not row then
-				row = CreateFrame("Button", self.frame:GetName().."Row"..i, self.frame);
+				row = CreateFrame("Button", self.frame:GetName().."Row"..i, self.frame, "BackdropTemplate");
 				row:SetFrameStrata("MEDIUM");
 				row:SetFrameLevel(2);
 				self.rows[i] = row;
@@ -136,7 +136,7 @@ do
 			for j = 1, #self.cols do
 				local col = row.cols[j];
 				if not col then
-					col = CreateFrame("Button", row:GetName().."col"..j, row);
+					col = CreateFrame("Button", row:GetName().."col"..j, row, "BackdropTemplate");
 					-- old code col.text = row:CreateFontString(col:GetName().."text", "OVERLAY", "GameFontHighlightSmall");
 					col.text = row:CreateFontString(col:GetName().."text", "BORDER", "GameFontHighlightSmall");
 					--col:SetFrameStrata("MEDIUM");
@@ -196,7 +196,7 @@ do
 
 		local row = self.head
 		if not row then
-			row = CreateFrame("Frame", self.frame:GetName().."Head", self.frame);
+			row = CreateFrame("Frame", self.frame:GetName().."Head", self.frame, "BackdropTemplate");
 			row:SetFrameStrata("MEDIUM");
 			row:SetFrameLevel(1);
 			row:SetPoint("BOTTOMLEFT", self.frame, "TOPLEFT", 4, 0);
@@ -792,7 +792,7 @@ do
 	function ScrollingTable:CreateST(cols, numRows, rowHeight, highlight, parent)
 		local st = {};
 		self.framecount = self.framecount or 1;
-		local f = CreateFrame("Frame", "ScrollTable" .. self.framecount, parent or UIParent);
+		local f = CreateFrame("Frame", "ScrollTable" .. self.framecount, parent or UIParent, "BackdropTemplate");
 		--f:SetFrameStrata("MEDIUM");
 		self.framecount = self.framecount + 1;
 		st.showing = true;

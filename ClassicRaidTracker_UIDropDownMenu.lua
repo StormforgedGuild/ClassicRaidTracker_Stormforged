@@ -20,7 +20,7 @@ MRT_LIB_UIDROPDOWNMENU_DEFAULT_TEXT_HEIGHT = nil;
 -- List of open menus
 MRT_LIB_OPEN_DROPDOWNMENUS = {}; --used by UnitPopup only
 
-local MRT_Lib_UIDropDownMenuDelegate = CreateFrame("FRAME");
+local MRT_Lib_UIDropDownMenuDelegate = CreateFrame("FRAME", _, _, "BackdropTemplate");
 for i = 1, MRT_LIB_UIDROPDOWNMENU_MAXLEVELS do
 	local listFrameName = "MRT_Lib_DropDownList"..i;
 	local f = CreateFrame("Button", listFrameName, nil, "MRT_Lib_UIDropDownListTemplate");
