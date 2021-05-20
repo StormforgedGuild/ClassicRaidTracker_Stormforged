@@ -36,10 +36,24 @@ local textBuffer= {};
 local pasted; 
 local MRT_Import = false;
 
+
 ------------------------------
 --  export frame functions  --
 ------------------------------
 function MRT_ExportFrame_Show(export,import)
+    MRT_ExportFrame:SetBackdrop({
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        tileSize=32,
+        edgeSize=24,
+        tile=true,
+        insets={
+            top=6,
+            bottom=6,
+            right=6,
+            left=6,
+        },
+    })
     if not import then
         MRT_Import = false;
         MRT_ExportFrame_Title:SetText("Export");

@@ -468,6 +468,58 @@ function MRT_GUI_ParseValues()
             left=6,
         },
     })
+    MRT_GUI_OneRowDialog:SetBackdrop({
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        tileSize=32,
+        edgeSize=24,
+        tile=true,
+        insets={
+            top=6,
+            bottom=6,
+            right=6,
+            left=6,
+        },
+    })
+    MRT_GUI_TwoRowDialog:SetBackdrop({
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        tileSize=32,
+        edgeSize=24,
+        tile=true,
+        insets={
+            top=6,
+            bottom=6,
+            right=6,
+            left=6,
+        },
+    })
+    MRT_GUI_ThreeRowDialog:SetBackdrop({
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        tileSize=32,
+        edgeSize=24,
+        tile=true,
+        insets={
+            top=6,
+            bottom=6,
+            right=6,
+            left=6,
+        },
+    })
+    MRT_GUI_FourRowDialog:SetBackdrop({
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        tileSize=32,
+        edgeSize=24,
+        tile=true,
+        insets={
+            top=6,
+            bottom=6,
+            right=6,
+            left=6,
+        },
+    })
 
 end
 

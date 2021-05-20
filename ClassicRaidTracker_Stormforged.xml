@@ -194,7 +194,7 @@
       <OnDragStop>self:StopMovingOrSizing();</OnDragStop>
     </Scripts>
   </Frame>
-  <Frame name="MRT_ExportFrame" toplevel="true" frameStrata="DIALOG" movable="true" hidden="true" enableKeyboard="true" enableMouse="true" parent="UIParent">
+  <Frame name="MRT_ExportFrame" toplevel="true" frameStrata="DIALOG" movable="true" hidden="true" enableKeyboard="true" enableMouse="true" parent="UIParent" inherits="BackdropTemplate">
     <Size x="450" y="348"/>
     <Anchors>
       <Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parent"/>
