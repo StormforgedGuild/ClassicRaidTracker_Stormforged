@@ -6,7 +6,7 @@
 ## LoadOnDemand: 0
 ## DefaultState: enabled
 ## SavedVariables: MRT_Options, MRT_RaidLog, MRT_PlayerDB, MRT_NumOfCurrentRaid, MRT_NumOfLastBoss, MRT_SFExport, MRT_LastPRImport
-## X-Max-Interface: 11305
+## X-Max-Interface: 20501
 ## X-Min-Interface: 11305
 ## X-Curse-Project-ID: 399582
 
