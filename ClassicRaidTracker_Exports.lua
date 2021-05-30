@@ -42,8 +42,8 @@ local MRT_Import = false;
 ------------------------------
 function MRT_ExportFrame_Show(export,import)
     MRT_ExportFrame:SetBackdrop({
-        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
-        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
         tileSize=32,
         edgeSize=24,
         tile=true,
