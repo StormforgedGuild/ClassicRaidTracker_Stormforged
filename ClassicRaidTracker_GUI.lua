@@ -456,8 +456,8 @@ function MRT_GUI_ParseValues()
     MRT_GUI_FourRowDialog_CBTraded:SetHitRectInsets(0, 0, 0, 0)
     MRT_GUI_FourRowDialog_CBTraded:Disable();
     MRT_GUIFrame:SetBackdrop({
-        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
-        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
         tileSize=32,
         edgeSize=24,
         tile=true,
@@ -469,8 +469,8 @@ function MRT_GUI_ParseValues()
         },
     })
     MRT_GUI_OneRowDialog:SetBackdrop({
-        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
-        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
         tileSize=32,
         edgeSize=24,
         tile=true,
@@ -482,8 +482,8 @@ function MRT_GUI_ParseValues()
         },
     })
     MRT_GUI_TwoRowDialog:SetBackdrop({
-        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
-        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
         tileSize=32,
         edgeSize=24,
         tile=true,
@@ -495,8 +495,8 @@ function MRT_GUI_ParseValues()
         },
     })
     MRT_GUI_ThreeRowDialog:SetBackdrop({
-        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
-        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
         tileSize=32,
         edgeSize=24,
         tile=true,
@@ -508,8 +508,8 @@ function MRT_GUI_ParseValues()
         },
     })
     MRT_GUI_FourRowDialog:SetBackdrop({
-        bgFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Background",
-        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+        bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile="Interface\\DialogFrame\\UI-DialogBox-Border",
         tileSize=32,
         edgeSize=24,
         tile=true,

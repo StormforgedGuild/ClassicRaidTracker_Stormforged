@@ -180,6 +180,14 @@ MRT_LegacyRaidZonesClassic = {
     [531] = true,       -- Temple of Ahn'Qiraj
     [249] = true,       -- Onyxia's Lair
     [533] = true,       -- Naxxramas
+    [532] = true,       -- Karazhan
+    [565] = true,       -- Gruul's Lair
+    [544] = true,       -- Magtheridon's Lair
+    [548] = true,       -- Serpentshrine Cavern
+    [550] = true,       -- Tempest Keep
+    [534] = true,       -- Hyjal Summit
+    [564] = true,       -- Black Temple
+    [580] = true,       -- Sunwell Plateau
 }
 MRT_LegacyRaidShortName = {
     [34] = "Stocks",    -- Stockades
@@ -190,6 +198,8 @@ MRT_LegacyRaidShortName = {
     [531] = "AQ40",     -- Temple of Ahn'Qiraj
     [249] = "Ony",      -- Onyxia's Lair
     [533] = "Naxx",     -- Naxxramas
+    [565] = "Gruul",    -- Gruul's Lair
+    [544] = "Mag",      -- Magtheridon's Lair
 }
 
 
