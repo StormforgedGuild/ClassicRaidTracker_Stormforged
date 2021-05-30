@@ -1117,6 +1117,21 @@ local SF_TOKEN_DATA = {
   ["Desecrated Wristguards"] = {22443, 22495, 22424},
   ["Desecrated Bracers"] = {22483, 22423},
   ["The Phylactery of Kel'Thuzad"] = {23206, 23207},
+  ["Pauldrons of the Fallen Defender"] = {29054, 29060, 29016, 29023, 29100, 29089, 29095},
+  ["Pauldrons of the Fallen Hero"] = {28967, 29084, 29079},
+  ["Pauldrons of the Fallen Champion"] = {29070, 29075, 29064, 29037, 29031, 29043, 29047},
+  ["Chestguard of the Fallen Defender"] = {29050, 29056, 29012, 29019, 29096, 29087, 29091},
+  ["Chestguard of the Fallen Hero"] = {28964, 29082, 29077},
+  ["Chestguard of the Fallen Champion"] = {29066, 29071, 29062, 29033, 29029, 29038, 29045},
+  ["Gloves of the Fallen Defender"] = {29055, 29057, 29017, 29020, 29097, 29090, 29092},
+  ["Gloves of the Fallen Hero"] = {28968, 29085, 29080},
+  ["Gloves of the Fallen Champion"] = {29067, 29072, 29065, 29034, 29032, 29039, 29048},
+  ["Helm of the Fallen Defender"] = {29049, 29058, 29011, 29021, 29098, 29086, 29093},
+  ["Helm of the Fallen Hero"] = {28963, 29081, 29076},
+  ["Helm of the Fallen Champion"] = {29068, 29073, 29061, 29035, 29028, 29040, 29044},
+  ["Leggings of the Fallen Defender"] = {29053, 29059, 29015, 29022, 29099, 29088, 29094},
+  ["Leggings of the Fallen Hero"] = {28966, 29083, 29078},
+  ["Leggings of the Fallen Champion"] = {29069, 29074, 29063, 29036, 29030, 29042, 29046},
 }
 
 -- this function is used to cache 
