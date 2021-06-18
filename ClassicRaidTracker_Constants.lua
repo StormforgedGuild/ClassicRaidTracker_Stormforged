@@ -200,6 +200,7 @@ MRT_LegacyRaidShortName = {
     [533] = "Naxx",     -- Naxxramas
     [565] = "Gruul",    -- Gruul's Lair
     [544] = "Mag",      -- Magtheridon's Lair
+    [532] = "Kara",     -- Karazhan
 }
 
 
