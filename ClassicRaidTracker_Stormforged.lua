@@ -2367,10 +2367,11 @@ function getSFEPGP(PlayerName)
     return getSFData(PlayerName);
 end
 function getSFData(PlayerName)
+    MRT_Debug("getSFData: Called!: " ..PlayerName);
     if not MRT_SFExport["info"] then
         return "0.00";
     else
-        --MRT_Debug("getSFEPGP: about to start loop");        
+        MRT_Debug("getSFEPGP: about to start loop");        
         local playerCount = MRT_SFExport["info"]["total_players"];
         for key, value in pairs(MRT_SFExport["players"]) do
             --MRT_Debug("getSFEPGP: in for loop");
@@ -2378,14 +2379,28 @@ function getSFData(PlayerName)
             --MRT_Debug("getSFEPGP: PlayerName = "..PlayerName);
             --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
             --MRT_Debug("getSFEPGP: value[main_name]: "..value["main_name"]);  
-            if strcomp(value["name"],PlayerName) then
+            if strcomp(value["name"],PlayerName.."-Earthfury") then
                 --MRT_Debug("getSFEPGP: Found player"); 
                 --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
                 for k, v in pairs(value["points"]) do
-                    return (v["points_current"]), (v["points_earned"]), (v["points_spent"]); --don't forget actual points spent is points_spent + 2000
+                    MRT_Debug("getSFEPGP: v[points_current]: "..v["points_current"]);
+                    if v["multidkp_id"]  == "2" then 
+                        return (v["points_current"]), (v["points_earned"]), (v["points_spent"]); --don't forget actual points spent is points_spent + 2000
+                    end 
+                end
+            end
+            if strcomp(value["name"],PlayerName.."-Kirtonos") then
+                --MRT_Debug("getSFEPGP: Found player"); 
+                --MRT_Debug("getSFEPGP: value[name]: "..value["name"]);        
+                for k, v in pairs(value["points"]) do
+                    MRT_Debug("getSFEPGP: v[points_current]: "..v["points_current"]);
+                    if v["multidkp_id"]  == "2" then 
+                        return (v["points_current"]), (v["points_earned"]), (v["points_spent"]); --don't forget actual points spent is points_spent + 2000
+                    end 
                 end
             end
         end
+        --MRT_Debug("getSFEPGP: didn't find name returning zeros");  
         return "0.00", "0.00", "0.00";
     end
 end
