@@ -552,8 +552,8 @@ local SF_FULL_ITEM_DATA =
   [516]={["Item"]="Staff Head of Atiesh",["GP"]=0,["MS_Only"]=nil,["Bid_Priority"]="Loot Council - SEE LC EXCEPTIONS"},
   [517]={["Item"]="Ring of the Dreamwalker",["GP"]=4000,["MS_Only"]=nil,["Bid_Priority"]="Druid"},
   [518]={["Item"]="Pit Lord's Satchel",["GP"]=0,["MS_Only"]=nil,["Bid_Priority"]="Free Roll"},
-  [519]={["Item"]="Chestguard of the Fallen Defender",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Tank Prio - Druid / Priest / Warrior"},
-  [520]={["Item"]="Chestguard of the Fallen Champion",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Tank Prio - Paladin / Rogue / Shaman"},
+  [519]={["Item"]="Chestguard of the Fallen Defender",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Tank List Prio - Druid / Priest / Warrior"},
+  [520]={["Item"]="Chestguard of the Fallen Champion",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Tank List Prio - Paladin / Rogue / Shaman"},
   [521]={["Item"]="Chestguard of the Fallen Hero",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Hunter / Mage / Warlock"},
   [522]={["Item"]="Magtheridon's Head",["GP"]=3000,["MS_Only"]=nil,["Bid_Priority"]="All"},
   [523]={["Item"]="Crystalheart Pulse Staff",["GP"]=3000,["MS_Only"]=nil,["Bid_Priority"]="Healer"},
@@ -574,8 +574,8 @@ local SF_FULL_ITEM_DATA =
   [538]={["Item"]="Belt of Divine Inspiration",["GP"]=500,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [539]={["Item"]="Hammer of the Naaru",["GP"]=3000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [540]={["Item"]="Maulgar's Warhelm",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
-  [541]={["Item"]="Pauldrons of the Fallen Defender",["GP"]=500,["MS_Only"]=nil,["Bid_Priority"]="Tank Prio - Druid / Priest / Warrior"},
-  [542]={["Item"]="Pauldrons of the Fallen Champion",["GP"]=500,["MS_Only"]=nil,["Bid_Priority"]="Tank Prio - Paladin / Rogue / Shaman"},
+  [541]={["Item"]="Pauldrons of the Fallen Defender",["GP"]=500,["MS_Only"]=nil,["Bid_Priority"]="Tank List Prio - Druid / Priest / Warrior"},
+  [542]={["Item"]="Pauldrons of the Fallen Champion",["GP"]=500,["MS_Only"]=nil,["Bid_Priority"]="Tank List Prio - Paladin / Rogue / Shaman"},
   [543]={["Item"]="Pauldrons of the Fallen Hero",["GP"]=500,["MS_Only"]=nil,["Bid_Priority"]="Hunter / Mage / Warlock"},
   [544]={["Item"]="Bloodmaw Magus-Blade",["GP"]=3000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS / Prot Pali"},
   [545]={["Item"]="Axe of the Gronn Lords",["GP"]=1000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
@@ -590,8 +590,8 @@ local SF_FULL_ITEM_DATA =
   [554]={["Item"]="Gauntlets of the Dragonslayer",["GP"]=1500,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS  "},
   [555]={["Item"]="Gronn-Stitched Girdle",["GP"]=2000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS  "},
   [556]={["Item"]="Dragonspine Trophy",["GP"]=9000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
-  [557]={["Item"]="Leggings of the Fallen Defender",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Tank Prio - Druid / Priest / Warrior"},
-  [558]={["Item"]="Leggings of the Fallen Champion",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Tank Prio - Paladin / Rogue / Shaman"},
+  [557]={["Item"]="Leggings of the Fallen Defender",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Tank List Prio - Druid / Priest / Warrior"},
+  [558]={["Item"]="Leggings of the Fallen Champion",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Tank List Prio - Paladin / Rogue / Shaman"},
   [559]={["Item"]="Leggings of the Fallen Hero",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Hunter / Mage / Warlock"}
 }
 
