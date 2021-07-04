@@ -1,7 +1,7 @@
 --[[-----------------------------------------------------------------------------
 EditBox Widget
 -------------------------------------------------------------------------------]]
-local Type, Version = "EditBox", 27
+local Type, Version = "EditBox", 28
 local AceGUI = LibStub and LibStub("AceGUI-3.0", true)
 if not AceGUI or (AceGUI:GetWidgetVersion(Type) or 0) >= Version then return end
 
@@ -81,23 +81,21 @@ end
 local function EditBox_OnReceiveDrag(frame)
 	local self = frame.obj
 	local type, id, info = GetCursorInfo()
+	local name
 	if type == "item" then
-		self:SetText(info)
-		self:Fire("OnEnterPressed", info)
-		ClearCursor()
+		name = info
 	elseif type == "spell" then
-		local name = GetSpellInfo(id, info)
-		self:SetText(name)
-		self:Fire("OnEnterPressed", name)
-		ClearCursor()
+		name = GetSpellInfo(id, info)
 	elseif type == "macro" then
-		local name = GetMacroInfo(id)
+		name = GetMacroInfo(id)
+	end
+	if name then
 		self:SetText(name)
 		self:Fire("OnEnterPressed", name)
 		ClearCursor()
+		HideButton(self)
+		AceGUI:ClearFocus()
 	end
-	HideButton(self)
-	AceGUI:ClearFocus()
 end
 
 local function EditBox_OnTextChanged(frame)
@@ -191,7 +189,6 @@ local methods = {
 	end,
 
 	["ClearFocus"] = function(self)
-		MRT_Debug("AG:EB:ClearFocus called!");
 		self.editbox:ClearFocus()
 		self.frame:SetScript("OnShow", nil)
 	end,
@@ -214,10 +211,6 @@ Constructor
 local function Constructor()
 	local num  = AceGUI:GetNextWidgetNum(Type)
 	local frame = CreateFrame("Frame", nil, UIParent)
-	--[[ frame:SetFrameStrata("HIGH")
-	frame:setFrameLevel(5)
-	frame:setTopLevel(true)
- ]]
 	frame:Hide()
 
 	local editbox = CreateFrame("EditBox", "AceGUI-3.0EditBox"..num, frame, "InputBoxTemplate")
@@ -236,19 +229,12 @@ local function Constructor()
 	editbox:SetPoint("BOTTOMLEFT", 6, 0)
 	editbox:SetPoint("BOTTOMRIGHT")
 	editbox:SetHeight(19)
-	--[[ editbox:SetFrameStrata("HIGH")
-	editbox:setFrameLevel(5)
-	editbox:setTopLevel(true)
- ]]
+
 	local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	label:SetPoint("TOPLEFT", 0, -2)
 	label:SetPoint("TOPRIGHT", 0, -2)
 	label:SetJustifyH("LEFT")
 	label:SetHeight(18)
---[[ 	label:SetFrameStrata("HIGH")
-	label:setFrameLevel(5)
-	label:setTopLevel(true)
- ]]
 
 	local button = CreateFrame("Button", nil, editbox, "UIPanelButtonTemplate")
 	button:SetWidth(40)
@@ -256,10 +242,6 @@ local function Constructor()
 	button:SetPoint("RIGHT", -2, 0)
 	button:SetText(OKAY)
 	button:SetScript("OnClick", Button_OnClick)
---[[ 	button:SetFrameStrata("HIGH")
-	button:setFrameLevel(5)
-	button:setTopLevel(true)
- ]]
 	button:Hide()
 
 	local widget = {
