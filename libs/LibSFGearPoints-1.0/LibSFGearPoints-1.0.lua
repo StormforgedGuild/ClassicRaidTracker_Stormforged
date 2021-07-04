@@ -570,7 +570,7 @@ local SF_FULL_ITEM_DATA =
   [534]={["Item"]="Glave of the Pit",["GP"]=1000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [535]={["Item"]="Bladespire Warbands",["GP"]=1000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [536]={["Item"]="Malefic Mask of the Shadows",["GP"]=2500,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
-  [537]={["Item"]="Brute Cloak of the Ogre Magi",["GP"]=1000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
+  [537]={["Item"]="Brute Cloak of the Ogre-Magi",["GP"]=1000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [538]={["Item"]="Belt of Divine Inspiration",["GP"]=500,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [539]={["Item"]="Hammer of the Naaru",["GP"]=3000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [540]={["Item"]="Maulgar's Warhelm",["GP"]=625,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
