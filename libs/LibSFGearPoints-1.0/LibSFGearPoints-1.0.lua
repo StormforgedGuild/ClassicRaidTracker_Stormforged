@@ -566,7 +566,7 @@ local SF_FULL_ITEM_DATA =
   [530]={["Item"]="Eredar Wand of Obliteration",["GP"]=1000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [531]={["Item"]="Terror Pit Girdle",["GP"]=250,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [532]={["Item"]="Thundering Greathelm",["GP"]=1250,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
-  [533]={["Item"]="Eye of Magtheridon",["GP"]=3000,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
+  [533]={["Item"]="Eye of Magtheridon",["GP"]=2500,["MS_Only"]=nil,["Bid_Priority"]="Caster DPS"},
   [534]={["Item"]="Glave of the Pit",["GP"]=1000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [535]={["Item"]="Bladespire Warbands",["GP"]=1000,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
   [536]={["Item"]="Malefic Mask of the Shadows",["GP"]=2500,["MS_Only"]=nil,["Bid_Priority"]="Physical DPS"},
