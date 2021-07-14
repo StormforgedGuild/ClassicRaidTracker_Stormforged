@@ -1174,6 +1174,7 @@ local SF_TOKEN_DATA = {
   ["Leggings of the Fallen Defender"] = {29053, 29059, 29015, 29022, 29099, 29088, 29094},
   ["Leggings of the Fallen Hero"] = {28966, 29083, 29078},
   ["Leggings of the Fallen Champion"] = {29069, 29074, 29063, 29036, 29030, 29042, 29046},
+  ["Magtheridon's Head"] = {28792, 28793, 28790, 28791},
 }
 
 -- this function is used to cache 
