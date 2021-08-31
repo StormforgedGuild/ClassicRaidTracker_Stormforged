@@ -201,6 +201,9 @@ MRT_LegacyRaidShortName = {
     [565] = "Gruul",    -- Gruul's Lair
     [544] = "Mag",      -- Magtheridon's Lair
     [532] = "Kara",     -- Karazhan
+    [548] = "SSC",       -- Serpentshrine Cavern
+    [550] = "TK",       -- Tempest Keep
+    
 }
 
 
