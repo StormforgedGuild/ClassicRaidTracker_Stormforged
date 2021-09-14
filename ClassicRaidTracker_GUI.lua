@@ -26,7 +26,7 @@
 -- Check for addon table
 if (not ClassicRaidTracker) then ClassicRaidTracker = {}; end
 local mrt = ClassicRaidTracker
-
+MRT_GLOBAL_CONST_BASEGP = 5000 -- TBC Phase 2 base GP is 5000
 --------------
 --  Locals  --
 --------------
@@ -3475,7 +3475,8 @@ function getModifiedPR(raidnum, PlayerName)
         end
         intpEP = tonumber(pEP);
     --  MRT_Debug("getModifiedPR: pPR: " .. pPR .. " pEP: " ..pEP.. " pGP: " .. pGP);
-        intpGP = tonumber(pGP) + 7000;
+        --intpGP = tonumber(pGP) + 5000; --TBC Phase2 GP Base is 5000 
+        intpGP = tonumber(pGP) + MRT_GLOBAL_CONST_BASEGP;
         --MRT_Debug("getModifiedPR:intpGP = " ..tostring(intpGP));
         for i, v in pairs(MRT_RaidLog[raidnum]["Loot"]) do
             if v["Looter"] == PlayerName then

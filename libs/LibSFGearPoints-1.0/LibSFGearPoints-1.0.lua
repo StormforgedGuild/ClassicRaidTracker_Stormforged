@@ -1211,7 +1211,7 @@ function lib:GetValue(item)
   if not rarity or rarity < quality_threshold then
       
       --SF this is mostly for testing purposes
-      MRT_Debug("GetValue: rarity too low"); 
+      --MRT_Debug("GetValue: rarity too low"); 
       low = SF_ITEM_DATA[itemName];
       return low, level, rarity, equipLoc
   end
@@ -1220,7 +1220,7 @@ function lib:GetValue(item)
 
   -- SF: Not really sure why this is needed.  keeping in just in case.
   if level < 463 then
-    MRT_Debug("GetValue: level < 463, is this needed?");
+    --MRT_Debug("GetValue: level < 463, is this needed?");
     --old code low = SF_ITEM_DATA[itemName];     
     low = getGP(itemName,true);     
     return low, level, rarity, equipLoc

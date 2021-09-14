@@ -2382,7 +2382,7 @@ function getSFData(PlayerName)
                 for k, v in pairs(value["points"]) do
                     MRT_Debug("getSFEPGP: v[points_current]: "..v["points_current"]);
                     if v["multidkp_id"]  == "2" then 
-                        return (v["points_current"]), (v["points_earned"]), (v["points_spent"]); --don't forget actual points spent is points_spent + 2000
+                        return (v["points_current"]), (v["points_earned"]), (v["points_spent"]); --don't forget actual points spent is points_spent + base GP (TBC Phase 2 is 5000)
                     end 
                 end
             end
