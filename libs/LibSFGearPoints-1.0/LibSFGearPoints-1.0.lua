@@ -652,7 +652,7 @@ local SF_FULL_ITEM_DATA =
   [616]={["Item"]="Mantle of the Tireless Tracker",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Physical DPS"},
   [617]={["Item"]="Razor-Scale Battlecloak",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Physical DPS"},
   [618]={["Item"]="Serpent-Coil Braid",["GP"]=1500,["MS_Only"]=0,["Bid_Priority"]="Mage"},
-  [619]={["Item"]="Banf of the Vigilant",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Healer"},
+  [619]={["Item"]="Band of the Vigilant",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Healer"},
   [620]={["Item"]="Mallet of the Tides",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Tank"},
   [621]={["Item"]="Bracers of Eradication",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Physical DPS"},
   [622]={["Item"]="Choker of Animalistic Fury",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Physical DPS"},
