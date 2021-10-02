@@ -665,7 +665,7 @@ local SF_FULL_ITEM_DATA =
   [629]={["Item"]="Tempest-Strider Boots",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Healer"},
   [630]={["Item"]="Velvet Boots of the Guardian",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Caster DPS"},
   [631]={["Item"]="Earring of Soulful Meditation",["GP"]=3000,["MS_Only"]=0,["Bid_Priority"]="Healer"},
-  [632]={["Item"]="Seal of Danzalar",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Caster DPS"},
+  [632]={["Item"]="The Seal of Danzalar",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Caster DPS"},
   [633]={["Item"]="Pendant of the Perilous",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Melee DPS"},
   [634]={["Item"]="Boots of Courage Unending",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Healer"},
   [635]={["Item"]="Wildfury Greatstaff",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Tank"},
