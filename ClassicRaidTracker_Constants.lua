@@ -748,7 +748,17 @@ MRT_IgnoredItemIDList = {
     [111245] = true,    -- Luminous Shard
     [115504] = true,    -- Fractured Temporal Crystal
     [113588] = true,    -- Temporal Crystal
-
+    
+    -- TBC TK Weapons
+    [30311] = true,     -- Warp Slicer
+    [30312] = true,     -- Infinity Blade
+    [30313] = true,     -- Staff of Disintegration
+    [30314] = true,     -- Phaseshift Bulwark
+    [30316] = true,     -- Devastation
+    [30317] = true,     -- Cosmic Infuser
+    [30318] = true,     -- Netherstrand Longbow
+    [30319] = true,     -- Nether Spike
+    
     -- Sigils of...
     [87208] = true,     -- Sigil of Power
     [87209] = true,     -- Sigil of Wisdom
