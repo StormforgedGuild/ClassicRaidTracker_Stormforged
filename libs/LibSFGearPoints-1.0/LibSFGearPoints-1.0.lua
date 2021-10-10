@@ -631,7 +631,7 @@ local SF_FULL_ITEM_DATA =
   [595]={["Item"]="Helm of the Vanquished Champion",["GP"]=2500,["MS_Only"]=0,["Bid_Priority"]="Tank > Paladin / Rogue / Shaman"},
   [596]={["Item"]="Helm of the Vanquished Defender",["GP"]=2500,["MS_Only"]=0,["Bid_Priority"]="Tank > Druid / Priest / Warrior"},
   [597]={["Item"]="Helm of the Vanquished Hero",["GP"]=2500,["MS_Only"]=0,["Bid_Priority"]="Hunter / Mage / Warlock"},
-  [598]={["Item"]="Fang of the Leviathan",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Caster DPS / Tank"},
+  [598]={["Item"]="Fang of the Leviathan",["GP"]=4000,["MS_Only"]=0,["Bid_Priority"]="Caster DPS / Tank"},
   [599]={["Item"]="True-Aim Stalker Bands",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Physical DPS"},
   [600]={["Item"]="Orca-Hide Boots",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Healer"},
   [601]={["Item"]="Girdle of the Invulnerable",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Tank"},
