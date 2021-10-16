@@ -670,7 +670,7 @@ local SF_FULL_ITEM_DATA =
   [634]={["Item"]="Boots of Courage Unending",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Healer"},
   [635]={["Item"]="Wildfury Greatstaff",["GP"]=2000,["MS_Only"]=0,["Bid_Priority"]="Tank"},
   [636]={["Item"]="Serpentshrine Shuriken",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Melee DPS"},
-  [637]={["Item"]="Pattern: Belt of Deep Shadow",["GP"]=1000,["MS_Only"]=0,["Bid_Priority"]="Guild Crafter"},
+  [637]={["Item"]="Pattern: Belt of Deep Shadow",["GP"]=0,["MS_Only"]=0,["Bid_Priority"]="Guild Crafter"},
   [638]={["Item"]="Pattern: Belt of Natural Power",["GP"]=0,["MS_Only"]=0,["Bid_Priority"]="Guild Crafter"},
   [639]={["Item"]="Pattern: Belt of the Long Road",["GP"]=0,["MS_Only"]=0,["Bid_Priority"]="Guild Crafter"},
   [640]={["Item"]="Pattern: Belt of Blasting",["GP"]=0,["MS_Only"]=0,["Bid_Priority"]="Guild Crafter"},
